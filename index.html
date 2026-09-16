@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kajal &amp; Adarsh — Mexico City, February 2027</title>
+<meta name="description" content="Kajal &amp; Adarsh are getting married in Mexico City, 19–21 February 2027.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jaini&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#FFF5F3;   /* coral 50 — the paper the ink sits on */
+  --coral-500:#E76958;   /* the name — matches the Paper frame */
+  --coral-600:#CE4E3E;   /* headings (large text, 3.32:1) */
+  --coral-700:#AC3C30;   /* body (4.61:1, AA) */
+  --coral-800:#8D332A;   /* nothing uses this yet — here if you want more weight */
+  --indigo-400:#898DDA;
+  --indigo-500:#5A5FBF;  /* rail, inactive */
+  --indigo-600:#484CA7;  /* rail, current section (5.54:1) */
+  --head:'Jaini','EB Garamond',Georgia,serif;
+  --body:'EB Garamond',Georgia,'Times New Roman',serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+
+/* ---------- risograph texture ----------
+   Turbulence is thresholded into HARD grain (feFuncA discrete) and flooded
+   with coral ink, so the paper is built out of ink stipple rather than washed
+   with grey noise. Dense coverage, small tonal step between paper and ink —
+   that combination is what reads as riso instead of as dust.
+     body::before — ~50% coverage, 1px grain (the field itself)
+     body::after  — ~25% coverage, coarser and a step darker (mottling)
+   Both sit behind the text, so the type stays crisp.                        */
+
+html{
+  background-color:var(--ground);
+}
+
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+}
+
+/* dense stipple — ~50% coverage at 1px grain, ink only one step off the paper.
+   Dense + low amplitude is what makes riso read as a grainy FIELD rather than
+   as flecks scattered on a clean sheet. */
+body::before{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='s' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='1' seed='11' stitchTiles='stitch' result='n'/%3E%3CfeColorMatrix in='n' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0' result='a'/%3E%3CfeComponentTransfer in='a' result='t'%3E%3CfeFuncA type='discrete' tableValues='0 1'/%3E%3C/feComponentTransfer%3E%3CfeFlood flood-color='%23FFCFC7' result='ink'/%3E%3CfeComposite in='ink' in2='t' operator='in'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+  background-size:240px 240px;
+  opacity:1;
+}
+
+/* second pass — coarser, darker stipple at lower density, so the field mottles
+   instead of sitting at one even tone */
+body::after{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='340'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' seed='4' stitchTiles='stitch' result='n'/%3E%3CfeColorMatrix in='n' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0' result='a'/%3E%3CfeComponentTransfer in='a' result='t'%3E%3CfeFuncA type='discrete' tableValues='0 0 0 1'/%3E%3C/feComponentTransfer%3E%3CfeFlood flood-color='%23FBAEA3' result='ink'/%3E%3CfeComposite in='ink' in2='t' operator='in'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
+  background-size:340px 340px;
+  opacity:.56;
+}
+
+/* texture is decoration — drop it when the viewer asks for more contrast */
+@media (prefers-contrast:more){
+  html{background-image:none;}
+  body::before,body::after{display:none;}
+}
+
+body{
+  margin:0 auto;
+  max-width:74rem;
+  padding:clamp(64px,12vw,170px) clamp(22px,7vw,88px) clamp(90px,16vw,200px);
+  background:transparent;
+  color:var(--coral-700);
+  font-family:var(--body);
+  font-size:19px;
+  line-height:33px;
+  text-align:center;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+h1,h2,h3{font-weight:400;margin:0;font-family:var(--head);letter-spacing:.01em;}
+p{margin:0 auto;max-width:68ch;}
+p + p{margin-top:19px;}
+
+h1{
+  font-size:clamp(54px,12vw,148px);
+  line-height:1.04;
+  color:var(--coral-500);
+  will-change:transform;
+}
+
+h1 + p{
+  font-size:clamp(23px,3.4vw,36px);
+  line-height:1.4;
+  margin-top:clamp(24px,3vw,38px);
+  max-width:21ch;
+  color:var(--coral-600);
+}
+
+h2{
+  font-size:clamp(31px,5vw,46px);
+  line-height:1.2;
+  margin-top:clamp(110px,17vw,210px);
+  margin-bottom:clamp(28px,3.6vw,48px);
+  color:var(--coral-600);
+  will-change:transform;
+}
+
+h3{
+  font-size:clamp(23px,3vw,31px);
+  line-height:1.3;
+  margin-top:clamp(52px,7vw,90px);
+  margin-bottom:14px;
+  color:var(--coral-600);
+}
+
+.meta{font-style:italic;}
+.when{font-style:italic;}
+.stamp{color:var(--coral-600);}
+
+/* links: plain text until hovered, then a hairline underline draws in */
+a{
+  color:inherit;
+  text-decoration:none;
+  background-image:linear-gradient(currentColor,currentColor);
+  background-repeat:no-repeat;
+  background-position:0 100%;
+  background-size:0% 1px;
+  transition:background-size .35s cubic-bezier(.2,.7,.3,1);
+  padding-bottom:1px;
+}
+a:hover,a:focus-visible{background-size:100% 1px;}
+a:focus-visible{outline:none;}
+@media (prefers-reduced-motion:reduce){a{transition:none;}}
+
+/* the two hero lines under the intro */
+.stamp{
+  margin-top:clamp(30px,4vw,52px);
+  font-family:var(--head);
+  font-size:clamp(19px,2.4vw,26px);
+  line-height:1.5;
+}
+
+/* left rail: section outline, rotated to read top-to-bottom */
+nav{
+  position:fixed;
+  left:clamp(18px,2.6vw,42px);
+  top:50%;
+  transform:translateY(-50%);
+  display:flex;
+  flex-direction:column;
+  gap:clamp(18px,2.4vw,34px);
+  z-index:10;
+}
+nav a{
+  font-family:var(--head);    /* Jaini */
+  font-size:15px;
+  line-height:1.2;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  text-align:left;
+  color:var(--indigo-500);
+  opacity:.34;                /* deliberately faint */
+  font-weight:400;
+  text-decoration:none;
+  background-image:none;      /* opt out of the body link underline */
+  padding:0;
+  transition:opacity .45s cubic-bezier(.2,.7,.3,1),
+             color .45s cubic-bezier(.2,.7,.3,1),
+             letter-spacing .45s cubic-bezier(.2,.7,.3,1);
+}
+nav a:hover,nav a:focus-visible{opacity:1;}
+nav a[aria-current="true"]{
+  color:var(--indigo-600);    /* 5.54:1 — a shade darker */
+  opacity:1;
+  letter-spacing:.2em;        /* Jaini has one weight, so presence comes from tracking */
+}
+@media (max-width:1180px){ nav{display:none;} }
+@media (prefers-reduced-motion:reduce){ nav a{transition:none;} }
+
+/* while the rail is on screen, keep the text column clear of it —
+   content stays centred in the viewport, just narrower on smaller screens */
+@media (min-width:1181px){
+  body{ max-width:min(74rem, calc(100vw - 26rem)); }
+}
+
+/* photographs — dropped into the column off-centre, alternating sides */
+picture{display:block;}
+picture img{
+  display:block;
+  width:clamp(190px,24vw,320px);
+  height:auto;
+}
+.snap-r img{margin-left:auto;  margin-right:clamp(0px,7vw,110px); transform:rotate(2.4deg);}
+.snap-l img{margin-right:auto; margin-left:clamp(0px,9vw,150px);  transform:rotate(-3.2deg);}
+.snap-c img{margin-inline:auto; margin-right:clamp(0px,3vw,40px); transform:rotate(-1.4deg);}
+picture{margin-block:clamp(52px,8vw,104px);}
+@media (max-width:700px){
+  .snap-r img,.snap-l img,.snap-c img{margin-inline:auto;}
+}
+
+.rv{opacity:0;transform:translateY(14px);transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1);}
+.rv.in{opacity:1;transform:none;}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none;}}
+</style>
+</head>
+<body>
+
+<nav>
+<a href="#weekend">The Weekend</a>
+<a href="#stay">Staying</a>
+<a href="#city">Make a Trip</a>
+<a href="#know">Good to Know</a>
+<a href="#faq">FAQs</a>
+</nav>
+
+<h1 data-px="0.20" data-px-hero>Kajal &amp; Adarsh</h1>
+<p class="rv">We're getting married in Mexico City!</p>
+<p class="rv" style="margin-top:20px;">We'd love for you to join us for a weekend of family, friends, good food, and celebration.</p>
+<p class="stamp" data-px="0.10" data-px-hero>Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico</p>
+
+<picture class="snap-r rv">
+<source srcset="img/couple.avif" type="image/avif">
+<img src="img/couple.png" width="620" height="827" loading="lazy" decoding="async" alt="Kajal and Adarsh sitting together, framed in gold">
+</picture>
+
+<h2 id="weekend" data-px="0.07">The Weekend</h2>
+
+<h3 class="rv">Welcome Party, Friday Evening</h3>
+<p class="when rv">Friday, February 19 · 5–9 PM · Indoor + outdoor</p>
+<p class="rv">Join us for an evening of drinks, dinner, and a warm welcome to Mexico City.</p>
+<p class="meta rv">The venue is approximately a 10-minute walk from Andaz. Transportation will be available for older guests.</p>
+<p class="meta rv">Attire: Light and effortless. Cocktail dresses, skirts &amp; blouses, sarees, button-downs &amp; trousers.</p>
+
+<h3 class="rv">Saatak &amp; Haldi, Saturday Daytime</h3>
+<p class="when rv">Saturday, February 20 · 10 AM–3 PM · Outdoor</p>
+<p class="rv">A daytime celebration with our families, including the Saatak ceremony, Haldi, food, and plenty of color.</p>
+<p class="meta rv">Transportation leaves Andaz at 9 AM and returns approximately 4 PM.</p>
+<p class="meta rv">Attire: Playful Indo-western outfits. Bright, solid colors are encouraged. Dress for sunshine and temps in the high 70s. Wear comfortable walking shoes — no sharp heels!</p>
+
+<h3 class="rv">Baarat &amp; Wedding, Sunday Daytime</h3>
+<p class="when rv">Sunday, February 21 · 10 AM–2:30 PM · Indoor</p>
+<p class="rv">The main event! Join us for the Baarat, wedding ceremony, and celebration.</p>
+<p class="meta rv">Transportation leaves Andaz at 9:30 AM and returns approximately 3 PM.</p>
+<p class="meta rv">Attire: Indian formal / wedding guest attire: lehengas, sarees, sherwanis &amp; suits, with earthy &amp; pastel tones. Florals encouraged!</p>
+
+<h3 class="rv">After Party, Sunday Evening</h3>
+<p class="when rv">Sunday, February 21 · 7 PM–late · Indoor</p>
+<p class="rv">Join us for an evening of music, drinks, and dancing.</p>
+<p class="meta rv">Transportation leaves Andaz at 6:30 PM.</p>
+<p class="meta rv">Attire: Formal, black tie optional. Think classic, elevated &amp; glamorous. Gowns, sarees, tuxedos &amp; dark suits. Jewel tones and dark colors.</p>
+
+<h2 id="stay" data-px="0.07">Staying in Mexico City</h2>
+
+<h3 class="rv">Hotel</h3>
+<p class="rv">We'll be staying at Andaz Mexico City Condesa, in the heart of Condesa. We have a room block available here: <a href="#" id="block">[Hotel block]</a></p>
+<p class="rv">Our room block rate is available for three days before and three days after the wedding, so we'd love for you to extend your stay and explore Mexico City if you have the time.</p>
+<p class="rv">We'll also be hosting breakfast at Andaz for hotel guests on Saturday, Sunday, and Monday mornings.</p>
+
+<picture class="snap-l rv">
+<source srcset="img/couple.avif" type="image/avif">
+<img src="img/couple.png" width="620" height="827" loading="lazy" decoding="async" alt="Kajal and Adarsh, holding hands">
+</picture>
+
+<h3 class="rv">Getting There</h3>
+<p class="rv">Please fly into MEX (Mexico City International Airport). MEX is approximately 30–40 minutes from the hotel, depending on traffic. NLU is considerably farther and can take around 1.5 hours, so MEX is the more convenient option for the wedding weekend.</p>
+<p class="rv">If you're arriving from the U.S., make sure your passport meets Mexico's current entry requirements. International guests should check visa and entry requirements based on their nationality before booking travel.</p>
+<p class="rv">Once you're in Mexico City, Uber is generally the easiest way to get around. You can also arrange transportation through your hotel.</p>
+
+<h3 class="rv">Getting Around During the Wedding</h3>
+<p class="rv">All wedding transportation will leave from Andaz Condesa.</p>
+<p class="rv">If you choose to stay elsewhere, we recommend staying within easy walking distance of Andaz so you can easily access the wedding shuttles.</p>
+
+<h2 id="city" data-px="0.07">Make a Trip of It</h2>
+<p class="rv">Mexico City is one of our favorite cities, and we hope you'll have some time to experience it beyond the wedding.</p>
+
+<h3 class="rv">Our favorite neighborhoods</h3>
+<p class="rv">Condesa — leafy streets, restaurants, coffee, bars, and beautiful architecture.</p>
+<p class="rv">Roma Norte — galleries, design shops, restaurants, and a lively neighborhood feel.</p>
+<p class="rv">Polanco — museums, shopping, restaurants, and some of the city's best-known cultural attractions.</p>
+<p class="rv" style="margin-top:26px;">There won't be much free daytime during the wedding festivities, but Saturday evening after the Haldi is free, and Monday is a great day to explore if you're staying an extra night.</p>
+
+<h2 id="know" data-px="0.07">A few things to know</h2>
+
+<h3 class="rv">Weather</h3>
+<p class="rv">February is typically dry and warm during the day, with cooler evenings. Expect afternoons to have a high of 75 and evenings to be cool around 60.</p>
+
+<h3 class="rv">Altitude</h3>
+<p class="rv">Mexico City sits at a high elevation, so you may notice the altitude when you first arrive. Take it easy on your first day, drink electrolytes, wear sunscreen, and give yourself some time to adjust.</p>
+
+<h3 class="rv">Currency</h3>
+<p class="rv">The local currency is the Mexican peso. Credit cards are widely accepted, but it's useful to have some pesos for smaller shops, markets, and tips. ATMs are widely available, though we recommend using ATMs located inside banks or other secure locations.</p>
+
+<h3 class="rv">Water</h3>
+<p class="rv">Bottled water is recommended for drinking. Bottled water is readily available at hotels, restaurants, and shops.</p>
+
+<h3 class="rv">Getting around</h3>
+<p class="rv">We recommend Uber or hotel-arranged transportation rather than hailing taxis on the street. When using a rideshare, always confirm the vehicle and license plate before getting in.</p>
+
+<h3 class="rv">At night</h3>
+<p class="rv">Condesa, Roma Norte, and Polanco are popular areas for visitors, but as in any major city, keep an eye on your belongings and use extra caution when walking around late at night. We recommend traveling with others and using a rideshare after dark.</p>
+
+<picture class="snap-c rv">
+<source srcset="img/couple.avif" type="image/avif">
+<img src="img/couple.png" width="620" height="827" loading="lazy" decoding="async" alt="Kajal and Adarsh laughing together">
+</picture>
+
+<h2 id="faq" data-px="0.07">FAQs</h2>
+
+<h3 class="rv">Can I bring my kids or parents?</h3>
+<p class="rv">We've reserved seats for the people listed on each invitation. Because we're working with a limited guest count, we aren't able to accommodate additional guests right now. If you have a specific situation you'd like to discuss, please reach out to us.</p>
+
+<h3 class="rv">How many people can stay in each hotel room?</h3>
+<p class="rv">Andaz king rooms accommodate 2 guests, while rooms with two beds accommodate 3 guests. Rollaway beds may also be available upon request.</p>
+
+<h3 class="rv">Can I stay somewhere besides Andaz?</h3>
+<p class="rv">Absolutely. We just ask that you stay within easy walking distance of Andaz, since all wedding transportation will depart from there.</p>
+
+<h3 class="rv">Can I stay in an Airbnb?</h3>
+<p class="rv">Yes, but please keep a few things in mind. Make sure it's within easy walking distance of Andaz and confirm that it has air conditioning. Many Mexico City accommodations do not have AC.</p>
+
+<h3 class="rv">What should I wear if I don't own Indian clothes?</h3>
+<p class="rv">You can absolutely wear something from your own wardrobe. For the wedding, think formal and festive. If you'd like to wear Indian clothing but aren't sure what to choose, we're happy to help!</p>
+
+<h3 class="rv">Is everything indoors?</h3>
+<p class="rv">No. The Welcome Party and Haldi will have outdoor portions, while the wedding and After Party will be indoors.</p>
+<p class="rv">We recommend comfortable shoes and bringing a light layer for the evening.</p>
+
+<h3 class="rv">What shoes should I wear?</h3>
+<p class="rv">There will be some walking and standing throughout the weekend, so comfortable shoes are a good idea. For the Haldi and Saatak events especially, choose shoes that are comfortable for walking, and over grass.</p>
+
+<h3 class="rv">Can I extend my trip?</h3>
+<p class="rv">Absolutely. We'd love for you to turn the wedding into a longer Mexico City trip. Our hotel block rate is available for three days before and after the wedding.</p>
+
+<h3 class="rv">Is there anything I should book early?</h3>
+<p class="rv">Flights and hotels are the main things to book early, particularly if you'd like to stay at Andaz or extend your trip.</p>
+
+<h3 class="rv">What should I know if I'm traveling internationally?</h3>
+<p class="rv">Make sure your passport is valid for your trip, check Mexico's entry requirements based on your nationality, and give yourself plenty of time at the airport.</p>
+<p class="rv">We also recommend having a backup copy of your passport and important travel information, keeping your phone charged, and letting your bank know you'll be traveling internationally if required by your bank.</p>
+<p class="rv">If you're coming from outside the U.S., please check the Mexican government's current entry requirements for your country before traveling.</p>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var items  = document.querySelectorAll('.rv');
+  var layers = Array.prototype.slice.call(document.querySelectorAll('[data-px]'));
+
+  /* reveal: body text fades up once as it enters */
+  if(reduce || !('IntersectionObserver' in window)){
+    items.forEach(function(el){ el.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, {rootMargin:'0px 0px -6% 0px', threshold:0.05});
+    items.forEach(function(el){ io.observe(el); });
+  }
+
+  /* left rail: mark the section you're currently in */
+  var railLinks = Array.prototype.slice.call(document.querySelectorAll('nav a'));
+  var marks = railLinks.map(function(a){
+    return document.getElementById(a.getAttribute('href').slice(1));
+  });
+  function markCurrent(){
+    var line = window.innerHeight * 0.42, current = -1;
+    for(var i=0;i<marks.length;i++){
+      if(marks[i] && marks[i].getBoundingClientRect().top <= line){ current = i; }
+    }
+    for(var j=0;j<railLinks.length;j++){
+      if(j === current){ railLinks[j].setAttribute('aria-current','true'); }
+      else { railLinks[j].removeAttribute('aria-current'); }
+    }
+  }
+  var railTicking = false;
+  window.addEventListener('scroll', function(){
+    if(!railTicking){ railTicking = true; window.requestAnimationFrame(function(){ markCurrent(); railTicking = false; }); }
+  }, {passive:true});
+  markCurrent();
+
+  /* parallax: headings drift against the scroll, measured from viewport centre */
+  if(reduce || !layers.length) return;
+
+  var vh = window.innerHeight, ticking = false;
+
+  function place(){
+    for(var i=0;i<layers.length;i++){
+      var el = layers[i];
+      var speed = parseFloat(el.getAttribute('data-px')) || 0;
+      var shift;
+      if(el.hasAttribute('data-px-hero')){
+        /* hero: keyed to scroll distance so it rests at zero on load */
+        shift = (window.scrollY || document.documentElement.scrollTop) * speed;
+      } else {
+        var r = el.getBoundingClientRect();
+        /* skip anything far outside the viewport */
+        if(r.bottom < -vh || r.top > vh*2){ continue; }
+        shift = ((r.top + r.height/2) - vh/2) * -speed;
+      }
+      el.style.transform = 'translate3d(0,' + shift.toFixed(2) + 'px,0)';
+    }
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', function(){
+    if(!ticking){ ticking = true; window.requestAnimationFrame(place); }
+  }, {passive:true});
+
+  window.addEventListener('resize', function(){
+    vh = window.innerHeight;
+    if(!ticking){ ticking = true; window.requestAnimationFrame(place); }
+  }, {passive:true});
+
+  place();
+})();
+</script>
+</body>
+</html>
