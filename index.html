@@ -414,15 +414,15 @@ a:focus-visible{outline:none;}
   display:block;width:100%;height:auto;
   filter:drop-shadow(0 18px 28px rgba(0,0,0,.55));
   transform-origin:50% 0;
-  animation:frame-sway 6s ease-in-out var(--d,0s) infinite alternate;
+  animation:frame-sway 3s ease-in-out var(--d,0s) infinite alternate;
 }
-/* hung from a nail: slower and smaller than the stickers' rock */
+/* hung from a nail: pivots from the top, a smaller swing than the stickers' rock */
 @keyframes frame-sway{
   from{rotate:1.6deg;}
   to{rotate:-1.6deg;}
 }
 @media (prefers-reduced-motion:reduce){ .frame img{animation:none;} }
-.frame-cliff{--w:min(30rem,70vw);--x:.8;--r:-2.2deg;--d:-1s;}
+.frame-dance{--w:min(24rem,62vw);--x:.8;--r:-2.2deg;--d:-1s;}
 .frame-chairs{--w:min(32rem,70vw);--x:-.9;--r:1.6deg;--d:-4s;}
 .frame-tacos{--w:min(22rem,58vw);--x:.45;--r:2.4deg;--d:-2.5s;}
 .frame-flowers{--w:min(19rem,50vw);--x:-.6;--r:-1.8deg;--d:-5.2s;}
@@ -707,7 +707,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </section>
 
-<figure class="frame frame-cliff rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-cliff-sm.webp 560w, img/frame-cliff.webp 900w" sizes="(max-width:700px) 70vw, 480px"><img src="img/frame-cliff.png" width="560" height="444" alt="Kajal and Adarsh sitting on a rock above the sea" loading="lazy" decoding="async"></picture></figure>
+<figure class="frame frame-dance rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-dance-sm.webp 560w, img/frame-dance-md.webp 900w, img/frame-dance.webp 1400w" sizes="(max-width:700px) 62vw, 384px"><img src="img/frame-dance.png" width="700" height="823" alt="Dancers in swirling pink and orange skirts" loading="lazy" decoding="async"></picture></figure>
 
 <section class="journey" aria-label="Staying in Mexico City">
 <div class="journey-pin">
