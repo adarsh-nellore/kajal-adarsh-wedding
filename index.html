@@ -409,9 +409,22 @@ a:focus-visible{outline:none;}
 .attire picture{display:block;margin:clamp(8px,1.5vw,20px) 0 clamp(20px,2.6vw,32px);}
 .attire img{display:block;width:100%;height:auto;filter:drop-shadow(0 18px 28px rgba(0,0,0,.5));}
 
-/* a gallery wall between sections: gilt frames hung straight on the page, no backdrop */
-.wall{margin:var(--gap) auto 0;width:min(52rem,100%);}
-.wall img{display:block;width:100%;height:auto;filter:drop-shadow(0 18px 28px rgba(0,0,0,.55));}
+/* gilt frames hung between sections, each nudged off-centre and tilted a little so the wall looks hung by hand;
+   --x is a share of one nudge unit, which grows with the screen */
+.frame{
+  --nudge:clamp(24px,10vw,150px);
+  display:block;
+  width:var(--w);
+  margin:var(--gap) auto 0;
+  translate:calc(var(--x) * var(--nudge)) 0;
+  rotate:var(--r);
+}
+.frame picture{display:block;margin:0;}
+.frame img{display:block;width:100%;height:auto;filter:drop-shadow(0 18px 28px rgba(0,0,0,.55));}
+.frame-cliff{--w:min(30rem,70vw);--x:.8;--r:-2.2deg;}
+.frame-chairs{--w:min(32rem,70vw);--x:-.9;--r:1.6deg;}
+.frame-tacos{--w:min(22rem,58vw);--x:.45;--r:2.4deg;}
+.frame-flowers{--w:min(19rem,50vw);--x:-.6;--r:-1.8deg;}
 .journey.pinned .journey-rail{flex-direction:row;gap:clamp(72px,9vw,150px);will-change:transform;}
 .journey.pinned .leg{flex:0 0 auto;width:auto;max-width:calc(100vw - var(--edge) - 32px);opacity:.16;transition:opacity .7s cubic-bezier(.2,.7,.3,1);}
 .journey.pinned .leg.on{opacity:1;}
@@ -693,6 +706,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </section>
 
+<figure class="frame frame-cliff rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-cliff-sm.webp 560w, img/frame-cliff.webp 900w" sizes="(max-width:700px) 70vw, 480px"><img src="img/frame-cliff.png" width="560" height="444" alt="Kajal and Adarsh sitting on a rock above the sea" loading="lazy" decoding="async"></picture></figure>
+
 <section class="journey" aria-label="Staying in Mexico City">
 <div class="journey-pin">
 <h2 id="stay">Staying in Mexico City</h2>
@@ -720,6 +735,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </div>
 </section>
+
+<figure class="frame frame-chairs rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-chairs-sm.webp 560w, img/frame-chairs.webp 900w" sizes="(max-width:700px) 70vw, 512px"><img src="img/frame-chairs.png" width="560" height="336" alt="Kajal and Adarsh holding hands among orange chairs in a garden" loading="lazy" decoding="async"></picture></figure>
 
 <section class="journey attire" data-pin aria-label="Attire">
 <div class="journey-pin">
@@ -759,6 +776,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </div>
 </section>
+
+<figure class="frame frame-tacos rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-tacos-sm.webp 560w, img/frame-tacos.webp 900w" sizes="(max-width:700px) 58vw, 352px"><img src="img/frame-tacos.png" width="560" height="708" alt="Kajal and Adarsh eating tacos" loading="lazy" decoding="async"></picture></figure>
 
 <section class="journey" aria-label="FAQs">
 <div class="journey-pin">
@@ -866,6 +885,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </div>
 </section>
+
+<figure class="frame frame-flowers rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-flowers-sm.webp 560w, img/frame-flowers.webp 900w" sizes="(max-width:700px) 50vw, 304px"><img src="img/frame-flowers.png" width="560" height="936" alt="Kajal and Adarsh with a bouquet of flowers" loading="lazy" decoding="async"></picture></figure>
 
 <section class="rsvp" aria-label="RSVP">
 <h2 id="rsvp">RSVP<picture class="stk stk-head stk-hearts" aria-hidden="true"><source type="image/webp" srcset="img/sticker-hearts-sm.webp 220w, img/sticker-hearts.webp 340w" sizes="(max-width:999px) 80px, 137px"><img src="img/sticker-hearts.png" width="340" height="288" alt="" loading="lazy" decoding="async"></picture></h2>
