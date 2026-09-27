@@ -190,7 +190,7 @@ a:focus-visible{outline:none;}
   filter:drop-shadow(0 10px 16px rgba(0,0,0,.5));
   /* the rock drives the separate `rotate` property, so it stacks on the tilt/entrance transform
      here and the parallax transform on the <picture> without overriding either */
-  animation:sticker-in .9s cubic-bezier(.2,.7,.3,1) .3s both, sticker-rock 5s ease-in-out -1.2s infinite alternate;
+  animation:sticker-in .9s cubic-bezier(.2,.7,.3,1) .3s both, sticker-rock 2.8s ease-in-out -1.4s infinite alternate;
 }
 @keyframes sticker-in{
   from{opacity:0;transform:rotate(calc(var(--tilt) - 9deg)) scale(1.12);}
@@ -198,7 +198,7 @@ a:focus-visible{outline:none;}
   to{opacity:1;transform:rotate(var(--tilt)) scale(1);}
 }
 @keyframes sticker-rock{
-  from{rotate:3deg;}
+  from{rotate:7deg;}
   to{rotate:-7deg;}
 }
 /* tablets and phones: no room beside the name, so it sits in the open space above it,
