@@ -213,36 +213,24 @@ a:focus-visible{outline:none;}
     top:calc(var(--mid) - .52 * var(--f) - 28px - 1.05 * var(--w));
   }
 }
-/* heading stickers hang in the left margin beside the heading, so they're on screen whenever the heading is;
-   phones have no margin, so there they sit at the heading's right end, bottom-aligned so they never cover the tabs below */
-#weekend,#faq{position:relative;}
-.sticker-2{
-  --tilt:-5deg;
-  position:absolute;
-  right:0;
-  bottom:0;
-  width:64px;
-  margin:0;
+/* selfie sticker: sits inside the date line, so it stays level with it; pushed out to the screen's left edge.
+   Phones have no room beside the dates, so there it drops just below them */
+.stamp{position:relative;}
+.sticker-left{
+  --tilt:-6deg;
+  left:calc(50% - 50vw + clamp(18px,2.6vw,42px));
+  top:50%;
+  margin-top:calc(-.5 * var(--w));
 }
-.sticker-2.sticker-hats{--tilt:4deg;}
-@media (min-width:1000px){
-  .sticker-2{
-    right:calc(100% + clamp(20px,2.4vw,40px));
-    top:0;
-    bottom:auto;
-    width:clamp(96px,9vw,140px);
+@media (max-width:760px){
+  .sticker-left{
+    left:0;
+    top:calc(100% + 20px);
+    margin-top:0;
   }
 }
-.sticker-2 img{
-  display:block;
-  width:100%;
-  height:auto;
-  transform:rotate(var(--tilt));
-  transform-origin:50% 4%;
-  filter:drop-shadow(0 10px 16px rgba(0,0,0,.5));
-  animation:sticker-rock 3.2s ease-in-out -.6s infinite alternate;
-}
-@media (prefers-reduced-motion:reduce){ .sticker img,.sticker-2 img{animation:none;} }
+.sticker-left img{animation-delay:.45s,-.2s;}
+@media (prefers-reduced-motion:reduce){ .sticker img{animation:none;} }
 
 /* ---------- sections: The Weekend pins and travels sideways; the rest swap cards from an index ---------- */
 .journey{
@@ -342,7 +330,7 @@ a:focus-visible{outline:none;}
   padding-bottom:24px;
   box-sizing:border-box;
 }
-/* cards dissolve as they leave to the left, so they never slide under the side menu or the sticker in the margin */
+/* cards dissolve as they leave to the left, so they never slide under the side menu */
 .journey.pinned .leg:has(~ .leg.on){opacity:0;}
 .journey.pinned h2{margin-top:auto;}
 .journey.pinned .journey-rail{margin-bottom:auto;}
@@ -608,7 +596,10 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
 <header class="hero" id="top">
 <h1 data-px="0.20" data-px-hero>Kajal y Adarsh</h1>
-<p class="stamp" data-px="0.10" data-px-hero>Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico</p>
+<p class="stamp" data-px="0.10" data-px-hero>Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico<picture class="sticker sticker-left" aria-hidden="true">
+<source type="image/webp" srcset="img/sticker-selfie-sm.webp 220w, img/sticker-selfie.webp 340w" sizes="(max-width:900px) 140px, 165px">
+<img src="img/sticker-selfie.png" width="340" height="338" alt="" decoding="async">
+</picture></p>
 <picture class="sticker" data-px="0.28" data-px-hero>
 <source type="image/webp" srcset="img/sticker-couple-sm.webp 220w, img/sticker-couple.webp 340w" sizes="(max-width:900px) 140px, 165px">
 <img src="img/sticker-couple.png" width="340" height="355" alt="Kajal and Adarsh" decoding="async">
@@ -616,7 +607,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <a class="cue" href="#weekend" aria-label="Skip to the details"><span aria-hidden="true">↓</span></a></header>
 <section class="journey" data-pin aria-label="The Weekend">
 <div class="journey-pin">
-<h2 id="weekend">The Weekend<picture class="sticker-2" aria-hidden="true"><source type="image/webp" srcset="img/sticker-selfie-sm.webp 220w, img/sticker-selfie.webp 340w" sizes="140px"><img src="img/sticker-selfie.png" width="340" height="338" alt="" loading="lazy" decoding="async"></picture></h2>
+<h2 id="weekend">The Weekend</h2>
 <div class="journey-rail">
 <article class="leg" data-tab="Friday Night">
 <div class="day"><b>2.19</b></div>
@@ -731,7 +722,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
 <section class="journey" aria-label="FAQs">
 <div class="journey-pin">
-<h2 id="faq">FAQs<picture class="sticker-2 sticker-hats" aria-hidden="true"><source type="image/webp" srcset="img/sticker-hats-sm.webp 220w, img/sticker-hats.webp 340w" sizes="140px"><img src="img/sticker-hats.png" width="340" height="331" alt="" loading="lazy" decoding="async"></picture></h2>
+<h2 id="faq">FAQs</h2>
 <div class="journey-rail">
 <article class="leg" data-tab="Kids &amp; parents">
 <div class="leg-body">
@@ -1125,43 +1116,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
   if(document.fonts && document.fonts.ready){ document.fonts.ready.then(measureAll); }
 
-  /* one gesture = one stop: the top, each section, and each card of a pinned section.
-     A section taller than the screen scrolls freely to its edge; the next gesture moves on.
-     Stops are read fresh at every gesture, since index cards and the form change height as you use them. */
-  var anim = null, queued = 0;
+  var anim = null;
   function pad(){ return Math.min(64, Math.max(24, window.innerHeight * 0.06)); }
-  function stops(){
-    var vh = window.innerHeight, sy = window.scrollY, maxY = document.documentElement.scrollHeight - vh, list = [];
-    function add(s, end){ s = Math.min(maxY, Math.round(s)); list.push({s:s, end:Math.min(maxY, Math.max(s, Math.round(end)))}); }
-    add(0, document.querySelector('.hero').offsetHeight - vh);
-    Array.prototype.forEach.call(document.querySelectorAll('.journey, .rsvp'), function(el){
-      var r = el.getBoundingClientRect();
-      if(el.classList.contains('pinned')){
-        var J = journeys.filter(function(j){ return j.el === el; })[0];
-        for(var k = 0; k < J.n; k++){ add(r.top + sy + J.len * k / (J.n - 1), 0); }
-        return;
-      }
-      add(el.querySelector('h2').getBoundingClientRect().top + sy - pad(), r.bottom + sy + 32 - vh);
-    });
-    list[list.length - 1].end = maxY;
-    return list;
-  }
-  /* where one gesture in this direction goes: to is null when the current section still has room to scroll natively, up to edge */
-  function plan(dir){
-    var list = stops(), y = window.scrollY, i = 0;
-    while(i + 1 < list.length && list[i + 1].s <= y + 2){ i++; }
-    var c = list[i], near = window.innerHeight * 0.35;
-    /* a sliver of room left glides the rest of the way, so a gesture never spends itself on a few pixels */
-    if(dir > 0){
-      if(y < c.end - 2) return c.end - y < near ? {to:c.end} : {to:null, edge:c.end};
-      return {to: i + 1 < list.length ? list[i + 1].s : y};
-    }
-    if(y > c.s + 2) return c.end > c.s + 2 && y - c.s >= near ? {to:null, edge:c.s} : {to:c.s};
-    if(i === 0) return {to:y};
-    var p = list[i - 1];
-    /* stepping back into a tall section lands on its bottom, so nothing is skipped */
-    return {to: p.end > p.s + 2 ? p.end : p.s};
-  }
   function stopOf(el){
     if(el.classList.contains('hero')) return 0;
     var box = el.closest('.journey');
@@ -1172,18 +1128,13 @@ picture{margin-block:clamp(52px,8vw,104px);}
     var html = document.documentElement, from = window.scrollY, t0 = 0, last = from;
     to = Math.max(0, Math.min(html.scrollHeight - window.innerHeight, Math.round(to)));
     if(anim){ window.cancelAnimationFrame(anim); anim = null; }
-    queued = 0;
     if(Math.abs(to - from) < 1) return;
     ms = ms || 650;
     html.style.scrollBehavior = 'auto';
-    /* a fresh gesture that arrived mid-glide takes its step as soon as this one lands */
-    function done(){
-      anim = null; html.style.scrollBehavior = '';
-      if(queued){ var p = plan(queued); queued = 0; if(p.to !== null){ glide(p.to); } }
-    }
+    function done(){ anim = null; html.style.scrollBehavior = ''; }
     function frame(now){
       /* the scrollbar was grabbed mid-glide: let go */
-      if(Math.abs(window.scrollY - last) > 3){ queued = 0; done(); return; }
+      if(Math.abs(window.scrollY - last) > 3){ done(); return; }
       if(!t0){ t0 = now; }
       var t = Math.min(1, (now - t0) / ms), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(2 - 2 * t, 3) / 2;
       last = Math.round(from + (to - from) * e);
@@ -1191,94 +1142,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
       if(t < 1){ anim = window.requestAnimationFrame(frame); } else { done(); }
     }
     anim = window.requestAnimationFrame(frame);
-  }
-
-  if(!reduce){
-    /* A wheel gesture starts after 120ms of quiet, or when the push rises again after the last one's inertia
-       has decayed; everything else, trackpad inertia included, belongs to the gesture before and can't step again.
-       A gesture that begins with room to scroll stays native and stops at the edge. */
-    var wheelAt = 0, acc = 0, peak = 0, low = 0, armed = false, native = null;
-    window.addEventListener('wheel', function(e){
-      if(e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-      var now = performance.now(), dy = e.deltaY * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? window.innerHeight : 1), a = Math.abs(dy);
-      var fresh = now - wheelAt > 120 || (!armed && low <= peak * 0.4 && a >= Math.max(12, low * 3));
-      wheelAt = now;
-      if(fresh){ acc = 0; peak = low = a; native = null; armed = true; }
-      else if(a >= peak){ peak = low = a; }
-      else { low = Math.min(low, a); }
-      if(anim){
-        e.preventDefault();
-        if(fresh){ queued = dy > 0 ? 1 : -1; }
-        armed = false; native = false;
-        return;
-      }
-      var p = plan(dy > 0 ? 1 : -1);
-      if(native === null){ native = p.to === null; armed = !native; }
-      if(native){
-        if(p.to !== null){ e.preventDefault(); return; }
-        var y = window.scrollY;
-        if(dy > 0 ? y + dy > p.edge : y + dy < p.edge){ e.preventDefault(); window.scrollTo(0, p.edge); }
-        return;
-      }
-      e.preventDefault();
-      if(!armed) return;
-      acc += dy;
-      if(Math.abs(acc) >= 10){ armed = false; glide(plan(acc > 0 ? 1 : -1).to); }
-    }, {passive:false});
-
-    /* touch: once the finger has clearly moved, the direction picks the mode. Sideways drags (the tab row,
-       index cards) and pinches are left alone. Where both directions step, the first tiny moves are held too,
-       so the page can't start a native scroll before the direction is known. */
-    var tx = 0, ty = 0, tmode = null, both = false, inTabs = false, trail = [];
-    window.addEventListener('touchstart', function(e){
-      tmode = e.touches.length > 1 ? 'skip' : null;
-      tx = e.touches[0].clientX; ty = e.touches[0].clientY;
-      trail = [[performance.now(), ty]];
-      inTabs = !!(e.target.closest && e.target.closest('.tabs'));
-      both = tmode === null && (anim || (plan(1).to !== null && plan(-1).to !== null));
-    }, {passive:true});
-    window.addEventListener('touchmove', function(e){
-      if(tmode === 'skip' || tmode === 'native') return;
-      if(e.touches.length > 1){ tmode = 'skip'; return; }
-      var dx = e.touches[0].clientX - tx, dy = e.touches[0].clientY - ty;
-      trail.push([performance.now(), e.touches[0].clientY]);
-      if(trail.length > 8){ trail.shift(); }
-      if(tmode === null){
-        if(Math.abs(dx) >= 6 && Math.abs(dx) > Math.abs(dy) * 1.5){ tmode = 'skip'; return; }
-        if(Math.abs(dy) < 4){ if(both && !inTabs && e.cancelable){ e.preventDefault(); } return; }
-        tmode = anim || plan(dy < 0 ? 1 : -1).to !== null ? 'gate' : 'native';
-      }
-      if(tmode === 'gate' && e.cancelable){ e.preventDefault(); }
-    }, {passive:false});
-    window.addEventListener('touchend', function(e){
-      if(tmode !== 'gate') return;
-      var now = performance.now(), y = e.changedTouches[0].clientY, dy = y - ty, ref = trail[0];
-      /* flick speed over the last ~100ms of the drag */
-      for(var j = trail.length - 1; j >= 0; j--){ ref = trail[j]; if(now - trail[j][0] >= 100) break; }
-      var v = Math.abs(y - ref[1]) / Math.max(16, now - ref[0]);
-      if(Math.abs(dy) >= 24 || (Math.abs(dy) >= 8 && v >= 0.3)){
-        var dir = dy < 0 ? 1 : -1;
-        if(anim){ queued = dir; return; }
-        var p = plan(dir);
-        if(p.to !== null){ glide(p.to); }
-      }
-    }, {passive:true});
-
-    window.addEventListener('keydown', function(e){
-      if(e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
-      var t = e.target;
-      if(t && t.closest && (t.isContentEditable || t.closest('input,textarea,select,button,.tabs'))) return;
-      var k = e.key, dir = 0;
-      if(k === 'PageDown' || k === 'ArrowDown' || (k === ' ' && !e.shiftKey)){ dir = 1; }
-      else if(k === 'PageUp' || k === 'ArrowUp' || (k === ' ' && e.shiftKey)){ dir = -1; }
-      else if(k === 'Home' || k === 'End'){ e.preventDefault(); glide(k === 'Home' ? 0 : document.documentElement.scrollHeight); return; }
-      else return;
-      if(anim){ e.preventDefault(); return; }
-      var p = plan(dir);
-      if(p.to === null) return;
-      e.preventDefault();
-      glide(p.to);
-    });
   }
 
   /* reveal: body text fades up once as it enters */
