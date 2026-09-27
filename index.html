@@ -235,15 +235,16 @@ a:focus-visible{outline:none;}
 .sticker-left img{animation-delay:.45s,-.2s;}
 @media (prefers-reduced-motion:reduce){ .sticker img{animation:none;} }
 
-/* heading stickers: in the left margin on desktop; on phones at the heading's right end, bottom-aligned so they clear the tabs.
+/* heading stickers: hearts (RSVP) in the left margin, dance (FAQs) in the right margin on desktop;
+   on phones at the heading's right end, bottom-aligned so they clear what follows.
    margin:0 overrides the global picture margin */
-#attire,#faq{position:relative;}
+#faq,#rsvp{position:relative;}
 .sticker-2{--tilt:-5deg;position:absolute;right:0;bottom:0;width:64px;margin:0;}
 .sticker-2.sticker-dance{--tilt:-4deg;width:84px;}
 .sticker-2.sticker-hearts{--tilt:4deg;}
 @media (min-width:1000px){
   .sticker-2{right:calc(100% + clamp(20px,2.4vw,40px));top:0;bottom:auto;width:clamp(96px,9vw,140px);}
-  .sticker-2.sticker-dance{width:clamp(96px,calc(50vw - 512px),182px);}
+  .sticker-2.sticker-dance{right:auto;left:calc(100% + clamp(24px,3vw,48px));width:clamp(96px,calc(50vw - 400px),200px);}
 }
 .sticker-2 img{display:block;width:100%;height:auto;transform:rotate(var(--tilt));transform-origin:50% 4%;filter:drop-shadow(0 10px 16px rgba(0,0,0,.5));animation:sticker-rock 3.2s ease-in-out -.6s infinite alternate;}
 @media (prefers-reduced-motion:reduce){ .sticker-2 img{animation:none;} }
@@ -693,7 +694,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
 <section class="journey attire" data-pin aria-label="Attire">
 <div class="journey-pin">
-<h2 id="attire">Attire<picture class="sticker-2 sticker-dance" aria-hidden="true"><source type="image/webp" srcset="img/sticker-dance-sm.webp 220w, img/sticker-dance.webp 340w" sizes="182px"><img src="img/sticker-dance.png" width="340" height="224" alt="" loading="lazy" decoding="async"></picture></h2>
+<h2 id="attire">Attire</h2>
 <div class="journey-rail">
 <article class="leg" data-tab="Welcome Party">
 <div class="leg-body">
@@ -732,7 +733,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
 <section class="journey" aria-label="FAQs">
 <div class="journey-pin">
-<h2 id="faq">FAQs<picture class="sticker-2 sticker-hearts" aria-hidden="true"><source type="image/webp" srcset="img/sticker-hearts-sm.webp 220w, img/sticker-hearts.webp 340w" sizes="140px"><img src="img/sticker-hearts.png" width="340" height="288" alt="" loading="lazy" decoding="async"></picture></h2>
+<h2 id="faq">FAQs<picture class="sticker-2 sticker-dance" aria-hidden="true"><source type="image/webp" srcset="img/sticker-dance-sm.webp 220w, img/sticker-dance.webp 340w" sizes="200px"><img src="img/sticker-dance.png" width="340" height="224" alt="" loading="lazy" decoding="async"></picture></h2>
 <div class="journey-rail">
 <article class="leg" data-tab="Kids &amp; parents">
 <div class="leg-body">
@@ -838,7 +839,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </section>
 
 <section class="rsvp" aria-label="RSVP">
-<h2 id="rsvp">RSVP</h2>
+<h2 id="rsvp">RSVP<picture class="sticker-2 sticker-hearts" aria-hidden="true"><source type="image/webp" srcset="img/sticker-hearts-sm.webp 220w, img/sticker-hearts.webp 340w" sizes="140px"><img src="img/sticker-hearts.png" width="340" height="288" alt="" loading="lazy" decoding="async"></picture></h2>
 <p class="lede rv">We would love to celebrate with you in Mexico City. Kindly reply by [Reply-by date].</p>
 <form class="rsvp-form rv" novalidate>
 <div class="field">
