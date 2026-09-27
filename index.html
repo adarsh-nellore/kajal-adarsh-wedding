@@ -410,11 +410,22 @@ a:focus-visible{outline:none;}
   rotate:var(--r);
 }
 .frame picture{display:block;margin:0;}
-.frame img{display:block;width:100%;height:auto;filter:drop-shadow(0 18px 28px rgba(0,0,0,.55));}
-.frame-cliff{--w:min(30rem,70vw);--x:.8;--r:-2.2deg;}
-.frame-chairs{--w:min(32rem,70vw);--x:-.9;--r:1.6deg;}
-.frame-tacos{--w:min(22rem,58vw);--x:.45;--r:2.4deg;}
-.frame-flowers{--w:min(19rem,50vw);--x:-.6;--r:-1.8deg;}
+.frame img{
+  display:block;width:100%;height:auto;
+  filter:drop-shadow(0 18px 28px rgba(0,0,0,.55));
+  transform-origin:50% 0;
+  animation:frame-sway 6s ease-in-out var(--d,0s) infinite alternate;
+}
+/* hung from a nail: slower and smaller than the stickers' rock */
+@keyframes frame-sway{
+  from{rotate:1.6deg;}
+  to{rotate:-1.6deg;}
+}
+@media (prefers-reduced-motion:reduce){ .frame img{animation:none;} }
+.frame-cliff{--w:min(30rem,70vw);--x:.8;--r:-2.2deg;--d:-1s;}
+.frame-chairs{--w:min(32rem,70vw);--x:-.9;--r:1.6deg;--d:-4s;}
+.frame-tacos{--w:min(22rem,58vw);--x:.45;--r:2.4deg;--d:-2.5s;}
+.frame-flowers{--w:min(19rem,50vw);--x:-.6;--r:-1.8deg;--d:-5.2s;}
 .journey.pinned .journey-rail{flex-direction:row;gap:clamp(72px,9vw,150px);will-change:transform;}
 .journey.pinned .leg{flex:0 0 auto;width:auto;max-width:calc(100vw - var(--edge) - 32px);opacity:.16;transition:opacity .7s cubic-bezier(.2,.7,.3,1);}
 .journey.pinned .leg.on{opacity:1;}
