@@ -16,6 +16,9 @@
   --white:#EAE3D6;   /* everything else — off-white, warmed to sit with the gold (15:1) */
   --head:'Jaini','EB Garamond',Georgia,serif;
   --body:'EB Garamond',Georgia,'Times New Roman',serif;
+  /* one gap between sections, and the offset from the top of the screen where every heading lands (matches pad() in the script) */
+  --gap:clamp(96px,13vw,168px);
+  --pad:clamp(24px,6vh,64px);
 }
 *{box-sizing:border-box;}
 html{overflow-x:clip;}
@@ -102,7 +105,7 @@ h1{
 h2{
   font-size:clamp(31px,5vw,46px);
   line-height:1.2;
-  margin-top:clamp(96px,13vw,168px);
+  margin-top:var(--gap);
   margin-bottom:clamp(24px,3vw,36px);
   will-change:transform;
 }
@@ -232,12 +235,25 @@ a:focus-visible{outline:none;}
 .sticker-left img{animation-delay:.45s,-.2s;}
 @media (prefers-reduced-motion:reduce){ .sticker img{animation:none;} }
 
+/* heading stickers: in the left margin on desktop; on phones at the heading's right end, bottom-aligned so they clear the tabs.
+   margin:0 overrides the global picture margin */
+#attire,#faq{position:relative;}
+.sticker-2{--tilt:-5deg;position:absolute;right:0;bottom:0;width:64px;margin:0;}
+.sticker-2.sticker-dance{--tilt:-4deg;width:84px;}
+.sticker-2.sticker-hearts{--tilt:4deg;}
+@media (min-width:1000px){
+  .sticker-2{right:calc(100% + clamp(20px,2.4vw,40px));top:0;bottom:auto;width:clamp(96px,9vw,140px);}
+  .sticker-2.sticker-dance{width:clamp(96px,calc(50vw - 512px),182px);}
+}
+.sticker-2 img{display:block;width:100%;height:auto;transform:rotate(var(--tilt));transform-origin:50% 4%;filter:drop-shadow(0 10px 16px rgba(0,0,0,.5));animation:sticker-rock 3.2s ease-in-out -.6s infinite alternate;}
+@media (prefers-reduced-motion:reduce){ .sticker-2 img{animation:none;} }
+
 /* ---------- sections: The Weekend pins and travels sideways; the rest swap cards from an index ---------- */
 .journey{
   position:relative;
   width:100vw;
   margin-left:calc(50% - 50vw);
-  margin-top:clamp(96px,13vw,168px);
+  margin-top:var(--gap);
   --edge:max(22px, calc(50vw - 19.375rem));
   --col:calc(100vw - 2*var(--edge));
 }
@@ -314,7 +330,8 @@ a:focus-visible{outline:none;}
 .when{color:var(--gold);}
 @media (max-width:560px){ .journey[data-pin] .leg{grid-template-columns:1fr;gap:4px;} .day b{font-size:72px;} }
 
-.journey.pinned{margin-top:0;}
+/* the heading holds at --pad from the top while pinned, so the gap above it still totals --gap on the way in */
+.journey.pinned{margin-top:calc(var(--gap) - var(--pad));}
 .journey.pinned .journey-pin{
   position:sticky;
   top:0;
@@ -322,18 +339,13 @@ a:focus-visible{outline:none;}
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
-  /* a screen tall, the block centred in it by auto margins, which fall back to the top padding when it doesn't fit */
-  min-height:100vh;
-  min-height:100svh;
-  --top:clamp(28px,5vh,56px);
+  --top:var(--pad);
   padding-top:var(--top);
-  padding-bottom:24px;
   box-sizing:border-box;
 }
 /* cards dissolve as they leave to the left, so they never slide under the side menu */
 .journey.pinned .leg:has(~ .leg.on){opacity:0;}
-.journey.pinned h2{margin-top:auto;}
-.journey.pinned .journey-rail{margin-bottom:auto;}
+.journey.pinned h2{margin-top:0;}
 .journey.pinned .tabs{margin-bottom:clamp(18px,2.2vw,30px);}
 
 .journey.attire .leg{display:block;}
@@ -348,12 +360,10 @@ a:focus-visible{outline:none;}
 .journey.pinned.attire picture{margin:0 0 clamp(14px,1.8vw,22px);}
 .journey.pinned.attire picture + .swatches{margin-bottom:clamp(16px,2vw,24px);}
 @media (max-height:820px){
-  .journey.pinned .journey-pin{--top:clamp(20px,3.5vh,32px);}
   .journey.pinned .tabs{margin-bottom:18px;}
 }
 @media (max-width:760px){
   .journey.pinned .journey-pin{
-    --top:clamp(16px,3svh,28px);
     -webkit-mask-image:linear-gradient(to right,transparent,#000 var(--edge));
             mask-image:linear-gradient(to right,transparent,#000 var(--edge));
   }
@@ -371,7 +381,7 @@ a:focus-visible{outline:none;}
 .attire img{display:block;width:100%;height:auto;filter:drop-shadow(0 18px 28px rgba(0,0,0,.5));}
 
 /* a gallery wall between sections: gilt frames hung straight on the page, no backdrop */
-.wall{margin:clamp(96px,13vw,168px) auto 0;width:min(52rem,100%);}
+.wall{margin:var(--gap) auto 0;width:min(52rem,100%);}
 .wall img{display:block;width:100%;height:auto;filter:drop-shadow(0 18px 28px rgba(0,0,0,.55));}
 .journey.pinned .journey-rail{flex-direction:row;gap:clamp(72px,9vw,150px);will-change:transform;}
 .journey.pinned .leg{flex:0 0 auto;width:auto;max-width:calc(100vw - var(--edge) - 32px);opacity:.16;transition:opacity .7s cubic-bezier(.2,.7,.3,1);}
@@ -683,7 +693,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
 <section class="journey attire" data-pin aria-label="Attire">
 <div class="journey-pin">
-<h2 id="attire">Attire</h2>
+<h2 id="attire">Attire<picture class="sticker-2 sticker-dance" aria-hidden="true"><source type="image/webp" srcset="img/sticker-dance-sm.webp 220w, img/sticker-dance.webp 340w" sizes="182px"><img src="img/sticker-dance.png" width="340" height="224" alt="" loading="lazy" decoding="async"></picture></h2>
 <div class="journey-rail">
 <article class="leg" data-tab="Welcome Party">
 <div class="leg-body">
@@ -722,7 +732,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
 <section class="journey" aria-label="FAQs">
 <div class="journey-pin">
-<h2 id="faq">FAQs</h2>
+<h2 id="faq">FAQs<picture class="sticker-2 sticker-hearts" aria-hidden="true"><source type="image/webp" srcset="img/sticker-hearts-sm.webp 220w, img/sticker-hearts.webp 340w" sizes="140px"><img src="img/sticker-hearts.png" width="340" height="288" alt="" loading="lazy" decoding="async"></picture></h2>
 <div class="journey-rail">
 <article class="leg" data-tab="Kids &amp; parents">
 <div class="leg-body">
@@ -1077,11 +1087,16 @@ picture{margin-block:clamp(52px,8vw,104px);}
       /* too short to show a whole card: stacked cards beat a clipped one */
       if(on && pin.offsetHeight > vh){ on = false; }
       journey.classList.toggle('pinned', on);
-      if(!on){ running = false; x = target = 0; journey.style.height = ''; rail.style.transform = ''; J.len = 0; J.step(); return; }
+      if(!on){ running = false; x = target = 0; journey.style.height = journey.style.marginBottom = ''; rail.style.transform = ''; J.len = 0; J.step(); return; }
       J.dist = legs[legs.length - 1].offsetLeft - legs[0].offsetLeft;
       J.len = (legs.length - 1) * vh * 1.5;
       /* the last day stays pinned a little longer before the page moves on */
       journey.style.height = (pin.offsetHeight + vh * 0.6 + J.len) + 'px';
+      /* the rail is as tall as its tallest card, but the last card is the one on screen as the page moves on,
+         so the next section's gap is measured from where that card's text ends */
+      var end = legs[legs.length - 1];
+      while(end.lastElementChild && end.tagName !== 'P'){ end = end.lastElementChild; }
+      journey.style.marginBottom = -Math.max(0, Math.round(pin.getBoundingClientRect().bottom - end.getBoundingClientRect().bottom)) + 'px';
       J.step(true);
     };
     return J;
