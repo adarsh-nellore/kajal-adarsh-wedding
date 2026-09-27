@@ -214,20 +214,22 @@ a:focus-visible{outline:none;}
   }
 }
 /* heading stickers hang in the left margin beside the heading, so they're on screen whenever the heading is;
-   phones have no margin, so there they sit at the heading's right end, level with it */
+   phones have no margin, so there they sit at the heading's right end, bottom-aligned so they never cover the tabs below */
 #weekend,#faq{position:relative;}
 .sticker-2{
   --tilt:-5deg;
   position:absolute;
   right:0;
-  top:-18px;
-  width:76px;
+  bottom:0;
+  width:64px;
+  margin:0;
 }
 .sticker-2.sticker-hats{--tilt:4deg;}
 @media (min-width:1000px){
   .sticker-2{
     right:calc(100% + clamp(20px,2.4vw,40px));
     top:0;
+    bottom:auto;
     width:clamp(96px,9vw,140px);
   }
 }
