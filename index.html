@@ -336,7 +336,11 @@ a:focus-visible{outline:none;}
 .journey-rail{display:flex;flex-direction:column;gap:clamp(56px,8vw,96px);padding-inline:var(--edge);}
 .leg-body{max-width:38.75rem;}
 .leg h3{margin-top:0;}
+.leg p + h3{margin-top:32px;}
 .leg p{max-width:none;}
+.leg ul{margin:10px 0 0;padding-left:1.2em;}
+.leg li + li{margin-top:6px;}
+.leg ul + p{margin-top:19px;}
 .journey[data-pin] .leg{display:grid;grid-template-columns:auto 1fr;gap:clamp(22px,3vw,48px);align-items:start;}
 .journey[data-pin] .leg-body{max-width:30rem;}
 .day{color:var(--gold);}
@@ -423,9 +427,9 @@ a:focus-visible{outline:none;}
 }
 @media (prefers-reduced-motion:reduce){ .frame img{animation:none;} }
 .frame-dance{--w:min(24rem,62vw);--x:.8;--r:-2.2deg;--d:-1s;}
-.frame-chairs{--w:min(32rem,70vw);--x:-.9;--r:1.6deg;--d:-4s;}
-.frame-tacos{--w:min(22rem,58vw);--x:.45;--r:2.4deg;--d:-2.5s;}
-.frame-flowers{--w:min(19rem,50vw);--x:-.6;--r:-1.8deg;--d:-5.2s;}
+.frame-market{--w:min(24rem,62vw);--x:-.9;--r:1.6deg;--d:-4s;}
+.frame-tacos{--w:min(24rem,62vw);--x:.45;--r:2.4deg;--d:-2.5s;}
+.frame-cliff{--w:min(32rem,72vw);--x:-.6;--r:-1.8deg;--d:-5.2s;}
 .journey.pinned .journey-rail{flex-direction:row;gap:clamp(72px,9vw,150px);will-change:transform;}
 .journey.pinned .leg{flex:0 0 auto;width:auto;max-width:calc(100vw - var(--edge) - 32px);opacity:.16;transition:opacity .7s cubic-bezier(.2,.7,.3,1);}
 .journey.pinned .leg.on{opacity:1;}
@@ -715,29 +719,37 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="journey-rail">
 <article class="leg" data-tab="Hotel">
 <div class="leg-body">
-<p>We'll be staying at Andaz Mexico City Condesa, in the heart of Condesa. We have a room block available here: <a href="#" id="block">[Hotel block]</a></p>
-<p>Our room block rate is available for three days before and three days after the wedding, so we'd love for you to extend your stay and explore Mexico City if you have the time.</p>
-<p>We'll also be hosting breakfast at Andaz for hotel guests on Saturday, Sunday, and Monday mornings.</p>
+<p>We’ll be staying at Andaz Mexico City Condesa, in the heart of Condesa, an amazing neighborhood in Mexico City. We’ll have shuttles to and from all wedding events for guests staying at the hotel.</p>
+<p>We have a room block available here: <a href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener">Hyatt Room Block</a></p>
+<p><a href="https://maps.app.goo.gl/VpuFjPGXvN67A7yP8" target="_blank" rel="noopener">Directions to Andaz</a></p>
+<p>Our discounted room block rate is available three days before and three days after the wedding, so we’d love for you to extend your stay and explore Mexico City if you have the time!</p>
+<p>We’ll also be providing hotel breakfast at Andaz for hotel guests on Saturday, Sunday, and Monday mornings.</p>
 </div>
 </article>
-<article class="leg" data-tab="Getting There">
+<article class="leg" data-tab="Flying">
 <div class="leg-body">
-<p>Please fly into MEX (Mexico City International Airport). MEX is approximately 30–40 minutes from the hotel, depending on traffic. NLU is considerably farther and can take around 1.5 hours, so MEX is the more convenient option for the wedding weekend.</p>
-<p>If you're arriving from the U.S., make sure your passport meets Mexico's current entry requirements. International guests should check visa and entry requirements based on their nationality before booking travel.</p>
-<p>Once you're in Mexico City, Uber is generally the easiest way to get around. You can also arrange transportation through your hotel.</p>
+<p>Please fly into MEX (Mexico City International Airport). MEX is approximately 30–40 minutes from the hotel, depending on traffic.</p>
+<p>NLU (Felipe Ángeles International Airport) is farther from the hotel and can take approximately 1.5–2 hours depending on traffic, so we recommend flying into MEX when possible.</p>
+<p>Please note that our Welcome Event begins at 5:00 p.m. on Friday, so plan your arrival accordingly!</p>
+<p>If you’re traveling from Southern California, you may also consider flying into Tijuana (TIJ) and crossing the border. Just keep in mind that crossing the border adds some extra time and fees.</p>
+<h3>A few passport reminders</h3>
+<p>If you’re traveling from the U.S., we recommend making sure your passport is valid for at least six months after your trip.</p>
+<p>International guests should check Mexico’s current visa and entry requirements based on their nationality before booking travel.</p>
 </div>
 </article>
-<article class="leg" data-tab="Getting Around">
+<article class="leg" data-tab="Transportation">
 <div class="leg-body">
-<p>All wedding transportation will leave from Andaz Condesa.</p>
-<p>If you choose to stay elsewhere, we recommend staying within easy walking distance of Andaz so you can easily access the wedding shuttles.</p>
+<p>Once you arrive, Uber is generally the easiest way to get around Mexico City. DiDi is also popular, and your hotel can help arrange private transportation if you prefer.</p>
+<p>All wedding transportation to and from our events will leave from Andaz Condesa.</p>
+<p>If you choose to stay elsewhere, we recommend staying within easy walking distance of Andaz so you can easily hop on the wedding shuttles.</p>
+<p>And when you’re not at a wedding event, we highly recommend walking! Condesa, Roma, and many of our favorite spots are best explored on foot.</p>
 </div>
 </article>
 </div>
 </div>
 </section>
 
-<figure class="frame frame-chairs rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-chairs-sm.webp 560w, img/frame-chairs.webp 900w" sizes="(max-width:700px) 70vw, 512px"><img src="img/frame-chairs.png" width="560" height="336" alt="Kajal and Adarsh holding hands among orange chairs in a garden" loading="lazy" decoding="async"></picture></figure>
+<figure class="frame frame-market rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-market-sm.webp 560w, img/frame-market-md.webp 900w, img/frame-market.webp 1400w" sizes="(max-width:700px) 62vw, 384px"><img src="img/frame-market.png" width="700" height="863" alt="A woman carrying flowers through a marigold market" loading="lazy" decoding="async"></picture></figure>
 
 <section class="journey attire" data-pin aria-label="Attire">
 <div class="journey-pin">
@@ -778,120 +790,130 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </section>
 
-<figure class="frame frame-tacos rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-tacos-sm.webp 560w, img/frame-tacos.webp 900w" sizes="(max-width:700px) 58vw, 352px"><img src="img/frame-tacos.png" width="560" height="708" alt="Kajal and Adarsh eating tacos" loading="lazy" decoding="async"></picture></figure>
+<figure class="frame frame-tacos rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-tacos-sm.webp 560w, img/frame-tacos-md.webp 900w, img/frame-tacos.webp 1400w" sizes="(max-width:700px) 62vw, 384px"><img src="img/frame-tacos.png" width="700" height="884" alt="Kajal and Adarsh eating tacos" loading="lazy" decoding="async"></picture></figure>
 
 <section class="journey" aria-label="FAQs">
 <div class="journey-pin">
 <h2 id="faq">FAQs</h2>
 <div class="journey-rail">
-<article class="leg" data-tab="Kids &amp; parents">
+<article class="leg" data-tab="RSVP">
 <div class="leg-body">
-<h3>Can I bring my kids or parents?</h3>
-<p>We've reserved seats for the people listed on each invitation. Because we're working with a limited guest count, we aren't able to accommodate additional guests right now. If you have a specific situation you'd like to discuss, please reach out to us.</p>
+<h3>When is the RSVP deadline?</h3>
+<p>Please RSVP by January 10. The sooner, the better!</p>
 </div>
 </article>
-<article class="leg" data-tab="Room capacity">
+<article class="leg" data-tab="Plus Ones">
 <div class="leg-body">
-<h3>How many people can stay in each hotel room?</h3>
-<p>Andaz king rooms accommodate 2 guests, while rooms with two beds accommodate 3 guests. Rollaway beds may also be available upon request.</p>
+<h3>Can I bring a plus one, my kids, or my parents?</h3>
+<p>Invitations have been extended to the guests listed on your RSVP. If there are additional people you’d like to bring, please let us know and we’ll do our best to accommodate them!</p>
 </div>
 </article>
-<article class="leg" data-tab="Other hotels">
+<article class="leg" data-tab="Attire">
 <div class="leg-body">
-<h3>Can I stay somewhere besides Andaz?</h3>
-<p>Absolutely. We just ask that you stay within easy walking distance of Andaz, since all wedding transportation will depart from there.</p>
+<h3>What should I wear to each event?</h3>
+<p>Please use the attire guidance listed for each event as inspiration! We’d love for you to wear something that feels like you, fits your personal style, and that you feel comfortable in.</p>
+<p>The images are simply here for inspiration, so please don’t feel like you need to recreate a particular look. If you have any questions related to attire, please reach out to us.</p>
 </div>
 </article>
-<article class="leg" data-tab="Airbnbs">
+<article class="leg" data-tab="Venues">
 <div class="leg-body">
-<h3>Can I stay in an Airbnb?</h3>
-<p>Yes, but please keep a few things in mind. Make sure it's within easy walking distance of Andaz and confirm that it has air conditioning. Many Mexico City accommodations do not have AC.</p>
+<p>We want to surprise everyone with the venues - trust us on this journey! The venues will be between a 20 - 40 minute drive from the hotel.</p>
 </div>
 </article>
-<article class="leg" data-tab="What to wear">
+<article class="leg" data-tab="Room Capacity">
 <div class="leg-body">
-<h3>What should I wear if I don't own Indian clothes?</h3>
-<p>You can absolutely wear something from your own wardrobe. For the wedding, think formal and festive. If you'd like to wear Indian clothing but aren't sure what to choose, we're happy to help!</p>
+<h3>How many people can stay in each room?</h3>
+<p>King rooms and suites accommodate 2 guests, while double rooms accommodate up to 3 guests. A rollaway bed may be available upon request.</p>
+<p>Additional guests may be accommodated for a small nightly fee, with a maximum of 3 adults or 2 adults + 2 children in double rooms.</p>
 </div>
 </article>
-<article class="leg" data-tab="Indoors?">
+<article class="leg" data-tab="Staying Elsewhere">
 <div class="leg-body">
-<h3>Is everything indoors?</h3>
-<p>No. The Welcome Party and Haldi will have outdoor portions, while the wedding and After Party will be indoors.</p>
-<p>We recommend comfortable shoes and bringing a light layer for the evening.</p>
-</div>
-</article>
-<article class="leg" data-tab="Shoes">
-<div class="leg-body">
-<h3>What shoes should I wear?</h3>
-<p>There will be some walking and standing throughout the weekend, so comfortable shoes are a good idea. For the Haldi and Saatak events especially, choose shoes that are comfortable for walking, and over grass.</p>
-</div>
-</article>
-<article class="leg" data-tab="Extending">
-<div class="leg-body">
-<h3>Can I extend my trip?</h3>
-<p>Absolutely. We'd love for you to turn the wedding into a longer Mexico City trip. Our hotel block rate is available for three days before and after the wedding.</p>
-</div>
-</article>
-<article class="leg" data-tab="Booking early">
-<div class="leg-body">
-<h3>Is there anything I should book early?</h3>
-<p>Flights and hotels are the main things to book early, particularly if you'd like to stay at Andaz or extend your trip.</p>
-</div>
-</article>
-<article class="leg" data-tab="International">
-<div class="leg-body">
-<h3>What should I know if I'm traveling internationally?</h3>
-<p>Make sure your passport is valid for your trip, check Mexico's entry requirements based on your nationality, and give yourself plenty of time at the airport.</p>
-<p>We also recommend having a backup copy of your passport and important travel information, keeping your phone charged, and letting your bank know you'll be traveling internationally if required by your bank.</p>
-<p>If you're coming from outside the U.S., please check the Mexican government's current entry requirements for your country before traveling.</p>
+<h3>I’m interested in staying at an Airbnb. What should I consider?</h3>
+<p>Of course! If you choose to stay at an Airbnb or another accommodation, we recommend choosing somewhere within easy walking distance of Andaz so you can easily access the wedding shuttles.</p>
+<p>Also, be sure to confirm that your accommodation has air conditioning. Many Mexico City accommodations do not have A/C.</p>
 </div>
 </article>
 <article class="leg" data-tab="Weather">
 <div class="leg-body">
 <h3>What will the weather be like?</h3>
-<p>February is typically dry and warm during the day, with cooler evenings. Expect afternoons to have a high of 75 and evenings to be cool around 60.</p>
+<p>February is typically dry and comfortable in Mexico City, with warm days and cooler evenings. Expect daytime temperatures around 75°F and evenings around 60°F.</p>
+<p>Mexico City is also at a high elevation, so you may notice the altitude when you first arrive. Take it easy on your first day, stay hydrated, wear sunscreen, and give yourself some time to adjust.</p>
 </div>
 </article>
-<article class="leg" data-tab="Altitude">
+<article class="leg" data-tab="Extending">
 <div class="leg-body">
-<h3>Will I notice the altitude?</h3>
-<p>Mexico City sits at a high elevation, so you may notice the altitude when you first arrive. Take it easy on your first day, drink electrolytes, wear sunscreen, and give yourself some time to adjust.</p>
+<h3>How many extra days should I stay in Mexico City?</h3>
+<p>We recommend staying for at least three extra days if you’d like to explore the city and surrounding areas. And if you have a week, you definitely won’t run out of things to do.</p>
+<p>Some popular spots include:</p>
+<ul>
+<li>Chapultepec Park: Museums, gardens, and a fortress</li>
+<li>Coyoacán: Vibrant neighborhood that includes the Frida Kahlo Museum</li>
+<li>Zócalo &amp; Centro Histórico: Historic center, with tons of activity</li>
+<li>Xochimilco: Colorful boats and canals</li>
+<li>Teotihuacán: Aztec pyramids just outside Mexico City. Hot air balloons are popular!</li>
+</ul>
+<p>Our favorite way to spend time in Mexico City is wandering around neighborhoods. Roma, Condesa, and Polanco are full of great restaurants, coffee shops, boutiques, galleries, and bars.</p>
+<p>We’ll add some of our favorite spots to the website as we get closer to the wedding!</p>
 </div>
 </article>
-<article class="leg" data-tab="Pesos">
+<article class="leg" data-tab="Free Time">
 <div class="leg-body">
-<h3>Should I bring pesos?</h3>
-<p>The local currency is the Mexican peso. Credit cards are widely accepted, but it's useful to have some pesos for smaller shops, markets, and tips. ATMs are widely available, though we recommend using ATMs located inside banks or other secure locations.</p>
+<h3>Will there be downtime over the weekend?</h3>
+<p>Yes! There will be no wedding event Saturday night.</p>
+<p>We’ll be back at the hotel around 4:00 p.m. after the daytime events, so the evening is yours. Rest, explore, grab a margarita, or make a dinner reservation with your group. Do whatever sounds most fun!</p>
 </div>
 </article>
-<article class="leg" data-tab="Water">
+<article class="leg" data-tab="Safety">
 <div class="leg-body">
-<h3>Can I drink the tap water?</h3>
-<p>Bottled water is recommended for drinking. Bottled water is readily available at hotels, restaurants, and shops.</p>
+<h3>What should I know about safety in Mexico City?</h3>
+<p>Mexico City is vibrant, exciting, and generally very welcoming - but like any major city, a little awareness goes a long way. Give yourself plenty of extra time to get around, as traffic can be unpredictable (especially during rush hours).</p>
+<p>We recommend using Uber or authorized taxis rather than hailing cars on the street. Keep personal belongings secure, avoid flashy valuables, and be mindful in crowded areas.</p>
+<p>When enjoying street food, look for busy stands with high turnover and freshly prepared items, and stick to bottled water. With a bit of planning and awareness, you’ll have an amazing experience exploring the city!</p>
 </div>
 </article>
-<article class="leg" data-tab="Taxis">
+<article class="leg" data-tab="Visas">
 <div class="leg-body">
-<h3>Should I take taxis?</h3>
-<p>We recommend Uber or hotel-arranged transportation rather than hailing taxis on the street. When using a rideshare, always confirm the vehicle and license plate before getting in.</p>
+<h3>What should I know if I’m traveling internationally?</h3>
+<p>Please check Mexico’s current entry and visa requirements based on your nationality before traveling.</p>
+<p>We also recommend:</p>
+<ul>
+<li>Keeping a backup copy of your passport and important travel information</li>
+<li>Keeping your phone charged while traveling</li>
+<li>Letting your bank know you’ll be traveling internationally, if required</li>
+<li>Giving yourself plenty of time at the airport</li>
+</ul>
+<p>If you’re traveling from outside the U.S., please check the Mexican government’s current requirements for your country before your trip.</p>
 </div>
 </article>
-<article class="leg" data-tab="At night">
+<article class="leg" data-tab="Taxi">
 <div class="leg-body">
-<h3>Is it safe to walk around at night?</h3>
-<p>Condesa, Roma Norte, and Polanco are popular areas for visitors, but as in any major city, keep an eye on your belongings and use extra caution when walking around late at night. We recommend traveling with others and using a rideshare after dark.</p>
+<h3>How should I get from the airport to the hotel?</h3>
+<p>We recommend using Uber to get from the airport to Andaz. DiDi is another popular option.</p>
+<p>If you’re not comfortable using a rideshare app, please let us know and we’ll be happy to help arrange transportation.</p>
+</div>
+</article>
+<article class="leg" data-tab="Gifts">
+<div class="leg-body">
+<h3>Are you accepting gifts?</h3>
+<p>We are not accepting gifts for the wedding. Your presence is truly the best gift we could ask for!</p>
+<p>If you would like to give us something, we’ll share more information closer to the wedding.</p>
+</div>
+</article>
+<article class="leg" data-tab="WhatsApp">
+<div class="leg-body">
+<p>Closer to the wedding, we’ll add everyone to a WhatsApp group with our planners so we can share important details and updates leading up to and during the wedding.</p>
 </div>
 </article>
 </div>
 </div>
 </section>
 
-<figure class="frame frame-flowers rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-flowers-sm.webp 560w, img/frame-flowers.webp 900w" sizes="(max-width:700px) 50vw, 304px"><img src="img/frame-flowers.png" width="560" height="936" alt="Kajal and Adarsh with a bouquet of flowers" loading="lazy" decoding="async"></picture></figure>
+<figure class="frame frame-cliff rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-cliff-sm.webp 560w, img/frame-cliff-md.webp 900w, img/frame-cliff.webp 1400w" sizes="(max-width:700px) 72vw, 512px"><img src="img/frame-cliff.png" width="700" height="554" alt="Kajal and Adarsh sitting on a rock above the sea" loading="lazy" decoding="async"></picture></figure>
 
 <section class="rsvp" aria-label="RSVP">
 <h2 id="rsvp">RSVP</h2>
-<p class="lede rv">We would love to celebrate with you in Mexico City. Kindly reply by [Reply-by date].</p>
+<p class="lede rv">We would love to celebrate with you in Mexico City. Kindly reply by January 10.</p>
 <form class="rsvp-form rv" novalidate>
 <div class="field">
 <label for="rsvp-name">Full name(s)</label>
