@@ -262,17 +262,13 @@ a:focus-visible{outline:none;}
 }
 
 /* heading stickers: bottom-aligned with the heading so they rise into the gap above and never reach what follows.
-   Phones and tablets: at the column's right end. Desktop: out in the margin, alternating sides down the page (.stk-l on the left);
-   where the nav rail shows but the left margin can't fit it and a sticker too, left ones come back to the column's right end */
-#stay,#rsvp{position:relative;}
+   Phones and tablets: at the column's right end. Desktop: out in the right margin */
+#rsvp{position:relative;}
 .stk-head{right:0;bottom:0;}
 @media (max-width:999px){ h2:has(> .stk-head){padding-right:calc(1.55 * var(--stk));} }
 @media (min-width:1000px){
   .stk-head{right:auto;left:calc(100% + var(--stk-gap));}
-  .stk-head.stk-l{left:auto;right:calc(100% + var(--stk-gap));}
 }
-@media (min-width:1181px) and (max-width:1299px){ .stk-head.stk-l{right:0;} }
-.stk-tacos{--tilt:calc(-1 * var(--stk-tilt));--d:-1s;}
 .stk-hearts{--d:-1.8s;}
 
 /* ---------- sections: The Weekend pins and travels sideways; the rest swap cards from an index ---------- */
@@ -699,7 +695,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
 <section class="journey" aria-label="Staying in Mexico City">
 <div class="journey-pin">
-<h2 id="stay">Staying in Mexico City<picture class="stk stk-head stk-l stk-tacos" aria-hidden="true"><source type="image/webp" srcset="img/sticker-tacos-sm.webp 220w, img/sticker-tacos.webp 340w" sizes="(max-width:999px) 100px, 168px"><img src="img/sticker-tacos.png" width="340" height="236" alt="" loading="lazy" decoding="async"></picture></h2>
+<h2 id="stay">Staying in Mexico City</h2>
 <div class="journey-rail">
 <article class="leg" data-tab="Hotel">
 <div class="leg-body">
