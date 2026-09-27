@@ -197,7 +197,7 @@ a:focus-visible{outline:none;}
 }
 @media (prefers-reduced-motion:reduce){ .stk img{animation:none !important;} }
 
-/* hero stickers, one per corner around the name: dance and couple above it (mirrored across the centre, tops level),
+/* hero stickers, one per corner around the name: hearts and couple above it (mirrored across the centre, tops level),
    selfie and standing level with the date line out at the screen edges. Out of the flow, so the name and dates lay out as without them.
    Positioned from the hero's centre using the same clamps as the h1 and .stamp:
      --f   the name's font-size; "Kajal y Adarsh" is ~4.98em wide, so its ends are 50% -/+ 2.49*--f
@@ -213,14 +213,14 @@ a:focus-visible{outline:none;}
 /* phones: the largest scale at which the pair above the name still fits across it */
 @media (max-width:600px){ .stk-hero{--k:1.15;} }
 .stk-hero img{animation:sticker-in .9s cubic-bezier(.2,.7,.3,1) var(--in,.3s) both, sticker-rock 3s ease-in-out var(--d,0s) infinite alternate;}
-.stk-couple,.stk-dance{top:calc(var(--mid) - .95 * var(--k) * var(--stk-lg));}
+.stk-couple,.stk-hearts{top:calc(var(--mid) - .95 * var(--k) * var(--stk-lg));}
 .stk-couple{--d:-1.4s;left:calc(50% + 2.49 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
-.stk-dance{--h:calc(var(--k) * var(--stk));--tilt:calc(-1 * var(--stk-tilt));--in:.6s;--d:-.6s;right:calc(50% + 2.49 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
+.stk-hearts{--h:calc(var(--k) * 1.15 * var(--stk));--tilt:calc(-1 * var(--stk-tilt));--in:.6s;--d:-.6s;right:calc(50% + 2.49 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
 /* tablets and phones: no room beside the name, so the pair sits above it, bottoms level, aligned with its two ends */
 @media (max-width:900px) and (min-height:560px){
-  .stk-couple,.stk-dance{top:calc(var(--mid) - .52 * var(--f) - 2 * var(--stk-gap) - 1.05 * var(--h));}
+  .stk-couple,.stk-hearts{top:calc(var(--mid) - .52 * var(--f) - 2 * var(--stk-gap) - 1.05 * var(--h));}
   .stk-couple{left:auto;right:calc(50% - 2.49 * var(--f));}
-  .stk-dance{right:auto;left:calc(50% - 2.49 * var(--f));}
+  .stk-hearts{right:auto;left:calc(50% - 2.49 * var(--f));}
 }
 /* dog: centred above the name, riding inside the h1 so it follows the title however it wraps (1em is the name's size).
    Its height gives way to the room left above the title on short screens; --half is half the title's height,
@@ -239,7 +239,7 @@ a:focus-visible{outline:none;}
     bottom:calc(100% + 3 * var(--stk-gap) + 1.2 * var(--k) * var(--stk-lg) + .5 * var(--swing));
   }
 }
-/* short phones: no row to spare up there, so it drops between the pair under the dates (three lines at 1.5), at the dance's size */
+/* short phones: no row to spare up there, so it drops between the pair under the dates (three lines at 1.5), at the base sticker size */
 @media (max-width:760px) and (min-height:560px) and (max-height:719px){
   .stk-dog{
     --h:calc(var(--k) * var(--stk));
@@ -260,16 +260,6 @@ a:focus-visible{outline:none;}
   .stk-selfie{left:max(0px, var(--swing) - clamp(22px,7vw,88px));}
   .stk-standing{right:max(0px, var(--swing) - clamp(22px,7vw,88px));}
 }
-
-/* heading stickers: bottom-aligned with the heading so they rise into the gap above and never reach what follows.
-   Phones and tablets: at the column's right end. Desktop: out in the right margin */
-#rsvp{position:relative;}
-.stk-head{right:0;bottom:0;}
-@media (max-width:999px){ h2:has(> .stk-head){padding-right:calc(1.55 * var(--stk));} }
-@media (min-width:1000px){
-  .stk-head{right:auto;left:calc(100% + var(--stk-gap));}
-}
-.stk-hearts{--d:-1.8s;}
 
 /* ---------- sections: The Weekend pins and travels sideways; the rest swap cards from an index ---------- */
 .journey{
@@ -652,7 +642,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <source type="image/webp" srcset="img/sticker-selfie-sm.webp 220w, img/sticker-selfie.webp 340w" sizes="(max-width:900px) 130px, 210px">
 <img src="img/sticker-selfie.png" width="340" height="338" alt="" decoding="async">
 </picture></p>
-<picture class="stk stk-hero stk-dance" data-px="0.28" data-px-hero aria-hidden="true"><source type="image/webp" srcset="img/sticker-dance-sm.webp 220w, img/sticker-dance.webp 340w" sizes="(max-width:900px) 140px, 235px"><img src="img/sticker-dance.png" width="340" height="224" alt="" decoding="async"></picture>
+<picture class="stk stk-hero stk-hearts" data-px="0.28" data-px-hero aria-hidden="true"><source type="image/webp" srcset="img/sticker-hearts-sm.webp 220w, img/sticker-hearts.webp 340w" sizes="(max-width:900px) 150px, 250px"><img src="img/sticker-hearts.png" width="340" height="288" alt="" decoding="async"></picture>
 <picture class="stk stk-hero stk-couple" data-px="0.28" data-px-hero>
 <source type="image/webp" srcset="img/sticker-couple-sm.webp 220w, img/sticker-couple.webp 340w" sizes="(max-width:900px) 130px, 210px">
 <img src="img/sticker-couple.png" width="340" height="355" alt="Kajal and Adarsh" decoding="async">
@@ -889,7 +879,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <figure class="frame frame-flowers rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-flowers-sm.webp 560w, img/frame-flowers.webp 900w" sizes="(max-width:700px) 50vw, 304px"><img src="img/frame-flowers.png" width="560" height="936" alt="Kajal and Adarsh with a bouquet of flowers" loading="lazy" decoding="async"></picture></figure>
 
 <section class="rsvp" aria-label="RSVP">
-<h2 id="rsvp">RSVP<picture class="stk stk-head stk-hearts" aria-hidden="true"><source type="image/webp" srcset="img/sticker-hearts-sm.webp 220w, img/sticker-hearts.webp 340w" sizes="(max-width:999px) 80px, 137px"><img src="img/sticker-hearts.png" width="340" height="288" alt="" loading="lazy" decoding="async"></picture></h2>
+<h2 id="rsvp">RSVP</h2>
 <p class="lede rv">We would love to celebrate with you in Mexico City. Kindly reply by [Reply-by date].</p>
 <form class="rsvp-form rv" novalidate>
 <div class="field">
