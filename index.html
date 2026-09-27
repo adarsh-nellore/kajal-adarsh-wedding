@@ -16,9 +16,8 @@
   --white:#EAE3D6;   /* everything else — off-white, warmed to sit with the gold (15:1) */
   --head:'Jaini','EB Garamond',Georgia,serif;
   --body:'EB Garamond',Georgia,'Times New Roman',serif;
-  /* one gap between sections, and the offset from the top of the screen where every heading lands (matches pad() in the script) */
+  /* the one gap between the end of a section and the next heading */
   --gap:clamp(96px,13vw,168px);
-  --pad:clamp(24px,6vh,64px);
 }
 *{box-sizing:border-box;}
 html{overflow-x:clip;}
@@ -248,6 +247,11 @@ a:focus-visible{outline:none;}
 }
 .sticker-2 img{display:block;width:100%;height:auto;transform:rotate(var(--tilt));transform-origin:50% 4%;filter:drop-shadow(0 10px 16px rgba(0,0,0,.5));animation:sticker-rock 3.2s ease-in-out -.6s infinite alternate;}
 @media (prefers-reduced-motion:reduce){ .sticker-2 img{animation:none;} }
+/* The Weekend: standing tall off the right end of the heading line, clear of the names below */
+#weekend{position:relative;}
+.sticker-standing{--tilt:4deg;position:absolute;right:calc(-1 * clamp(0px,8vw - 60px,80px));bottom:0;width:clamp(44px,5vw,66px);margin:0;pointer-events:none;}
+.sticker-standing img{display:block;width:100%;height:auto;transform:rotate(var(--tilt));transform-origin:50% 4%;filter:drop-shadow(0 10px 16px rgba(0,0,0,.5));animation:sticker-rock 3.6s ease-in-out -2.1s infinite alternate;}
+@media (prefers-reduced-motion:reduce){ .sticker-standing img{animation:none;} }
 
 /* ---------- sections: The Weekend pins and travels sideways; the rest swap cards from an index ---------- */
 .journey{
@@ -331,8 +335,11 @@ a:focus-visible{outline:none;}
 .when{color:var(--gold);}
 @media (max-width:560px){ .journey[data-pin] .leg{grid-template-columns:1fr;gap:4px;} .day b{font-size:72px;} }
 
-/* the heading holds at --pad from the top while pinned, so the gap above it still totals --gap on the way in */
-.journey.pinned{margin-top:calc(var(--gap) - var(--pad));}
+/* the block sits centred in a screen-tall pin; the script sets --lift/--drop to the empty space above the heading
+   and below the last card, so the gap to the neighbouring sections still reads as --gap.
+   The pin can then overlap the previous section's tail, so only its content takes clicks */
+.journey.pinned{margin-top:calc(var(--gap) - var(--lift, 0px));margin-bottom:calc(0px - var(--drop, 0px));pointer-events:none;}
+.journey.pinned .journey-pin > *{pointer-events:auto;}
 .journey.pinned .journey-pin{
   position:sticky;
   top:0;
@@ -340,13 +347,17 @@ a:focus-visible{outline:none;}
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
-  --top:var(--pad);
-  padding-top:var(--top);
+  /* a screen tall, the block centred in it by auto margins, which fall back to the padding when it doesn't fit */
+  min-height:100vh;
+  min-height:100svh;
+  --top:clamp(28px,5vh,56px);
+  padding-block:var(--top);
   box-sizing:border-box;
 }
 /* cards dissolve as they leave to the left, so they never slide under the side menu */
 .journey.pinned .leg:has(~ .leg.on){opacity:0;}
-.journey.pinned h2{margin-top:0;}
+.journey.pinned h2{margin-top:auto;}
+.journey.pinned .journey-rail{margin-bottom:auto;}
 .journey.pinned .tabs{margin-bottom:clamp(18px,2.2vw,30px);}
 
 .journey.attire .leg{display:block;}
@@ -361,10 +372,12 @@ a:focus-visible{outline:none;}
 .journey.pinned.attire picture{margin:0 0 clamp(14px,1.8vw,22px);}
 .journey.pinned.attire picture + .swatches{margin-bottom:clamp(16px,2vw,24px);}
 @media (max-height:820px){
+  .journey.pinned .journey-pin{--top:clamp(20px,3.5vh,32px);}
   .journey.pinned .tabs{margin-bottom:18px;}
 }
 @media (max-width:760px){
   .journey.pinned .journey-pin{
+    --top:clamp(16px,3svh,28px);
     -webkit-mask-image:linear-gradient(to right,transparent,#000 var(--edge));
             mask-image:linear-gradient(to right,transparent,#000 var(--edge));
   }
@@ -618,7 +631,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <a class="cue" href="#weekend" aria-label="Skip to the details"><span aria-hidden="true">↓</span></a></header>
 <section class="journey" data-pin aria-label="The Weekend">
 <div class="journey-pin">
-<h2 id="weekend">The Weekend</h2>
+<h2 id="weekend">The Weekend<picture class="sticker-standing" aria-hidden="true"><source type="image/webp" srcset="img/sticker-standing-sm.webp 220w, img/sticker-standing.webp 340w" sizes="66px"><img src="img/sticker-standing.png" width="340" height="774" alt="" decoding="async"></picture></h2>
 <div class="journey-rail">
 <article class="leg" data-tab="Friday Night">
 <div class="day"><b>2.19</b></div>
@@ -1081,23 +1094,24 @@ picture{margin-block:clamp(52px,8vw,104px);}
         var rest = 0;
         legs.forEach(function(l){ var im = l.querySelector('img'); rest = Math.max(rest, l.offsetHeight - (im ? im.offsetHeight : 0)); });
         var head = rail.offsetTop - pin.firstElementChild.offsetTop + parseFloat(getComputedStyle(pin).paddingTop);
-        var room = Math.floor(vh - head - rest - 48);
+        var room = Math.floor(vh - head - rest - parseFloat(getComputedStyle(pin).paddingBottom) - 24);
         journey.style.setProperty('--img', room + 'px');
         if(room < 110){ on = false; }
       }
       /* too short to show a whole card: stacked cards beat a clipped one */
       if(on && pin.offsetHeight > vh){ on = false; }
       journey.classList.toggle('pinned', on);
-      if(!on){ running = false; x = target = 0; journey.style.height = journey.style.marginBottom = ''; rail.style.transform = ''; J.len = 0; J.step(); return; }
+      if(!on){ running = false; x = target = 0; journey.style.height = ''; journey.style.removeProperty('--lift'); journey.style.removeProperty('--drop'); rail.style.transform = ''; J.len = 0; J.step(); return; }
       J.dist = legs[legs.length - 1].offsetLeft - legs[0].offsetLeft;
       J.len = (legs.length - 1) * vh * 1.5;
       /* the last day stays pinned a little longer before the page moves on */
       journey.style.height = (pin.offsetHeight + vh * 0.6 + J.len) + 'px';
-      /* the rail is as tall as its tallest card, but the last card is the one on screen as the page moves on,
-         so the next section's gap is measured from where that card's text ends */
-      var end = legs[legs.length - 1];
+      /* the last card is the one on screen as the page moves on, and the rail is as tall as the tallest card,
+         so the gap below is measured from where the last card's text ends */
+      var end = legs[legs.length - 1], box = pin.getBoundingClientRect();
       while(end.lastElementChild && end.tagName !== 'P'){ end = end.lastElementChild; }
-      journey.style.marginBottom = -Math.max(0, Math.round(pin.getBoundingClientRect().bottom - end.getBoundingClientRect().bottom)) + 'px';
+      journey.style.setProperty('--lift', Math.round(pin.firstElementChild.getBoundingClientRect().top - box.top) + 'px');
+      journey.style.setProperty('--drop', Math.max(0, Math.round(box.bottom - end.getBoundingClientRect().bottom)) + 'px');
       J.step(true);
     };
     return J;
