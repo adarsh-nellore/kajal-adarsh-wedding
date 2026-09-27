@@ -216,6 +216,11 @@ a:focus-visible{outline:none;}
 .stk-couple,.stk-hearts{top:calc(var(--mid) - .95 * var(--k) * var(--stk-lg));}
 .stk-couple{--d:-1.4s;left:calc(50% + 2.49 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
 .stk-hearts{--h:calc(var(--k) * 1.15 * var(--stk));--tilt:calc(-1 * var(--stk-tilt));--in:.6s;--d:-.6s;right:calc(50% + 2.49 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
+/* beside the nav rail the name wraps to two lines, the longer "Kajal y" ~2.44em wide */
+@media (min-width:1181px) and (max-width:1327px){
+  .stk-couple{left:calc(50% + 1.22 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
+  .stk-hearts{right:calc(50% + 1.22 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
+}
 /* tablets and phones: no room beside the name, so the pair sits above it, bottoms level, aligned with its two ends */
 @media (max-width:900px) and (min-height:560px){
   .stk-couple,.stk-hearts{top:calc(var(--mid) - .52 * var(--f) - 2 * var(--stk-gap) - 1.05 * var(--h));}
@@ -251,14 +256,15 @@ a:focus-visible{outline:none;}
 @media (min-width:1181px) and (max-width:1327px) and (max-height:830px),(min-width:901px) and (max-height:680px){ .stk-dog{display:none;} }
 .stamp{position:relative;}
 .stk-selfie,.stk-standing{top:50%;margin-top:calc(-.35 * var(--h));}
-/* edge stickers stay in by --swing, how far the rock carries their lower end, so they never push past the screen */
-.stk-selfie{--in:.45s;--d:-.2s;left:calc(50% - 50vw + clamp(18px,2.6vw,42px) + var(--swing));}
-.stk-standing{--h:calc(var(--k) * 1.35 * var(--stk-lg));--tilt:calc(-1 * var(--stk-tilt));--in:.75s;--d:-2.1s;right:calc(50% - 50vw + clamp(18px,2.6vw,42px) + var(--swing));}
+/* just outside the ends of the date line, but never nearer the screen edge than --swing (how far the rock carries
+   their lower end) past the edge margin; the selfie is about as wide as it is tall, the standing pair .44 of its height */
+.stk-selfie{--in:.45s;--d:-.2s;right:min(100% + 2 * var(--stk-gap) + var(--swing), 50vw + 50% - var(--h) - clamp(18px,2.6vw,42px) - var(--swing));}
+.stk-standing{--h:calc(var(--k) * 1.35 * var(--stk-lg));--tilt:calc(-1 * var(--stk-tilt));--in:.75s;--d:-2.1s;left:min(100% + 2 * var(--stk-gap) + var(--swing), 50vw + 50% - .44 * var(--h) - clamp(18px,2.6vw,42px) - var(--swing));}
 /* tablets and phones: no room beside the dates, so the pair drops just below them, at the column's two edges */
 @media (max-width:900px) and (min-height:560px){
   .stk-selfie,.stk-standing{top:calc(100% + var(--stk-gap));margin-top:0;}
-  .stk-selfie{left:max(0px, var(--swing) - clamp(22px,7vw,88px));}
-  .stk-standing{right:max(0px, var(--swing) - clamp(22px,7vw,88px));}
+  .stk-selfie{right:auto;left:max(0px, var(--swing) - clamp(22px,7vw,88px));}
+  .stk-standing{left:auto;right:max(0px, var(--swing) - clamp(22px,7vw,88px));}
 }
 
 /* ---------- sections: The Weekend pins and travels sideways; the rest swap cards from an index ---------- */
