@@ -213,15 +213,23 @@ a:focus-visible{outline:none;}
     top:calc(var(--mid) - .52 * var(--f) - 28px - 1.05 * var(--w));
   }
 }
-/* second sticker rides along with The Weekend's heading, off to the right of it */
+/* heading stickers hang in the left margin beside the heading, so they're on screen whenever the heading is;
+   phones have no margin, so there they sit at the heading's right end, level with it */
 #weekend,#faq{position:relative;}
-.sticker-2.sticker-hats{--tilt:4deg;}
 .sticker-2{
   --tilt:-5deg;
   position:absolute;
   right:0;
-  bottom:10%;
-  width:clamp(84px,10vw,140px);
+  top:-18px;
+  width:76px;
+}
+.sticker-2.sticker-hats{--tilt:4deg;}
+@media (min-width:1000px){
+  .sticker-2{
+    right:calc(100% + clamp(20px,2.4vw,40px));
+    top:0;
+    width:clamp(96px,9vw,140px);
+  }
 }
 .sticker-2 img{
   display:block;
@@ -331,10 +339,9 @@ a:focus-visible{outline:none;}
   padding-top:var(--top);
   padding-bottom:24px;
   box-sizing:border-box;
-  /* cards dissolve as they leave to the left, so they never slide under the side menu */
-  -webkit-mask-image:linear-gradient(to right,transparent calc(var(--edge) - 190px),#000 calc(var(--edge) - 24px));
-          mask-image:linear-gradient(to right,transparent calc(var(--edge) - 190px),#000 calc(var(--edge) - 24px));
 }
+/* cards dissolve as they leave to the left, so they never slide under the side menu or the sticker in the margin */
+.journey.pinned .leg:has(~ .leg.on){opacity:0;}
 .journey.pinned h2{margin-top:auto;}
 .journey.pinned .journey-rail{margin-bottom:auto;}
 .journey.pinned .tabs{margin-bottom:clamp(18px,2.2vw,30px);}
