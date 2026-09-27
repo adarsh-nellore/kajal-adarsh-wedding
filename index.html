@@ -162,6 +162,57 @@ a:focus-visible{outline:none;}
 .cue.gone{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .35s cubic-bezier(.2,.7,.3,1),visibility 0s .35s;}
 .hero + h2{margin-top:clamp(64px,10vw,120px);}
 
+/* couple sticker: out of the flow entirely, so the name and dates lay out exactly as before.
+   Positioned from the hero's centre using the same clamps as the h1 and .stamp:
+     --f   the name's font-size; "Kajal y Adarsh" is ~4.98em wide, so its right end is 50% + 2.49*--f
+     --mid the name's vertical centre (the centred block minus half the stamp below it)
+   Desktop: just past the "h", rising above the name's top-right corner, balancing the nav rail. */
+.sticker{
+  --tilt:6deg;
+  --f:clamp(54px,12vw,148px);
+  --mid:calc(50% - (clamp(30px,4vw,52px) + 3 * clamp(19px,2.4vw,26px)) / 2);
+  --w:clamp(120px,11vw,165px);
+  position:absolute;
+  z-index:1;
+  left:calc(50% + 2.49 * var(--f) + clamp(16px,2vw,28px));
+  top:calc(var(--mid) - .8 * var(--w));
+  display:block;
+  width:var(--w);
+  margin:0;
+  will-change:transform;
+}
+.sticker img{
+  display:block;
+  width:100%;
+  height:auto;
+  transform:rotate(var(--tilt));
+  transform-origin:50% 4%;
+  filter:drop-shadow(0 10px 16px rgba(0,0,0,.5));
+  /* the rock drives the separate `rotate` property, so it stacks on the tilt/entrance transform
+     here and the parallax transform on the <picture> without overriding either */
+  animation:sticker-in .9s cubic-bezier(.2,.7,.3,1) .3s both, sticker-rock 5s ease-in-out -1.2s infinite alternate;
+}
+@keyframes sticker-in{
+  from{opacity:0;transform:rotate(calc(var(--tilt) - 9deg)) scale(1.12);}
+  55%{opacity:1;}
+  to{opacity:1;transform:rotate(var(--tilt)) scale(1);}
+}
+@keyframes sticker-rock{
+  from{rotate:3deg;}
+  to{rotate:-7deg;}
+}
+/* tablets and phones: no room beside the name, so it sits in the open space above it,
+   right-aligned with the end of "Adarsh" and clear of the line box */
+@media (max-width:900px) and (min-height:560px){
+  .sticker{
+    --tilt:5deg;
+    --w:clamp(100px,24vw,140px);
+    left:calc(50% + 2.49 * var(--f) - var(--w));
+    top:calc(var(--mid) - .52 * var(--f) - 28px - 1.05 * var(--w));
+  }
+}
+@media (prefers-reduced-motion:reduce){ .sticker img{animation:none;} }
+
 /* ---------- sections: The Weekend pins and travels sideways; the rest swap cards from an index ---------- */
 .journey{
   position:relative;
@@ -252,14 +303,20 @@ a:focus-visible{outline:none;}
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
-  --top:clamp(64px,12vh,128px);
+  /* a screen tall, the block centred in it by auto margins, which fall back to the top padding when it doesn't fit */
+  min-height:100vh;
+  min-height:100svh;
+  --top:clamp(28px,5vh,56px);
   padding-top:var(--top);
+  padding-bottom:24px;
   box-sizing:border-box;
   /* cards dissolve as they leave to the left, so they never slide under the side menu */
   -webkit-mask-image:linear-gradient(to right,transparent calc(var(--edge) - 190px),#000 calc(var(--edge) - 24px));
           mask-image:linear-gradient(to right,transparent calc(var(--edge) - 190px),#000 calc(var(--edge) - 24px));
 }
-.journey.pinned h2{margin-top:0;}
+.journey.pinned h2{margin-top:auto;}
+.journey.pinned .journey-rail{margin-bottom:auto;}
+.journey.pinned .tabs{margin-bottom:clamp(18px,2.2vw,30px);}
 
 .journey.attire .leg{display:block;}
 .journey.attire .leg-body{max-width:none;width:min(44rem, calc(100vw - var(--edge) - 32px));}
@@ -267,15 +324,27 @@ a:focus-visible{outline:none;}
 .attire .leg-body p{max-width:38.75rem;margin-inline:0;}
 .attire .when + p{margin-top:6px;}
 .journey.attire .leg-body{padding-bottom:12px;}
-/* while pinned the whole card has to fit on screen, so the lineup gives up height on short windows;
-   the px constant is everything else in the pin (heading, tabs, text, swatches) at its largest */
-.journey.pinned.attire img{width:auto;max-width:100%;max-height:calc(100svh - var(--top) - 448px);}
+/* while pinned the whole card has to fit on screen, so the lineup gives up height;
+   --img is set by the script from what's left after the heading, tabs, text and swatches (the px fallback is before it runs) */
+.journey.pinned.attire img{width:auto;max-width:100%;max-height:var(--img, calc(100svh - var(--top) - 448px));}
+.journey.pinned.attire picture{margin:0 0 clamp(14px,1.8vw,22px);}
+.journey.pinned.attire picture + .swatches{margin-bottom:clamp(16px,2vw,24px);}
 @media (max-height:820px){
-  .journey.pinned .journey-pin{--top:clamp(32px,6vh,64px);}
-  .journey.pinned .tabs{margin-bottom:28px;}
-  .journey.pinned.attire picture{margin:8px 0 20px;}
-  .journey.pinned.attire picture + .swatches{margin-bottom:22px;}
-  .journey.pinned.attire img{max-height:calc(100svh - var(--top) - 384px);}
+  .journey.pinned .journey-pin{--top:clamp(20px,3.5vh,32px);}
+  .journey.pinned .tabs{margin-bottom:18px;}
+}
+@media (max-width:760px){
+  .journey.pinned .journey-pin{
+    --top:clamp(16px,3svh,28px);
+    -webkit-mask-image:linear-gradient(to right,transparent,#000 var(--edge));
+            mask-image:linear-gradient(to right,transparent,#000 var(--edge));
+  }
+  .journey.pinned h2{margin-bottom:8px;}
+  .journey.pinned .tabs{margin-bottom:14px;}
+  .journey.pinned .leg{max-width:calc(100vw - 2*var(--edge));}
+  .journey.pinned.attire .leg-body{width:calc(100vw - 2*var(--edge));}
+  .journey.pinned.attire picture{margin-bottom:12px;}
+  .journey.pinned.attire picture + .swatches{margin-bottom:14px;}
 }
 .swatches{display:flex;flex-wrap:wrap;gap:10px;list-style:none;margin:22px 0 0;padding:0;}
 .attire picture + .swatches{margin:0 0 clamp(22px,2.8vw,34px);}
@@ -510,6 +579,10 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <header class="hero" id="top">
 <h1 data-px="0.20" data-px-hero>Kajal y Adarsh</h1>
 <p class="stamp" data-px="0.10" data-px-hero>Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico</p>
+<picture class="sticker" data-px="0.28" data-px-hero>
+<source type="image/webp" srcset="img/sticker-couple-sm.webp 220w, img/sticker-couple.webp 340w" sizes="(max-width:900px) 140px, 165px">
+<img src="img/sticker-couple.png" width="340" height="355" alt="Kajal and Adarsh" decoding="async">
+</picture>
 <a class="cue" href="#weekend" aria-label="Skip to the details"><span aria-hidden="true">↓</span></a></header>
 <section class="journey" data-pin aria-label="The Weekend">
 <div class="journey-pin">
@@ -803,15 +876,22 @@ picture{margin-block:clamp(52px,8vw,104px);}
     var el = document.getElementById(a.getAttribute('href').slice(1));
     if(!el) return;
     e.preventDefault();
-    var box = el.closest('.journey') || el;
-    window.scrollTo({top: box.getBoundingClientRect().top + window.scrollY, behavior: reduce ? 'auto' : 'smooth'});
+    if(reduce){
+      var box = el.closest('.journey') || el;
+      window.scrollTo({top: box.getBoundingClientRect().top + window.scrollY, behavior: 'auto'});
+    } else { glide(stopOf(el), 900); }
     a.blur();
   });
 
   var layers = Array.prototype.slice.call(document.querySelectorAll('[data-px]'));
 
   /* sections: The Weekend pins and its rail travels sideways as you scroll; the rest are a simple index that swaps cards in place */
-  var wide = window.matchMedia('(min-width:761px) and (min-height:640px)');
+  var wide = window.matchMedia('(min-width:761px) and (min-height:640px), (max-width:760px) and (min-height:500px)');
+  /* lengths key off the small viewport (address bar showing), which doesn't change as the bar slides, so nothing jitters */
+  var probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none;';
+  document.body.appendChild(probe);
+  function screenH(){ return probe.offsetHeight || window.innerHeight; }
   /* the sideways Weekend is a first-visit thing; once someone has scrolled through it, it becomes a plain index like the rest */
   var SEEN = 'weekend-seen', seen = false;
   try { seen = localStorage.getItem(SEEN) === '1'; } catch(e){}
@@ -850,7 +930,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
     pin.insertBefore(tabs, rail);
 
     function fit(){ rail.style.height = legs[J.cur].offsetHeight + 'px'; }
-    Array.prototype.forEach.call(rail.querySelectorAll('img'), function(img){
+    var imgs = rail.querySelectorAll('img');
+    Array.prototype.forEach.call(imgs, function(img){
       img.addEventListener('load', function(){
         if(index){ if(J.cur >= 0){ fit(); } }
         else if(J.measure){ J.measure(); }
@@ -899,7 +980,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
         var y = journey.classList.contains('pinned')
           ? journey.getBoundingClientRect().top + window.scrollY + J.len * i / Math.max(1, legs.length - 1)
           : legs[i].getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.2;
-        window.scrollTo({top: y, behavior: reduce ? 'auto' : 'smooth'});
+        if(reduce){ window.scrollTo({top: y, behavior: 'auto'}); } else { glide(y); }
       }
       mark(i);
     }
@@ -965,13 +1046,25 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
     J.measure = function(){
       if(index){ fit(); return; }
-      var on = wide.matches && !reduce && legs.length > 1;
+      var on = wide.matches && !reduce && legs.length > 1, vh = screenH();
+      journey.classList.toggle('pinned', on);
+      if(on && imgs.length){
+        /* the lineup gets whatever height the rest of the tallest card leaves, with some air below */
+        var rest = 0;
+        legs.forEach(function(l){ var im = l.querySelector('img'); rest = Math.max(rest, l.offsetHeight - (im ? im.offsetHeight : 0)); });
+        var head = rail.offsetTop - pin.firstElementChild.offsetTop + parseFloat(getComputedStyle(pin).paddingTop);
+        var room = Math.floor(vh - head - rest - 48);
+        journey.style.setProperty('--img', room + 'px');
+        if(room < 110){ on = false; }
+      }
+      /* too short to show a whole card: stacked cards beat a clipped one */
+      if(on && pin.offsetHeight > vh){ on = false; }
       journey.classList.toggle('pinned', on);
       if(!on){ running = false; x = target = 0; journey.style.height = ''; rail.style.transform = ''; J.len = 0; J.step(); return; }
       J.dist = legs[legs.length - 1].offsetLeft - legs[0].offsetLeft;
-      J.len = (legs.length - 1) * window.innerHeight * 1.5;
+      J.len = (legs.length - 1) * vh * 1.5;
       /* the last day stays pinned a little longer before the page moves on */
-      journey.style.height = (pin.offsetHeight + window.innerHeight * 0.6 + J.len) + 'px';
+      journey.style.height = (pin.offsetHeight + vh * 0.6 + J.len) + 'px';
       J.step(true);
     };
     return J;
@@ -1001,6 +1094,162 @@ picture{margin-block:clamp(52px,8vw,104px);}
   measureAll();
 
   if(document.fonts && document.fonts.ready){ document.fonts.ready.then(measureAll); }
+
+  /* one gesture = one stop: the top, each section, and each card of a pinned section.
+     A section taller than the screen scrolls freely to its edge; the next gesture moves on.
+     Stops are read fresh at every gesture, since index cards and the form change height as you use them. */
+  var anim = null, queued = 0;
+  function pad(){ return Math.min(64, Math.max(24, window.innerHeight * 0.06)); }
+  function stops(){
+    var vh = window.innerHeight, sy = window.scrollY, maxY = document.documentElement.scrollHeight - vh, list = [];
+    function add(s, end){ s = Math.min(maxY, Math.round(s)); list.push({s:s, end:Math.min(maxY, Math.max(s, Math.round(end)))}); }
+    add(0, document.querySelector('.hero').offsetHeight - vh);
+    Array.prototype.forEach.call(document.querySelectorAll('.journey, .rsvp'), function(el){
+      var r = el.getBoundingClientRect();
+      if(el.classList.contains('pinned')){
+        var J = journeys.filter(function(j){ return j.el === el; })[0];
+        for(var k = 0; k < J.n; k++){ add(r.top + sy + J.len * k / (J.n - 1), 0); }
+        return;
+      }
+      add(el.querySelector('h2').getBoundingClientRect().top + sy - pad(), r.bottom + sy + 32 - vh);
+    });
+    list[list.length - 1].end = maxY;
+    return list;
+  }
+  /* where one gesture in this direction goes: to is null when the current section still has room to scroll natively, up to edge */
+  function plan(dir){
+    var list = stops(), y = window.scrollY, i = 0;
+    while(i + 1 < list.length && list[i + 1].s <= y + 2){ i++; }
+    var c = list[i], near = window.innerHeight * 0.35;
+    /* a sliver of room left glides the rest of the way, so a gesture never spends itself on a few pixels */
+    if(dir > 0){
+      if(y < c.end - 2) return c.end - y < near ? {to:c.end} : {to:null, edge:c.end};
+      return {to: i + 1 < list.length ? list[i + 1].s : y};
+    }
+    if(y > c.s + 2) return c.end > c.s + 2 && y - c.s >= near ? {to:null, edge:c.s} : {to:c.s};
+    if(i === 0) return {to:y};
+    var p = list[i - 1];
+    /* stepping back into a tall section lands on its bottom, so nothing is skipped */
+    return {to: p.end > p.s + 2 ? p.end : p.s};
+  }
+  function stopOf(el){
+    if(el.classList.contains('hero')) return 0;
+    var box = el.closest('.journey');
+    if(box && box.classList.contains('pinned')) return box.getBoundingClientRect().top + window.scrollY;
+    return el.getBoundingClientRect().top + window.scrollY - pad();
+  }
+  function glide(to, ms){
+    var html = document.documentElement, from = window.scrollY, t0 = 0, last = from;
+    to = Math.max(0, Math.min(html.scrollHeight - window.innerHeight, Math.round(to)));
+    if(anim){ window.cancelAnimationFrame(anim); anim = null; }
+    queued = 0;
+    if(Math.abs(to - from) < 1) return;
+    ms = ms || 650;
+    html.style.scrollBehavior = 'auto';
+    /* a fresh gesture that arrived mid-glide takes its step as soon as this one lands */
+    function done(){
+      anim = null; html.style.scrollBehavior = '';
+      if(queued){ var p = plan(queued); queued = 0; if(p.to !== null){ glide(p.to); } }
+    }
+    function frame(now){
+      /* the scrollbar was grabbed mid-glide: let go */
+      if(Math.abs(window.scrollY - last) > 3){ queued = 0; done(); return; }
+      if(!t0){ t0 = now; }
+      var t = Math.min(1, (now - t0) / ms), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(2 - 2 * t, 3) / 2;
+      last = Math.round(from + (to - from) * e);
+      window.scrollTo(0, last);
+      if(t < 1){ anim = window.requestAnimationFrame(frame); } else { done(); }
+    }
+    anim = window.requestAnimationFrame(frame);
+  }
+
+  if(!reduce){
+    /* A wheel gesture starts after 120ms of quiet, or when the push rises again after the last one's inertia
+       has decayed; everything else, trackpad inertia included, belongs to the gesture before and can't step again.
+       A gesture that begins with room to scroll stays native and stops at the edge. */
+    var wheelAt = 0, acc = 0, peak = 0, low = 0, armed = false, native = null;
+    window.addEventListener('wheel', function(e){
+      if(e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      var now = performance.now(), dy = e.deltaY * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? window.innerHeight : 1), a = Math.abs(dy);
+      var fresh = now - wheelAt > 120 || (!armed && low <= peak * 0.4 && a >= Math.max(12, low * 3));
+      wheelAt = now;
+      if(fresh){ acc = 0; peak = low = a; native = null; armed = true; }
+      else if(a >= peak){ peak = low = a; }
+      else { low = Math.min(low, a); }
+      if(anim){
+        e.preventDefault();
+        if(fresh){ queued = dy > 0 ? 1 : -1; }
+        armed = false; native = false;
+        return;
+      }
+      var p = plan(dy > 0 ? 1 : -1);
+      if(native === null){ native = p.to === null; armed = !native; }
+      if(native){
+        if(p.to !== null){ e.preventDefault(); return; }
+        var y = window.scrollY;
+        if(dy > 0 ? y + dy > p.edge : y + dy < p.edge){ e.preventDefault(); window.scrollTo(0, p.edge); }
+        return;
+      }
+      e.preventDefault();
+      if(!armed) return;
+      acc += dy;
+      if(Math.abs(acc) >= 10){ armed = false; glide(plan(acc > 0 ? 1 : -1).to); }
+    }, {passive:false});
+
+    /* touch: once the finger has clearly moved, the direction picks the mode. Sideways drags (the tab row,
+       index cards) and pinches are left alone. Where both directions step, the first tiny moves are held too,
+       so the page can't start a native scroll before the direction is known. */
+    var tx = 0, ty = 0, tmode = null, both = false, inTabs = false, trail = [];
+    window.addEventListener('touchstart', function(e){
+      tmode = e.touches.length > 1 ? 'skip' : null;
+      tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+      trail = [[performance.now(), ty]];
+      inTabs = !!(e.target.closest && e.target.closest('.tabs'));
+      both = tmode === null && (anim || (plan(1).to !== null && plan(-1).to !== null));
+    }, {passive:true});
+    window.addEventListener('touchmove', function(e){
+      if(tmode === 'skip' || tmode === 'native') return;
+      if(e.touches.length > 1){ tmode = 'skip'; return; }
+      var dx = e.touches[0].clientX - tx, dy = e.touches[0].clientY - ty;
+      trail.push([performance.now(), e.touches[0].clientY]);
+      if(trail.length > 8){ trail.shift(); }
+      if(tmode === null){
+        if(Math.abs(dx) >= 6 && Math.abs(dx) > Math.abs(dy) * 1.5){ tmode = 'skip'; return; }
+        if(Math.abs(dy) < 4){ if(both && !inTabs && e.cancelable){ e.preventDefault(); } return; }
+        tmode = anim || plan(dy < 0 ? 1 : -1).to !== null ? 'gate' : 'native';
+      }
+      if(tmode === 'gate' && e.cancelable){ e.preventDefault(); }
+    }, {passive:false});
+    window.addEventListener('touchend', function(e){
+      if(tmode !== 'gate') return;
+      var now = performance.now(), y = e.changedTouches[0].clientY, dy = y - ty, ref = trail[0];
+      /* flick speed over the last ~100ms of the drag */
+      for(var j = trail.length - 1; j >= 0; j--){ ref = trail[j]; if(now - trail[j][0] >= 100) break; }
+      var v = Math.abs(y - ref[1]) / Math.max(16, now - ref[0]);
+      if(Math.abs(dy) >= 24 || (Math.abs(dy) >= 8 && v >= 0.3)){
+        var dir = dy < 0 ? 1 : -1;
+        if(anim){ queued = dir; return; }
+        var p = plan(dir);
+        if(p.to !== null){ glide(p.to); }
+      }
+    }, {passive:true});
+
+    window.addEventListener('keydown', function(e){
+      if(e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+      var t = e.target;
+      if(t && t.closest && (t.isContentEditable || t.closest('input,textarea,select,button,.tabs'))) return;
+      var k = e.key, dir = 0;
+      if(k === 'PageDown' || k === 'ArrowDown' || (k === ' ' && !e.shiftKey)){ dir = 1; }
+      else if(k === 'PageUp' || k === 'ArrowUp' || (k === ' ' && e.shiftKey)){ dir = -1; }
+      else if(k === 'Home' || k === 'End'){ e.preventDefault(); glide(k === 'Home' ? 0 : document.documentElement.scrollHeight); return; }
+      else return;
+      if(anim){ e.preventDefault(); return; }
+      var p = plan(dir);
+      if(p.to === null) return;
+      e.preventDefault();
+      glide(p.to);
+    });
+  }
 
   /* reveal: body text fades up once as it enters */
   var items = document.querySelectorAll('.rv');
