@@ -213,7 +213,25 @@ a:focus-visible{outline:none;}
     top:calc(var(--mid) - .52 * var(--f) - 28px - 1.05 * var(--w));
   }
 }
-@media (prefers-reduced-motion:reduce){ .sticker img{animation:none;} }
+/* second sticker rides along with The Weekend's heading, off to the right of it */
+#weekend{position:relative;}
+.sticker-2{
+  --tilt:-5deg;
+  position:absolute;
+  right:0;
+  bottom:10%;
+  width:clamp(84px,10vw,140px);
+}
+.sticker-2 img{
+  display:block;
+  width:100%;
+  height:auto;
+  transform:rotate(var(--tilt));
+  transform-origin:50% 4%;
+  filter:drop-shadow(0 10px 16px rgba(0,0,0,.5));
+  animation:sticker-rock 3.2s ease-in-out -.6s infinite alternate;
+}
+@media (prefers-reduced-motion:reduce){ .sticker img,.sticker-2 img{animation:none;} }
 
 /* ---------- sections: The Weekend pins and travels sideways; the rest swap cards from an index ---------- */
 .journey{
@@ -588,7 +606,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <a class="cue" href="#weekend" aria-label="Skip to the details"><span aria-hidden="true">↓</span></a></header>
 <section class="journey" data-pin aria-label="The Weekend">
 <div class="journey-pin">
-<h2 id="weekend">The Weekend</h2>
+<h2 id="weekend">The Weekend<picture class="sticker-2" aria-hidden="true"><source type="image/webp" srcset="img/sticker-selfie-sm.webp 220w, img/sticker-selfie.webp 340w" sizes="140px"><img src="img/sticker-selfie.png" width="340" height="338" alt="" loading="lazy" decoding="async"></picture></h2>
 <div class="journey-rail">
 <article class="leg" data-tab="Friday Night">
 <div class="day"><b>2.19</b></div>
