@@ -354,55 +354,12 @@ a:focus-visible{outline:none;}
 .when{color:var(--gold);}
 @media (max-width:560px){ .journey[data-pin] .leg{grid-template-columns:1fr;gap:4px;} .day b{font-size:72px;} }
 
-/* the block sits centred in a screen-tall pin; the script sets --lift/--drop to the empty space above the heading
-   and below the last card, so the gap to the neighbouring sections still reads as --gap.
-   The pin can then overlap the previous section's tail, so only its content takes clicks */
-.journey.pinned{margin-top:calc(var(--gap) - var(--lift, 0px));margin-bottom:calc(0px - var(--drop, 0px));pointer-events:none;}
-.journey.pinned .journey-pin > *{pointer-events:auto;}
-.journey.pinned .journey-pin{
-  position:sticky;
-  top:0;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  /* a screen tall, the block centred in it by auto margins, which fall back to the padding when it doesn't fit */
-  min-height:100vh;
-  min-height:100svh;
-  --top:clamp(28px,5vh,56px);
-  padding-block:var(--top);
-  box-sizing:border-box;
-}
-/* cards dissolve as they leave to the left, so they never slide under the side menu */
-.journey.pinned .leg:has(~ .leg.on){opacity:0;}
-.journey.pinned h2{margin-top:auto;}
-.journey.pinned .journey-rail{margin-bottom:auto;}
-
 .journey.attire .leg{display:block;}
 .journey.attire .leg-body{max-width:none;width:min(44rem, calc(100vw - var(--edge) - 32px));}
 .journey.index.attire .leg-body{width:auto;}
 .attire .leg-body p{max-width:38.75rem;margin-inline:0;}
 .attire .when + p{margin-top:6px;}
 .journey.attire .leg-body{padding-bottom:12px;}
-/* while pinned the whole card has to fit on screen, so the lineup gives up height;
-   --img is set by the script from what's left after the heading, tabs, text and swatches (the px fallback is before it runs) */
-.journey.pinned.attire img{width:auto;max-width:100%;max-height:var(--img, calc(100svh - var(--top) - 448px));}
-.journey.pinned.attire picture{margin:0 0 clamp(14px,1.8vw,22px);}
-.journey.pinned.attire picture + .swatches{margin-bottom:clamp(16px,2vw,24px);}
-@media (max-height:820px){
-  .journey.pinned .journey-pin{--top:clamp(20px,3.5vh,32px);}
-}
-@media (max-width:760px){
-  .journey.pinned .journey-pin{
-    --top:clamp(16px,3svh,28px);
-    -webkit-mask-image:linear-gradient(to right,transparent,#000 var(--edge));
-            mask-image:linear-gradient(to right,transparent,#000 var(--edge));
-  }
-  .journey.pinned .leg{max-width:calc(100vw - 2*var(--edge));}
-  .journey.pinned.attire .leg-body{width:calc(100vw - 2*var(--edge));}
-  .journey.pinned.attire picture{margin-bottom:12px;}
-  .journey.pinned.attire picture + .swatches{margin-bottom:14px;}
-}
 .swatches{display:flex;flex-wrap:wrap;gap:10px;list-style:none;margin:22px 0 0;padding:0;}
 .attire picture + .swatches{margin:0 0 clamp(22px,2.8vw,34px);}
 .swatches li{width:22px;height:22px;border-radius:50%;background:var(--c);box-shadow:0 0 0 1px rgba(234,227,214,.28);}
@@ -436,9 +393,6 @@ a:focus-visible{outline:none;}
 .frame-market{--w:min(24rem,62vw);--x:-.9;--r:1.6deg;--d:-4s;}
 .frame-tacos{--w:min(24rem,62vw);--x:.45;--r:2.4deg;--d:-2.5s;}
 .frame-cliff{--w:min(32rem,72vw);--x:-.6;--r:-1.8deg;--d:-5.2s;}
-.journey.pinned .journey-rail{flex-direction:row;gap:clamp(72px,9vw,150px);will-change:transform;}
-.journey.pinned .leg{flex:0 0 auto;width:auto;max-width:calc(100vw - var(--edge) - 32px);opacity:.16;transition:opacity .7s cubic-bezier(.2,.7,.3,1);}
-.journey.pinned .leg.on{opacity:1;}
 /* index mode: one card at a time, stacked in a single cell; the rail eases to the chosen card's height */
 .journey.index .journey-rail{display:grid;overflow:hidden;transition:height .55s cubic-bezier(.2,.7,.3,1);}
 .journey.index .leg{grid-area:1/1;align-self:start;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s .3s;}
@@ -450,7 +404,7 @@ a:focus-visible{outline:none;}
   transition:opacity .6s cubic-bezier(.2,.7,.3,1),transform .6s cubic-bezier(.2,.7,.3,1);
   transition-delay:calc(var(--i,0) * 70ms);
 }
-@media (prefers-reduced-motion:reduce){ .tab,.journey.pinned .leg,.journey.index .journey-rail,.journey.index .leg,.journey.index .leg .leg-body>*{transition:none !important;} }
+@media (prefers-reduced-motion:reduce){ .tab,.journey.index .journey-rail,.journey.index .leg,.journey.index .leg .leg-body>*{transition:none !important;} }
 
 /* date + place under the name */
 .stamp{
@@ -996,21 +950,15 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
   var layers = Array.prototype.slice.call(document.querySelectorAll('[data-px]'));
 
-  /* sections: The Weekend pins and its rail travels sideways as you scroll; the rest are a simple index that swaps cards in place */
-  var wide = window.matchMedia('(min-width:761px) and (min-height:640px), (max-width:760px) and (min-height:500px)');
-  /* lengths key off the small viewport (address bar showing), which doesn't change as the bar slides, so nothing jitters */
-  var probe = document.createElement('div');
-  probe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none;';
-  document.body.appendChild(probe);
-  function screenH(){ return probe.offsetHeight || window.innerHeight; }
+  /* sections: an index that swaps cards in place, so the page itself only ever scrolls down.
+     Pick a name, or swipe / scroll sideways over the section to step through the cards */
   var journeys = Array.prototype.map.call(document.querySelectorAll('.journey'), function(journey, d){
     var pin = journey.querySelector('.journey-pin');
     var rail = journey.querySelector('.journey-rail');
     var legs = Array.prototype.slice.call(rail.children);
     var oneLine = journey.hasAttribute('data-pin');
-    var index = !oneLine;
-    var J = {el:journey, dist:0, len:0, cur:-1, n:legs.length};
-    journey.classList.toggle('index', index);
+    var J = {cur:-1};
+    journey.classList.add('index');
 
     var tabs = document.createElement('div');
     tabs.className = 'tabs';
@@ -1027,9 +975,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
       b.setAttribute('aria-controls', leg.id);
       leg.setAttribute('role', 'tabpanel');
       leg.setAttribute('aria-labelledby', b.id);
-      if(index){
-        Array.prototype.forEach.call(leg.querySelector('.leg-body').children, function(c, k){ c.style.setProperty('--i', k); });
-      }
+      Array.prototype.forEach.call(leg.querySelector('.leg-body').children, function(c, k){ c.style.setProperty('--i', k); });
       /* a mouse click shouldn't leave the name focused, or Space would press it again instead of scrolling the page */
       b.addEventListener('click', function(e){ go(i); if(e.detail){ b.blur(); } });
       tabs.appendChild(b);
@@ -1040,10 +986,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
     function fit(){ rail.style.height = legs[J.cur].offsetHeight + 'px'; }
     var imgs = rail.querySelectorAll('img');
     Array.prototype.forEach.call(imgs, function(img){
-      img.addEventListener('load', function(){
-        if(index){ if(J.cur >= 0){ fit(); } }
-        else if(J.measure){ J.measure(); }
-      });
+      img.addEventListener('load', function(){ if(J.cur >= 0){ fit(); } });
     });
 
     function mark(i){
@@ -1055,9 +998,9 @@ picture{margin-block:clamp(52px,8vw,104px);}
       });
       legs.forEach(function(l, j){
         l.classList.toggle('on', j === i);
-        if(index){ l.inert = j !== i; }
+        l.inert = j !== i;
       });
-      if(index){ fit(); }
+      fit();
       if(oneLine){ reveal(btns[i]); }
     }
 
@@ -1082,16 +1025,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
       edges();
     }
 
-    function go(i){
-      i = Math.max(0, Math.min(legs.length - 1, i));
-      if(!index){
-        var y = journey.classList.contains('pinned')
-          ? journey.getBoundingClientRect().top + window.scrollY + J.len * i / Math.max(1, legs.length - 1)
-          : legs[i].getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.2;
-        if(reduce){ window.scrollTo({top: y, behavior: 'auto'}); } else { glide(y); }
-      }
-      mark(i);
-    }
+    function go(i){ mark(Math.max(0, Math.min(legs.length - 1, i))); }
 
     tabs.addEventListener('keydown', function(e){
       var k = e.key, i = J.cur;
@@ -1105,96 +1039,39 @@ picture{margin-block:clamp(52px,8vw,104px);}
       btns[J.cur].focus({preventScroll:true});
     });
 
-    if(index){
-      var sx = 0, sy = 0;
-      rail.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, {passive:true});
-      rail.addEventListener('touchend', function(e){
-        var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
-        if(Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5){ go(J.cur + (dx < 0 ? 1 : -1)); }
-      }, {passive:true});
-      mark(0);
-    }
+    /* the one-line name row scrolls sideways itself, so gestures over it are left alone */
+    function onTabs(e){ return e.target.closest && e.target.closest('.tabs'); }
 
-    /* the rail eases toward where the scroll says it should be, which smooths trackpad jitter */
-    var x = 0, target = 0, last = 0, running = false;
-    function paint(){
-      rail.style.transform = 'translate3d(' + (-x).toFixed(1) + 'px,0,0)';
-      var pos = J.dist ? x / J.dist * (legs.length - 1) : 0;
-      var n = Math.round(pos);
-      /* only switch the lit day once we're clearly past the midpoint, so it doesn't flicker there */
-      if(J.cur < 0 || (n !== J.cur && Math.abs(pos - J.cur) > 0.6)){ mark(n); }
-    }
-    function tick(now){
-      var dt = Math.min(64, now - (last || now));
-      last = now;
-      x += (target - x) * (1 - Math.pow(0.88, dt / 16.7));
-      if(Math.abs(target - x) < 0.3){ x = target; running = false; last = 0; }
-      paint();
-      if(running){ window.requestAnimationFrame(tick); }
-    }
+    var sx = 0, sy = 0;
+    journey.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, {passive:true});
+    journey.addEventListener('touchend', function(e){
+      if(onTabs(e)) return;
+      var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+      if(Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5){ go(J.cur + (dx < 0 ? 1 : -1)); }
+    }, {passive:true});
 
-    J.step = function(jump){
-      if(index) return;
-      if(journey.classList.contains('pinned')){
-        var p = J.len ? Math.min(1, Math.max(0, -journey.getBoundingClientRect().top / J.len)) : 0;
-        /* hold still on each card for a stretch of scroll, then glide to the next */
-        var s = p * (legs.length - 1), k = Math.min(legs.length - 2, Math.floor(s)), f = s - k, hold = 0.4;
-        f = Math.min(1, Math.max(0, (f - hold / 2) / (1 - hold)));
-        f = f * f * (3 - 2 * f);
-        target = (k + f) / (legs.length - 1) * J.dist;
-        if(jump){ x = target; paint(); return; }
-        if(!running){ running = true; window.requestAnimationFrame(tick); }
-      } else {
-        var n = 0, line = window.innerHeight * 0.5;
-        legs.forEach(function(l, i){ if(l.getBoundingClientRect().top < line){ n = i; } });
-        mark(n);
-      }
-    };
+    /* trackpads and sideways wheels: one card per flick. A flick's momentum keeps sending events for a while,
+       so after a step the rest of that gesture (until a 250ms lull) is swallowed */
+    var acc = 0, lastWheel = 0, spent = false;
+    journey.addEventListener('wheel', function(e){
+      if(onTabs(e) || Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      var now = Date.now();
+      if(now - lastWheel > 250){ acc = 0; spent = false; }
+      lastWheel = now;
+      if(spent) return;
+      acc += e.deltaX;
+      if(Math.abs(acc) > 40){ go(J.cur + (acc > 0 ? 1 : -1)); spent = true; }
+    }, {passive:false});
 
-    J.measure = function(){
-      if(index){ fit(); return; }
-      var on = wide.matches && !reduce && legs.length > 1, vh = screenH();
-      journey.classList.toggle('pinned', on);
-      if(on && imgs.length){
-        /* the lineup gets whatever height the rest of the tallest card leaves, with some air below */
-        var rest = 0;
-        legs.forEach(function(l){ var im = l.querySelector('img'); rest = Math.max(rest, l.offsetHeight - (im ? im.offsetHeight : 0)); });
-        var head = rail.offsetTop - pin.firstElementChild.offsetTop + parseFloat(getComputedStyle(pin).paddingTop);
-        var room = Math.floor(vh - head - rest - parseFloat(getComputedStyle(pin).paddingBottom) - 24);
-        journey.style.setProperty('--img', room + 'px');
-        if(room < 110){ on = false; }
-      }
-      /* too short to show a whole card: stacked cards beat a clipped one */
-      if(on && pin.offsetHeight > vh){ on = false; }
-      journey.classList.toggle('pinned', on);
-      if(!on){ running = false; x = target = 0; journey.style.height = ''; journey.style.removeProperty('--lift'); journey.style.removeProperty('--drop'); rail.style.transform = ''; J.len = 0; J.step(); return; }
-      J.dist = legs[legs.length - 1].offsetLeft - legs[0].offsetLeft;
-      J.len = (legs.length - 1) * vh * 1.5;
-      /* the last day stays pinned a little longer before the page moves on */
-      journey.style.height = (pin.offsetHeight + vh * 0.6 + J.len) + 'px';
-      /* the last card is the one on screen as the page moves on, and the rail is as tall as the tallest card,
-         so the gap below is measured from where the last card's text ends */
-      var end = legs[legs.length - 1], box = pin.getBoundingClientRect();
-      while(end.lastElementChild && end.tagName !== 'P'){ end = end.lastElementChild; }
-      journey.style.setProperty('--lift', Math.round(pin.firstElementChild.getBoundingClientRect().top - box.top) + 'px');
-      journey.style.setProperty('--drop', Math.max(0, Math.round(box.bottom - end.getBoundingClientRect().bottom)) + 'px');
-      J.step(true);
-    };
+    mark(0);
+    J.measure = fit;
     return J;
   });
 
   function ready(){ setTimeout(function(){ document.documentElement.classList.add('ready'); }, 300); }
   if(document.readyState === 'complete'){ ready(); } else { window.addEventListener('load', ready); }
 
-  var jTicking = false;
-  window.addEventListener('scroll', function(){
-    if(jTicking) return;
-    jTicking = true;
-    window.requestAnimationFrame(function(){
-      jTicking = false;
-      journeys.forEach(function(J){ J.step(); });
-    });
-  }, {passive:true});
   function measureAll(){ journeys.forEach(function(J){ J.measure(); }); }
   /* phones fire resize as the address bar slides; re-measuring then would yank the page, so only react to real resizes */
   var lastW = window.innerWidth, lastH = window.innerHeight;
@@ -1212,8 +1089,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
   function pad(){ return Math.min(64, Math.max(24, window.innerHeight * 0.06)); }
   function stopOf(el){
     if(el.classList.contains('hero')) return 0;
-    var box = el.closest('.journey');
-    if(box && box.classList.contains('pinned')) return box.getBoundingClientRect().top + window.scrollY;
     return el.getBoundingClientRect().top + window.scrollY - pad();
   }
   function glide(to, ms){
