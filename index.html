@@ -260,11 +260,19 @@ a:focus-visible{outline:none;}
 .stamp{position:relative;}
 /* Events stickers sit in the margin right of their card's text; phones don't have the room */
 .leg:has(.stk){position:relative;}
-.stk-mendhi,.stk-haldi,.stk-ganesh{top:calc(.5 * var(--swing));left:calc(100% + 2 * var(--stk-gap));}
+.stk-mendhi,.stk-haldi,.stk-ganesh,.stk-martini{top:calc(.5 * var(--swing));left:calc(100% + 2 * var(--stk-gap));}
 .stk-mendhi{--h:calc(1.3 * var(--stk-lg));--d:-3s;}
 .stk-haldi{--h:var(--stk-lg);--tilt:calc(-1 * var(--stk-tilt));--d:-1.7s;}
 .stk-ganesh{--h:calc(1.3 * var(--stk-lg));--d:-4.2s;}
-@media (max-width:999px){ .stk-mendhi,.stk-haldi,.stk-ganesh{display:none;} }
+.stk-martini{--h:calc(1.3 * var(--stk-lg));--tilt:calc(-1 * var(--stk-tilt));--d:-2.6s;}
+/* second stickers tuck under the first, overlapping a little; their cards grow so the rail doesn't clip them */
+.stk-samosa{--h:var(--stk);--d:-3.6s;top:calc(.95 * var(--stk-lg));left:calc(100% + 2 * var(--stk-gap) + .2 * var(--stk));}
+.stk-cake{--h:var(--stk);--d:-.8s;top:calc(1.2 * var(--stk-lg));left:calc(100% + 2 * var(--stk-gap) - .25 * var(--stk));}
+@media (min-width:1000px){
+  .leg:has(.stk-samosa){min-height:calc(.95 * var(--stk-lg) + 1.3 * var(--stk));}
+  .leg:has(.stk-cake){min-height:calc(1.2 * var(--stk-lg) + 1.3 * var(--stk));}
+}
+@media (max-width:999px){ .stk-mendhi,.stk-haldi,.stk-ganesh,.stk-martini,.stk-cake,.stk-samosa{display:none;} }
 
 /* hangs below the dates out of the flow, so the name, dates and stickers keep their places */
 .cover-rsvp{position:absolute;top:calc(100% + clamp(24px,3vw,40px));left:50%;transform:translateX(-50%);text-decoration:none;white-space:nowrap;}
@@ -364,7 +372,7 @@ a:focus-visible{outline:none;}
 .journey[data-pin] .leg-body{max-width:30rem;}
 .day{color:var(--gold);}
 .day b{display:block;font-family:var(--head);font-weight:400;font-size:clamp(64px,8vw,120px);line-height:.82;}
-.when{color:var(--gold);}
+.when{color:var(--gold);font-size:1.15em;font-weight:500;}
 @media (max-width:560px){ .journey[data-pin] .leg{grid-template-columns:1fr;gap:4px;} .day b{font-size:72px;} }
 
 .journey.attire .leg{display:block;}
@@ -659,6 +667,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p>Transportation leaves Andaz at 9 AM and returns approximately 4 PM.</p></div>
 </div>
 <picture class="stk stk-haldi" aria-hidden="true"><source type="image/webp" srcset="img/sticker-haldi-sm.webp 220w, img/sticker-haldi.webp 340w" sizes="200px"><img src="img/sticker-haldi.png" width="340" height="270" alt="" loading="lazy" decoding="async"></picture>
+<picture class="stk stk-samosa" aria-hidden="true"><source type="image/webp" srcset="img/sticker-samosa-sm.webp 220w, img/sticker-samosa.webp 340w" sizes="160px"><img src="img/sticker-samosa.png" width="340" height="257" alt="" loading="lazy" decoding="async"></picture>
 </article>
 <article class="leg" data-tab="Sunday Daytime">
 <div class="day"><b>2.21</b></div>
@@ -680,6 +689,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p>Join us for an evening of music, drinks, and dancing.</p>
 <p>Transportation leaves Andaz at 6:30 PM.</p></div>
 </div>
+<picture class="stk stk-martini" aria-hidden="true"><source type="image/webp" srcset="img/sticker-martini-sm.webp 220w, img/sticker-martini.webp 340w" sizes="130px"><img src="img/sticker-martini.png" width="340" height="550" alt="" loading="lazy" decoding="async"></picture>
+<picture class="stk stk-cake" aria-hidden="true"><source type="image/webp" srcset="img/sticker-cake-sm.webp 220w, img/sticker-cake.webp 340w" sizes="140px"><img src="img/sticker-cake.png" width="340" height="281" alt="" loading="lazy" decoding="async"></picture>
 </article>
 </div>
 </div>
@@ -693,7 +704,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="journey-rail">
 <article class="leg" data-tab="Hotel">
 <div class="leg-body">
-<p>We’ll be staying at Andaz Mexico City Condesa, in the heart of Condesa, an amazing neighborhood in Mexico City. We’ll have shuttles to and from all wedding events for guests staying at the hotel.</p>
+<p>We’ll be staying at Andaz Mexico City Condesa (a Hyatt hotel), in the heart of Condesa, an amazing neighborhood in Mexico City. We’ll have shuttles to and from all wedding events for guests staying at the hotel.</p>
 <p><a href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener">Hyatt Room Block</a></p>
 <p><a href="https://maps.app.goo.gl/VpuFjPGXvN67A7yP8" target="_blank" rel="noopener">Directions to Andaz</a></p>
 <p>Our discounted room block rate is available three days before and three days after the wedding, so we’d love for you to extend your stay and explore Mexico City if you have the time!</p>
