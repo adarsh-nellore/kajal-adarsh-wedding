@@ -498,6 +498,14 @@ picture{margin-block:clamp(52px,8vw,104px);}
 /* same text column as the index sections; not a .journey, so the tab script leaves it alone */
 .rsvp{width:100vw;margin-left:calc(50% - 50vw);padding-inline:max(22px, calc(50vw - 19.375rem));}
 .rsvp h2{margin-bottom:clamp(14px,1.8vw,22px);}
+/* beside the heading, in the margin right of the text column; its height gives way to the room out to the screen edge */
+.rsvp{position:relative;}
+.stk-hats{
+  --h:min(1.2 * var(--stk-lg), (50vw - 19.375rem - 2 * var(--stk-gap) - clamp(18px,2.6vw,42px)) / 1.15);
+  --tilt:calc(-1 * var(--stk-tilt));--d:-3.3s;
+  top:calc(.5 * var(--swing));left:calc(50% + 19.375rem + 2 * var(--stk-gap));
+}
+@media (max-width:999px){ .stk-hats{display:none;} }
 .rsvp-form{margin-top:var(--inner);}
 .rsvp fieldset{border:0;margin:0;padding:0;min-width:0;}
 .rsvp legend{padding:0;}
@@ -883,6 +891,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <section class="rsvp" aria-label="RSVP">
 <h2 id="rsvp">RSVP</h2>
 <p class="lede rv">Kindly reply by January 10.</p>
+<picture class="stk stk-hats" aria-hidden="true"><source type="image/webp" srcset="img/sticker-hats-sm.webp 220w, img/sticker-hats.webp 340w" sizes="190px"><img src="img/sticker-hats.png" width="340" height="329" alt="" loading="lazy" decoding="async"></picture>
 <form class="rsvp-form rv" novalidate>
 <div class="field">
 <label for="rsvp-name">Full name(s)</label>
