@@ -1040,35 +1040,52 @@ picture{margin-block:clamp(52px,8vw,104px);}
       btns[J.cur].focus({preventScroll:true});
     });
 
-    /* the one-line name row scrolls sideways itself, so gestures over it are left alone */
-    function onTabs(e){ return e.target.closest && e.target.closest('.tabs'); }
-
-    var sx = 0, sy = 0;
-    journey.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, {passive:true});
-    journey.addEventListener('touchend', function(e){
-      if(onTabs(e)) return;
-      var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
-      if(Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5){ go(J.cur + (dx < 0 ? 1 : -1)); }
-    }, {passive:true});
-
-    /* trackpads and sideways wheels: one card per flick. A flick's momentum keeps sending events for a while,
-       so after a step the rest of that gesture (until a 250ms lull) is swallowed */
-    var acc = 0, lastWheel = 0, spent = false;
-    journey.addEventListener('wheel', function(e){
-      if(onTabs(e) || Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
-      e.preventDefault();
-      var now = Date.now();
-      if(now - lastWheel > 250){ acc = 0; spent = false; }
-      lastWheel = now;
-      if(spent) return;
-      acc += e.deltaX;
-      if(Math.abs(acc) > 40){ go(J.cur + (acc > 0 ? 1 : -1)); spent = true; }
-    }, {passive:false});
-
     mark(0);
+    J.el = journey;
+    J.go = go;
     J.measure = fit;
     return J;
   });
+
+  /* sideways gestures step the cards of whichever section spans that height of the screen, wherever the pointer is
+     across it; the one-line name rows scroll sideways themselves, so gestures over them are left alone */
+  function sectionAt(e, y){
+    if(e.target.closest && e.target.closest('.tabs')) return null;
+    for(var i = 0; i < journeys.length; i++){
+      var r = journeys[i].el.getBoundingClientRect();
+      if(y >= r.top && y <= r.bottom) return journeys[i];
+    }
+    return null;
+  }
+
+  var sx = 0, sy = 0, swipeJ = null;
+  window.addEventListener('touchstart', function(e){
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+    swipeJ = sectionAt(e, sy);
+  }, {passive:true});
+  window.addEventListener('touchend', function(e){
+    if(!swipeJ) return;
+    var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+    if(Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2){ swipeJ.go(swipeJ.cur + (dx < 0 ? 1 : -1)); }
+    swipeJ = null;
+  }, {passive:true});
+
+  /* trackpads and sideways wheels: one card per flick. After a flick the trackpad keeps coasting with ever-smaller
+     deltas, which are swallowed; a pause or a delta that jumps back up is a fresh flick */
+  var acc = 0, lastT = 0, lastAbs = 0, spent = false;
+  window.addEventListener('wheel', function(e){
+    if(Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    var J = sectionAt(e, e.clientY);
+    if(!J) return;
+    e.preventDefault();
+    var now = Date.now(), a = Math.abs(e.deltaX);
+    if(now - lastT > 150 || (spent && a > lastAbs * 2 && a > 6)){ acc = 0; spent = false; }
+    lastT = now;
+    lastAbs = a;
+    if(spent) return;
+    acc += e.deltaX;
+    if(Math.abs(acc) > 30){ J.go(J.cur + (acc > 0 ? 1 : -1)); spent = true; }
+  }, {passive:false});
 
   function ready(){ setTimeout(function(){ document.documentElement.classList.add('ready'); }, 300); }
   if(document.readyState === 'complete'){ ready(); } else { window.addEventListener('load', ready); }
