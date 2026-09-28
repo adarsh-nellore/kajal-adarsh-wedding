@@ -186,7 +186,7 @@ a:focus-visible{outline:none;}
   transform:rotate(var(--tilt));
   transform-origin:50% 4%;
   filter:drop-shadow(0 10px 16px rgba(0,0,0,.5));
-  animation:sticker-rock 3s ease-in-out var(--d,0s) infinite alternate;
+  animation:sticker-rock 5s ease-in-out var(--d,0s) infinite alternate;
 }
 @keyframes sticker-in{
   from{opacity:0;transform:rotate(calc(-1 * var(--tilt))) scale(1.06);}
@@ -194,8 +194,8 @@ a:focus-visible{outline:none;}
   to{opacity:1;transform:rotate(var(--tilt)) scale(1);}
 }
 @keyframes sticker-rock{
-  from{rotate:7deg;}
-  to{rotate:-7deg;}
+  from{rotate:4deg;}
+  to{rotate:-4deg;}
 }
 @media (prefers-reduced-motion:reduce){ .stk img{animation:none !important;} }
 
@@ -214,7 +214,7 @@ a:focus-visible{outline:none;}
 }
 /* phones: the largest scale at which the pair above the name still fits across it */
 @media (max-width:600px){ .stk-hero{--k:1.15;} }
-.stk-hero img{animation:sticker-in .9s cubic-bezier(.2,.7,.3,1) var(--in,.3s) both, sticker-rock 3s ease-in-out var(--d,0s) infinite alternate;}
+.stk-hero img{animation:sticker-in .9s cubic-bezier(.2,.7,.3,1) var(--in,.3s) both, sticker-rock 5s ease-in-out var(--d,0s) infinite alternate;}
 .stk-couple,.stk-hearts{top:calc(var(--mid) - .95 * var(--k) * var(--stk-lg));}
 .stk-couple{--d:-1.4s;left:calc(50% + 2.49 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
 .stk-hearts{--h:calc(var(--k) * 1.15 * var(--stk));--tilt:calc(-1 * var(--stk-tilt));--in:.6s;--d:-.6s;right:calc(50% + 2.49 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
@@ -371,14 +371,11 @@ a:focus-visible{outline:none;}
 .attire picture{display:block;margin:clamp(8px,1.5vw,20px) 0 clamp(20px,2.6vw,32px);}
 .attire img{display:block;width:100%;height:auto;filter:drop-shadow(0 18px 28px rgba(0,0,0,.5));}
 
-/* gilt frames hung between sections, each nudged off-centre and tilted a little so the wall looks hung by hand;
-   --x is a share of one nudge unit, which grows with the screen */
+/* gilt frames hung between sections, centred on the text column and tilted a little so the wall looks hung by hand */
 .frame{
-  --nudge:clamp(24px,10vw,150px);
   display:block;
   width:var(--w);
   margin:var(--gap) auto 0;
-  translate:calc(var(--x) * var(--nudge)) 0;
   rotate:var(--r);
 }
 .frame picture{display:block;margin:0;}
@@ -386,18 +383,18 @@ a:focus-visible{outline:none;}
   display:block;width:100%;height:auto;
   filter:drop-shadow(0 18px 28px rgba(0,0,0,.55));
   transform-origin:50% 0;
-  animation:frame-sway 3s ease-in-out var(--d,0s) infinite alternate;
+  animation:frame-sway 5s ease-in-out var(--d,0s) infinite alternate;
 }
 /* hung from a nail: pivots from the top, a smaller swing than the stickers' rock */
 @keyframes frame-sway{
-  from{rotate:1.6deg;}
-  to{rotate:-1.6deg;}
+  from{rotate:1deg;}
+  to{rotate:-1deg;}
 }
 @media (prefers-reduced-motion:reduce){ .frame img{animation:none;} }
-.frame-dance{--w:min(24rem,62vw);--x:.8;--r:-2.2deg;--d:-1s;}
-.frame-market{--w:min(24rem,62vw);--x:-.9;--r:1.6deg;--d:-4s;}
-.frame-tacos{--w:min(24rem,62vw);--x:.45;--r:2.4deg;--d:-2.5s;}
-.frame-cliff{--w:min(32rem,72vw);--x:-.6;--r:-1.8deg;--d:-5.2s;}
+.frame-dance{--w:min(30rem,78vw);--r:-2.2deg;--d:-1s;}
+.frame-market{--w:min(30rem,78vw);--r:1.6deg;--d:-4s;}
+.frame-tacos{--w:min(30rem,78vw);--r:2.4deg;--d:-2.5s;}
+.frame-cliff{--w:min(38.75rem,88vw);--r:-1.8deg;--d:-5.2s;}
 /* index mode: one card at a time, stacked in a single cell; the rail eases to the chosen card's height */
 .journey.index .journey-rail{display:grid;overflow:hidden;transition:height .55s cubic-bezier(.2,.7,.3,1);}
 .journey.index .leg{grid-area:1/1;align-self:start;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s .3s;}
@@ -676,7 +673,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </section>
 
-<figure class="frame frame-dance rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-dance-sm.webp 560w, img/frame-dance-md.webp 900w, img/frame-dance.webp 1400w" sizes="(max-width:700px) 62vw, 384px"><img src="img/frame-dance.png" width="700" height="823" alt="Dancers in swirling pink and orange skirts" loading="lazy" decoding="async"></picture></figure>
+<figure class="frame frame-dance rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-dance-sm.webp 560w, img/frame-dance-md.webp 900w, img/frame-dance.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-dance.png" width="700" height="823" alt="Dancers in swirling pink and orange skirts" loading="lazy" decoding="async"></picture></figure>
 
 <section class="journey" aria-label="Staying in Mexico City">
 <div class="journey-pin">
@@ -712,7 +709,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </section>
 
-<figure class="frame frame-market rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-market-sm.webp 560w, img/frame-market-md.webp 900w, img/frame-market.webp 1400w" sizes="(max-width:700px) 62vw, 384px"><img src="img/frame-market.png" width="700" height="863" alt="A woman carrying flowers through a marigold market" loading="lazy" decoding="async"></picture></figure>
+<figure class="frame frame-market rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-market-sm.webp 560w, img/frame-market-md.webp 900w, img/frame-market.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-market.png" width="700" height="863" alt="A woman carrying flowers through a marigold market" loading="lazy" decoding="async"></picture></figure>
 
 <section class="journey attire" data-pin aria-label="Attire">
 <div class="journey-pin">
@@ -753,7 +750,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </section>
 
-<figure class="frame frame-tacos rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-tacos-sm.webp 560w, img/frame-tacos-md.webp 900w, img/frame-tacos.webp 1400w" sizes="(max-width:700px) 62vw, 384px"><img src="img/frame-tacos.png" width="700" height="884" alt="Kajal and Adarsh eating tacos" loading="lazy" decoding="async"></picture></figure>
+<figure class="frame frame-tacos rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-tacos-sm.webp 560w, img/frame-tacos-md.webp 900w, img/frame-tacos.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-tacos.png" width="700" height="884" alt="Kajal and Adarsh eating tacos" loading="lazy" decoding="async"></picture></figure>
 
 <section class="journey" aria-label="FAQs">
 <div class="journey-pin">
@@ -872,7 +869,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </section>
 
-<figure class="frame frame-cliff rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-cliff-sm.webp 560w, img/frame-cliff-md.webp 900w, img/frame-cliff.webp 1400w" sizes="(max-width:700px) 72vw, 512px"><img src="img/frame-cliff.png" width="700" height="554" alt="Kajal and Adarsh sitting on a rock above the sea" loading="lazy" decoding="async"></picture></figure>
+<figure class="frame frame-cliff rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-cliff-sm.webp 560w, img/frame-cliff-md.webp 900w, img/frame-cliff.webp 1400w" sizes="(max-width:700px) 88vw, 620px"><img src="img/frame-cliff.png" width="700" height="554" alt="Kajal and Adarsh sitting on a rock above the sea" loading="lazy" decoding="async"></picture></figure>
 
 <section class="rsvp" aria-label="RSVP">
 <h2 id="rsvp">RSVP</h2>
