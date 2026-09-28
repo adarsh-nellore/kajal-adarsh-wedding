@@ -1070,21 +1070,23 @@ picture{margin-block:clamp(52px,8vw,104px);}
     swipeJ = null;
   }, {passive:true});
 
-  /* trackpads and sideways wheels: one card per flick. After a flick the trackpad keeps coasting with ever-smaller
-     deltas, which are swallowed; a pause or a delta that jumps back up is a fresh flick */
-  var acc = 0, lastT = 0, lastAbs = 0, spent = false;
+  /* trackpads and sideways wheels: one card per flick. After a flick the trackpad keeps coasting, fading with some
+     wobble, and that is all swallowed. A fresh flick is a pause, or (once the step is 250ms old, past the flick's own run-up) deltas that climb
+     three times running past 10px, which a fading coast doesn't do */
+  var acc = 0, lastT = 0, lastAbs = 0, rise = 0, stepT = 0, spent = false;
   window.addEventListener('wheel', function(e){
     if(Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
     var J = sectionAt(e, e.clientY);
     if(!J) return;
     e.preventDefault();
     var now = Date.now(), a = Math.abs(e.deltaX);
-    if(now - lastT > 150 || (spent && a > lastAbs * 2 && a > 6)){ acc = 0; spent = false; }
+    rise = a > lastAbs ? rise + 1 : 0;
+    if(now - lastT > 150 || (spent && now - stepT > 250 && rise >= 3 && a > 10)){ acc = 0; spent = false; }
     lastT = now;
     lastAbs = a;
     if(spent) return;
     acc += e.deltaX;
-    if(Math.abs(acc) > 30){ J.go(J.cur + (acc > 0 ? 1 : -1)); spent = true; }
+    if(Math.abs(acc) > 30){ J.go(J.cur + (acc > 0 ? 1 : -1)); spent = true; stepT = now; rise = 0; }
   }, {passive:false});
 
   function ready(){ setTimeout(function(){ document.documentElement.classList.add('ready'); }, 300); }
