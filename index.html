@@ -258,6 +258,11 @@ a:focus-visible{outline:none;}
 /* where that room would leave it smaller than --stk, it sits out */
 @media (min-width:1181px) and (max-width:1327px) and (max-height:830px),(min-width:901px) and (max-height:680px){ .stk-dog{display:none;} }
 .stamp{position:relative;}
+/* Events stickers sit in the margin right of their card's text; phones don't have the room */
+.leg:has(.stk){position:relative;}
+.stk-mendhi{--h:var(--stk-lg);--d:-3s;top:var(--swing);left:calc(100% + 2 * var(--stk-gap));}
+@media (max-width:999px){ .stk-mendhi{display:none;} }
+
 /* hangs below the dates out of the flow, so the name, dates and stickers keep their places */
 .cover-rsvp{position:absolute;top:calc(100% + clamp(24px,3vw,40px));left:50%;transform:translateX(-50%);text-decoration:none;white-space:nowrap;}
 .stk-selfie,.stk-standing{top:50%;margin-top:calc(-.35 * var(--h));}
@@ -639,6 +644,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p>Join us for an evening of drinks, dinner, and a warm welcome to Mexico City.</p>
 <p>The venue is approximately a 10-minute walk from Andaz. Transportation will be available for older guests.</p></div>
 </div>
+<picture class="stk stk-mendhi" aria-hidden="true"><source type="image/webp" srcset="img/sticker-mendhi-sm.webp 220w, img/sticker-mendhi.webp 340w" sizes="180px"><img src="img/sticker-mendhi.png" width="340" height="296" alt="" loading="lazy" decoding="async"></picture>
 </article>
 <article class="leg" data-tab="Saturday Daytime">
 <div class="day"><b>2.20</b></div>
