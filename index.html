@@ -391,7 +391,8 @@ a:focus-visible{outline:none;}
   to{rotate:-.5deg;}
 }
 @media (prefers-reduced-motion:reduce){ .frame img{animation:none;} }
-.frame-dance{--w:min(30rem,78vw);--r:-1deg;--d:-1s;}
+/* extra room above for the stickers that sit among the Events cards */
+.frame-dance{--w:min(30rem,78vw);--r:-1deg;--d:-1s;margin-top:calc(var(--gap) + clamp(56px,7vw,112px));}
 .frame-market{--w:min(30rem,78vw);--r:.8deg;--d:-4s;}
 .frame-tacos{--w:min(30rem,78vw);--r:1deg;--d:-2.5s;}
 .frame-cliff{--w:min(38.75rem,88vw);--r:-.8deg;--d:-5.2s;}
