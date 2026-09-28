@@ -265,12 +265,12 @@ a:focus-visible{outline:none;}
 .stk-haldi{--h:var(--stk-lg);--tilt:calc(-1 * var(--stk-tilt));--d:-1.7s;}
 .stk-ganesh{--h:calc(1.3 * var(--stk-lg));--d:-4.2s;}
 .stk-martini{--h:calc(1.3 * var(--stk-lg));--tilt:calc(-1 * var(--stk-tilt));--d:-2.6s;}
-/* second stickers tuck under the first, overlapping a little; their cards grow so the rail doesn't clip them */
-.stk-samosa{--h:var(--stk);--d:-3.6s;top:calc(.95 * var(--stk-lg));left:calc(100% + 2 * var(--stk-gap) + .2 * var(--stk));}
-.stk-cake{--h:var(--stk);--d:-.8s;top:calc(1.2 * var(--stk-lg));left:calc(100% + 2 * var(--stk-gap) - .25 * var(--stk));}
+/* second stickers sit under the first; their cards grow so the rail doesn't clip them */
+.stk-samosa{--h:var(--stk);--d:-3.6s;top:calc(1.35 * var(--stk-lg));left:calc(100% - .5 * var(--stk));}
+.stk-cake{--h:var(--stk);--d:-.8s;top:calc(1.72 * var(--stk-lg));left:calc(100% - .9 * var(--stk));}
 @media (min-width:1000px){
-  .leg:has(.stk-samosa){min-height:calc(.95 * var(--stk-lg) + 1.3 * var(--stk));}
-  .leg:has(.stk-cake){min-height:calc(1.2 * var(--stk-lg) + 1.3 * var(--stk));}
+  .leg:has(.stk-samosa){min-height:calc(1.35 * var(--stk-lg) + 1.3 * var(--stk));}
+  .leg:has(.stk-cake){min-height:calc(1.72 * var(--stk-lg) + 1.3 * var(--stk));}
 }
 @media (max-width:999px){ .stk-mendhi,.stk-haldi,.stk-ganesh,.stk-martini,.stk-cake,.stk-samosa{display:none;} }
 
