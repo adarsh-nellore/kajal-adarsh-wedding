@@ -349,9 +349,9 @@ a:focus-visible{outline:none;}
 .leg h3{margin-top:0;}
 .leg p + h3{margin-top:32px;}
 .leg p{max-width:none;}
-.leg ul:not(.swatches),.faq-a ul{margin:10px 0 0;padding-left:1.2em;}
-.leg ul:not(.swatches) li + li,.faq-a li + li{margin-top:6px;}
-.leg ul:not(.swatches) + p,.faq-a ul + p{margin-top:19px;}
+.leg ul:not(.swatches){margin:10px 0 0;padding-left:1.2em;}
+.leg ul:not(.swatches) li + li{margin-top:6px;}
+.leg ul:not(.swatches) + p{margin-top:19px;}
 .journey[data-pin] .leg{display:grid;grid-template-columns:auto 1fr;gap:clamp(22px,3vw,48px);align-items:start;}
 .journey[data-pin] .leg-body{max-width:30rem;}
 .day{color:var(--gold);}
@@ -497,32 +497,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
 @media (max-width:700px){
   .snap-r img,.snap-l img,.snap-c img{margin-inline:auto;}
 }
-
-/* ---------- FAQs: a list of questions, each opening its answer beneath it; not a .journey, so no tabs ---------- */
-.faq{width:100vw;margin-left:calc(50% - 50vw);padding-inline:max(22px, calc(50vw - 19.375rem));}
-.faq-list{margin-top:var(--inner);border-top:1px solid rgba(212,160,78,.28);}
-.faq details{border-bottom:1px solid rgba(212,160,78,.28);}
-.faq summary{
-  display:flex;
-  justify-content:space-between;
-  align-items:baseline;
-  gap:24px;
-  padding:18px 0;
-  list-style:none;
-  cursor:pointer;
-  font-weight:500;
-  font-size:clamp(19px,2vw,22px);
-  line-height:1.35;
-  color:var(--gold);
-}
-.faq summary::-webkit-details-marker{display:none;}
-.faq summary::after{content:"+";flex:none;font-size:1.3em;line-height:1;transition:transform .35s cubic-bezier(.2,.7,.3,1);}
-.faq details[open] summary::after{transform:rotate(45deg);}
-.faq summary:focus-visible{outline:1px solid var(--gold);outline-offset:4px;}
-.faq-a{padding-bottom:24px;}
-.faq-a p{max-width:none;}
-.faq details[open] .faq-a{animation:rsvp-in .5s cubic-bezier(.2,.7,.3,1);}
-@media (prefers-reduced-motion:reduce){ .faq summary::after{transition:none;} .faq details[open] .faq-a{animation:none;} }
 
 /* ---------- RSVP: a plain form on the page — underlined fields, nothing boxed ---------- */
 /* same text column as the index sections; not a .journey, so the tab script leaves it alone */
@@ -778,58 +752,59 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
 <figure class="frame frame-tacos rv"><picture data-px="0.06"><source type="image/webp" srcset="img/frame-tacos-sm.webp 560w, img/frame-tacos-md.webp 900w, img/frame-tacos.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-tacos.png" width="700" height="884" alt="Kajal and Adarsh eating tacos" loading="lazy" decoding="async"></picture></figure>
 
-<section class="faq" aria-label="FAQs">
+<section class="journey" aria-label="FAQs">
+<div class="journey-pin">
 <h2 id="faq">FAQs</h2>
-<div class="faq-list">
-<details>
-<summary>When is the RSVP deadline?</summary>
-<div class="faq-a">
+<div class="journey-rail">
+<article class="leg" data-tab="RSVP">
+<div class="leg-body">
+<h3>When is the RSVP deadline?</h3>
 <p>Please RSVP by January 10. The sooner, the better!</p>
 </div>
-</details>
-<details>
-<summary>Can I bring a plus one, my kids, or my parents?</summary>
-<div class="faq-a">
+</article>
+<article class="leg" data-tab="Plus Ones">
+<div class="leg-body">
+<h3>Can I bring a plus one, my kids, or my parents?</h3>
 <p>Invitations have been extended to the guests listed on your RSVP. If there are additional people you’d like to bring, please let us know and we’ll do our best to accommodate them!</p>
 </div>
-</details>
-<details>
-<summary>What should I wear to each event?</summary>
-<div class="faq-a">
+</article>
+<article class="leg" data-tab="Attire">
+<div class="leg-body">
+<h3>What should I wear to each event?</h3>
 <p>Please use the attire guidance listed for each event as inspiration! We’d love for you to wear something that feels like you, fits your personal style, and that you feel comfortable in.</p>
 <p>The images are simply here for inspiration, so please don’t feel like you need to recreate a particular look. If you have any questions related to attire, please reach out to us.</p>
 </div>
-</details>
-<details>
-<summary>Where will the events be held?</summary>
-<div class="faq-a">
+</article>
+<article class="leg" data-tab="Venues">
+<div class="leg-body">
+<h3>Where will the events be held?</h3>
 <p>We want to surprise everyone with the venues - trust us on this journey! The venues will be between a 20 - 40 minute drive from the hotel.</p>
 </div>
-</details>
-<details>
-<summary>How many people can stay in each room?</summary>
-<div class="faq-a">
+</article>
+<article class="leg" data-tab="Room Capacity">
+<div class="leg-body">
+<h3>How many people can stay in each room?</h3>
 <p>King rooms and suites accommodate 2 guests, while double rooms accommodate up to 3 guests. A rollaway bed may be available upon request.</p>
 <p>Additional guests may be accommodated for a small nightly fee, with a maximum of 3 adults or 2 adults + 2 children in double rooms.</p>
 </div>
-</details>
-<details>
-<summary>I’m interested in staying at an Airbnb. What should I consider?</summary>
-<div class="faq-a">
+</article>
+<article class="leg" data-tab="Staying Elsewhere">
+<div class="leg-body">
+<h3>I’m interested in staying at an Airbnb. What should I consider?</h3>
 <p>Of course! If you choose to stay at an Airbnb or another accommodation, we recommend choosing somewhere within easy walking distance of Andaz so you can easily access the wedding shuttles.</p>
 <p>Also, be sure to confirm that your accommodation has air conditioning. Many Mexico City accommodations do not have A/C.</p>
 </div>
-</details>
-<details>
-<summary>What will the weather be like?</summary>
-<div class="faq-a">
+</article>
+<article class="leg" data-tab="Weather">
+<div class="leg-body">
+<h3>What will the weather be like?</h3>
 <p>February is typically dry and comfortable in Mexico City, with warm days and cooler evenings. Expect daytime temperatures around 75°F and evenings around 60°F.</p>
 <p>Mexico City is also at a high elevation, so you may notice the altitude when you first arrive. Take it easy on your first day, stay hydrated, wear sunscreen, and give yourself some time to adjust.</p>
 </div>
-</details>
-<details>
-<summary>How many extra days should I stay in Mexico City?</summary>
-<div class="faq-a">
+</article>
+<article class="leg" data-tab="Extending">
+<div class="leg-body">
+<h3>How many extra days should I stay in Mexico City?</h3>
 <p>We recommend staying for at least three extra days if you’d like to explore the city and surrounding areas. And if you have a week, you definitely won’t run out of things to do.</p>
 <p>Some popular spots include:</p>
 <ul>
@@ -842,25 +817,25 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p>Our favorite way to spend time in Mexico City is wandering around neighborhoods. Roma, Condesa, and Polanco are full of great restaurants, coffee shops, boutiques, galleries, and bars.</p>
 <p>We’ll add some of our favorite spots to the website as we get closer to the wedding!</p>
 </div>
-</details>
-<details>
-<summary>Will there be downtime over the weekend?</summary>
-<div class="faq-a">
+</article>
+<article class="leg" data-tab="Free Time">
+<div class="leg-body">
+<h3>Will there be downtime over the weekend?</h3>
 <p>Yes! There will be no wedding event Saturday night.</p>
 <p>We’ll be back at the hotel around 4:00 p.m. after the daytime events, so the evening is yours. Rest, explore, grab a margarita, or make a dinner reservation with your group. Do whatever sounds most fun!</p>
 </div>
-</details>
-<details>
-<summary>What should I know about safety in Mexico City?</summary>
-<div class="faq-a">
+</article>
+<article class="leg" data-tab="Safety">
+<div class="leg-body">
+<h3>What should I know about safety in Mexico City?</h3>
 <p>Mexico City is vibrant, exciting, and generally very welcoming - but like any major city, a little awareness goes a long way. Give yourself plenty of extra time to get around, as traffic can be unpredictable (especially during rush hours).</p>
 <p>We recommend using Uber or authorized taxis rather than hailing cars on the street. Keep personal belongings secure, avoid flashy valuables, and be mindful in crowded areas.</p>
 <p>When enjoying street food, look for busy stands with high turnover and freshly prepared items, and stick to bottled water. With a bit of planning and awareness, you’ll have an amazing experience exploring the city!</p>
 </div>
-</details>
-<details>
-<summary>What should I know if I’m traveling internationally?</summary>
-<div class="faq-a">
+</article>
+<article class="leg" data-tab="Visas">
+<div class="leg-body">
+<h3>What should I know if I’m traveling internationally?</h3>
 <p>Please check Mexico’s current entry and visa requirements based on your nationality before traveling.</p>
 <p>We also recommend:</p>
 <ul>
@@ -871,27 +846,28 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </ul>
 <p>If you’re traveling from outside the U.S., please check the Mexican government’s current requirements for your country before your trip.</p>
 </div>
-</details>
-<details>
-<summary>How should I get from the airport to the hotel?</summary>
-<div class="faq-a">
+</article>
+<article class="leg" data-tab="Taxi">
+<div class="leg-body">
+<h3>How should I get from the airport to the hotel?</h3>
 <p>We recommend using Uber to get from the airport to Andaz. DiDi is another popular option.</p>
 <p>If you’re not comfortable using a rideshare app, please let us know and we’ll be happy to help arrange transportation.</p>
 </div>
-</details>
-<details>
-<summary>Are you accepting gifts?</summary>
-<div class="faq-a">
+</article>
+<article class="leg" data-tab="Gifts">
+<div class="leg-body">
+<h3>Are you accepting gifts?</h3>
 <p>We are not accepting gifts for the wedding. Your presence is truly the best gift we could ask for!</p>
 <p>If you would like to give us something, we’ll share more information closer to the wedding.</p>
 </div>
-</details>
-<details>
-<summary>How will we get updates during the wedding?</summary>
-<div class="faq-a">
+</article>
+<article class="leg" data-tab="WhatsApp">
+<div class="leg-body">
+<h3>How will we get updates during the wedding?</h3>
 <p>Closer to the wedding, we’ll add everyone to a WhatsApp group with our planners so we can share important details and updates leading up to and during the wedding.</p>
 </div>
-</details>
+</article>
+</div>
 </div>
 </section>
 
