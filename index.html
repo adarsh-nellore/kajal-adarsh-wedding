@@ -272,7 +272,7 @@ a:focus-visible{outline:none;}
   .stk-standing{left:auto;right:max(0px, var(--swing) - clamp(22px,7vw,88px));}
 }
 
-/* ---------- sections: The Weekend pins and travels sideways; the rest swap cards from an index ---------- */
+/* ---------- sections: each swaps cards in place from an index ---------- */
 .journey{
   position:relative;
   width:100vw;
@@ -318,7 +318,7 @@ a:focus-visible{outline:none;}
   .tab{position:relative;}
   .tab::after{content:"";position:absolute;inset:-7px -10px;}
 }
-/* The Weekend's names stay on one line, running to the screen edge and sliding sideways if they don't fit */
+/* Events' and Attire's names stay on one line, running to the screen edge and sliding sideways if they don't fit */
 .journey[data-pin] .tabs{
   flex-wrap:nowrap;
   width:calc(100vw - var(--edge));
@@ -604,7 +604,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <body>
 
 <nav>
-<a href="#weekend">The Weekend</a>
+<a href="#weekend">Events</a>
 <a href="#stay">Travel</a>
 <a href="#attire">Attire</a>
 <a href="#faq">FAQs</a>
@@ -625,9 +625,9 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <img src="img/sticker-couple.png" width="340" height="355" alt="Kajal and Adarsh" decoding="async">
 </picture>
 <a class="cue" href="#weekend" aria-label="Skip to the details"><span aria-hidden="true">↓</span></a></header>
-<section class="journey" data-pin aria-label="The Weekend">
+<section class="journey" data-pin aria-label="Events">
 <div class="journey-pin">
-<h2 id="weekend">The Weekend</h2>
+<h2 id="weekend">Events</h2>
 <div class="journey-rail">
 <article class="leg" data-tab="Friday Night">
 <div class="day"><b>2.19</b></div>
