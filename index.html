@@ -222,13 +222,13 @@ a:focus-visible{outline:none;}
   --h:min(1.3 * var(--k) * var(--stk-lg), (50vw - var(--end) - var(--stk-gap) - clamp(18px,2.6vw,42px)) / 1.06);
   --d:-1.4s;
   top:calc(var(--mid) - .5 * var(--h));
-  left:calc(50% + var(--end) + var(--stk-gap) + .5 * var(--swing));
+  left:calc(50% + var(--end) + 1.13 * var(--stk-gap) + .5 * var(--swing));
 }
-.stk-hearts{--h:calc(var(--k) * 1.15 * var(--stk));--tilt:calc(-1 * var(--stk-tilt));--in:.6s;--d:-.6s;right:calc(50% + 2.49 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
+.stk-hearts{--h:calc(var(--k) * 1.15 * var(--stk));--tilt:calc(-1 * var(--stk-tilt));--in:.6s;--d:-.6s;right:calc(50% + 2.49 * var(--f) + 1.27 * var(--stk-gap) + .5 * var(--swing));}
 /* beside the nav rail the name wraps to two lines, the longer "Kajal y" ~2.44em wide */
 @media (min-width:1181px) and (max-width:1327px){
-  .stk-couple{--end:calc(1.22 * var(--f));}
-  .stk-hearts{right:calc(50% + 1.22 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
+  .stk-couple{--end:calc(1.22 * var(--f));left:calc(50% + var(--end) + 1.4 * var(--stk-gap) + .5 * var(--swing));}
+  .stk-hearts{right:calc(50% + 1.22 * var(--f) + 1.27 * var(--stk-gap) + .5 * var(--swing));}
 }
 /* tablets and phones: no room beside the name, so the pair sits above it, bottoms level, aligned with its two ends */
 @media (max-width:900px) and (min-height:560px){
@@ -255,10 +255,11 @@ a:focus-visible{outline:none;}
 
 /* hangs below the dates out of the flow, so the name, dates and stickers keep their places */
 .cover-rsvp{position:absolute;top:calc(100% + clamp(24px,3vw,40px));left:50%;transform:translateX(-50%);text-decoration:none;white-space:nowrap;}
-.stk-selfie{top:50%;margin-top:calc(-.35 * var(--h));}
+.stk-selfie{top:50%;margin-top:calc(-.23 * var(--h));}
 /* just outside the left end of the date line, but never nearer the screen edge than --swing past the edge margin;
    the selfie is about as wide as it is tall */
-.stk-selfie{--in:.45s;--d:-.2s;right:min(100% + 2 * var(--stk-gap) + var(--swing), 50vw + 50% - var(--h) - clamp(18px,2.6vw,42px) - var(--swing));}
+.stk-selfie{--in:.45s;--d:-.2s;right:min(100% + .1 * var(--stk-gap), 50vw + 50% - var(--h) - clamp(18px,2.6vw,42px) - var(--swing));}
+@media (min-width:1181px) and (max-width:1327px){ .stk-selfie{margin-top:calc(-.35 * var(--h));} }
 /* tablets and phones: no room beside the dates, so it drops below the RSVP button (its gap, then ~49px tall), centred */
 @media (max-width:900px) and (min-height:560px){
   .stk-selfie{top:calc(100% + clamp(24px,3vw,40px) + 49px + 1.5 * var(--stk-gap));margin-top:0;right:auto;left:calc(50% - .5 * var(--h));}
@@ -631,7 +632,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <h3>Welcome Party</h3>
 <p class="when">5–9 PM · Indoor/outdoor</p>
 <p>Join us for a warm welcome to Mexico City.</p>
-<p>The venue is approximately a 10-minute walk from Andaz. Transportation will be available for older guests.</p></div>
+<p>The venue is approximately a 10-minute walk from the hotel. Transportation will be available for older guests.</p></div>
 </div>
 <picture class="stk stk-mendhi" aria-hidden="true"><source type="image/webp" srcset="img/sticker-mendhi-sm.webp 220w, img/sticker-mendhi.webp 340w" sizes="150px"><img src="img/sticker-mendhi.png" width="340" height="469" alt="" loading="lazy" decoding="async"></picture>
 </article>
