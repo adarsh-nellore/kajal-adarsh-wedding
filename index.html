@@ -199,8 +199,7 @@ a:focus-visible{outline:none;}
 }
 @media (prefers-reduced-motion:reduce){ .stk img{animation:none !important;} }
 
-/* hero stickers, one per corner around the name: hearts and couple above it (mirrored across the centre, tops level),
-   selfie and standing level with the date line out at the screen edges. Out of the flow, so the name and dates lay out as without them.
+/* hero stickers around the name: hearts above its left end, the couple beside its right end, the selfie left of the date line. Out of the flow, so the name and dates lay out as without them.
    Positioned from the hero's centre using the same clamps as the h1 and .stamp:
      --f   the name's font-size; "Kajal y Adarsh" is ~4.98em wide, so its ends are 50% -/+ 2.49*--f
      --mid the name's vertical centre (the centred block minus half the stamp below it)
@@ -215,48 +214,28 @@ a:focus-visible{outline:none;}
 /* phones: the largest scale at which the pair above the name still fits across it */
 @media (max-width:600px){ .stk-hero{--k:1.15;} }
 .stk-hero img{animation:sticker-in .9s cubic-bezier(.2,.7,.3,1) var(--in,.3s) both, sticker-rock 5s ease-in-out var(--d,0s) infinite alternate;}
-.stk-couple,.stk-hearts{top:calc(var(--mid) - .95 * var(--k) * var(--stk-lg));}
-.stk-couple{--d:-1.4s;left:calc(50% + 2.49 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
+.stk-hearts{top:calc(var(--mid) - .95 * var(--k) * var(--stk-lg));}
+/* the couple, larger, level with the middle of the name; --end is how far the name runs right of centre.
+   Its height gives way to the room between the name and the screen edge (it's .96 as wide as tall, plus half its swing) */
+.stk-couple{
+  --end:calc(2.49 * var(--f));
+  --h:min(1.3 * var(--k) * var(--stk-lg), (50vw - var(--end) - var(--stk-gap) - clamp(18px,2.6vw,42px)) / 1.06);
+  --d:-1.4s;
+  top:calc(var(--mid) - .5 * var(--h));
+  left:calc(50% + var(--end) + var(--stk-gap) + .5 * var(--swing));
+}
 .stk-hearts{--h:calc(var(--k) * 1.15 * var(--stk));--tilt:calc(-1 * var(--stk-tilt));--in:.6s;--d:-.6s;right:calc(50% + 2.49 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
 /* beside the nav rail the name wraps to two lines, the longer "Kajal y" ~2.44em wide */
 @media (min-width:1181px) and (max-width:1327px){
-  .stk-couple{left:calc(50% + 1.22 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
+  .stk-couple{--end:calc(1.22 * var(--f));}
   .stk-hearts{right:calc(50% + 1.22 * var(--f) + var(--stk-gap) + .5 * var(--swing));}
 }
 /* tablets and phones: no room beside the name, so the pair sits above it, bottoms level, aligned with its two ends */
 @media (max-width:900px) and (min-height:560px){
   .stk-couple,.stk-hearts{top:calc(var(--mid) - .52 * var(--f) - 2 * var(--stk-gap) - 1.05 * var(--h));}
-  .stk-couple{left:auto;right:calc(50% - 2.49 * var(--f));}
+  .stk-couple{--h:calc(var(--k) * var(--stk-lg));left:auto;right:calc(50% - 2.49 * var(--f));}
   .stk-hearts{right:auto;left:calc(50% - 2.49 * var(--f));}
 }
-/* dog: centred above the name, riding inside the h1 so it follows the title however it wraps (1em is the name's size).
-   Its height gives way to the room left above the title on short screens; --half is half the title's height,
-   one line except beside the nav rail up to 1327px, where the narrower column wraps it to two */
-.stk-dog{
-  --half:.52em;
-  --h:min(var(--k) * var(--stk-lg), 50svh - var(--half) - (clamp(30px,4vw,52px) + 3 * clamp(19px,2.4vw,26px)) / 2 - 3.5 * var(--stk-gap));
-  --tilt:calc(-1 * var(--stk-tilt));--in:.15s;--d:-.9s;
-  left:50%;bottom:calc(100% + var(--stk-gap) + .5 * var(--swing));transform:translateX(-50%);
-}
-@media (min-width:1181px) and (max-width:1327px){ .stk-dog{--half:1.04em;} }
-/* phones and narrow tablets: the pair above the name fills its width, so the dog takes a row of its own above them */
-@media (max-width:760px) and (min-height:560px){
-  .stk-dog{
-    --h:min(var(--k) * var(--stk-lg), (50svh - var(--half) - (clamp(30px,4vw,52px) + 3 * clamp(19px,2.4vw,26px)) / 2 - 5 * var(--stk-gap) - 1.2 * var(--k) * var(--stk-lg)) / 1.2);
-    bottom:calc(100% + 3 * var(--stk-gap) + 1.2 * var(--k) * var(--stk-lg) + .5 * var(--swing));
-  }
-}
-/* short phones: no row to spare up there, so it drops between the pair under the dates (three lines at 1.5)
-   and the RSVP button (its gap, then 1.2 lines of 24px plus 20px of padding and border), at the base sticker size */
-@media (max-width:760px) and (min-height:560px) and (max-height:719px){
-  .stk-dog{
-    --h:calc(var(--k) * var(--stk));
-    bottom:auto;
-    top:calc(100% + clamp(30px,4vw,52px) + 4.5 * clamp(19px,2.4vw,26px) + clamp(24px,3vw,40px) + 49px + var(--stk-gap));
-  }
-}
-/* where that room would leave it smaller than --stk, it sits out */
-@media (min-width:1181px) and (max-width:1327px) and (max-height:830px),(min-width:901px) and (max-height:680px){ .stk-dog{display:none;} }
 .stamp{position:relative;}
 /* Events stickers sit in the margin right of their card's text; phones don't have the room */
 .leg:has(.stk){position:relative;}
@@ -265,28 +244,27 @@ a:focus-visible{outline:none;}
 .stk-haldi{--h:var(--stk-lg);--tilt:calc(-1 * var(--stk-tilt));--d:-1.7s;}
 .stk-ganesh{--h:calc(1.3 * var(--stk-lg));--d:-4.2s;}
 .stk-martini{--h:calc(1.3 * var(--stk-lg));--tilt:calc(-1 * var(--stk-tilt));--d:-2.6s;}
-/* second stickers sit under the first; their cards grow so the rail doesn't clip them */
-.stk-samosa{--h:var(--stk);--d:-3.6s;top:calc(1.35 * var(--stk-lg));left:calc(100% - .5 * var(--stk));}
-.stk-cake{--h:var(--stk);--d:-.8s;top:calc(1.72 * var(--stk-lg));left:calc(100% - .9 * var(--stk));}
+/* second stickers sit just below and left of the first, clear of it; their cards grow so the rail doesn't clip them */
+.stk-samosa{--h:var(--stk);--d:-3.6s;top:calc(1.22 * var(--stk-lg));left:calc(100% - .35 * var(--stk));}
+.stk-cake{--h:var(--stk);--d:-.8s;top:calc(1.56 * var(--stk-lg));left:100%;}
 @media (min-width:1000px){
-  .leg:has(.stk-samosa){min-height:calc(1.35 * var(--stk-lg) + 1.3 * var(--stk));}
-  .leg:has(.stk-cake){min-height:calc(1.72 * var(--stk-lg) + 1.3 * var(--stk));}
+  .leg:has(.stk-samosa){min-height:calc(1.22 * var(--stk-lg) + 1.2 * var(--stk));}
+  .leg:has(.stk-cake){min-height:calc(1.56 * var(--stk-lg) + 1.25 * var(--stk));}
 }
 @media (max-width:999px){ .stk-mendhi,.stk-haldi,.stk-ganesh,.stk-martini,.stk-cake,.stk-samosa{display:none;} }
 
 /* hangs below the dates out of the flow, so the name, dates and stickers keep their places */
 .cover-rsvp{position:absolute;top:calc(100% + clamp(24px,3vw,40px));left:50%;transform:translateX(-50%);text-decoration:none;white-space:nowrap;}
-.stk-selfie,.stk-standing{top:50%;margin-top:calc(-.35 * var(--h));}
-/* just outside the ends of the date line, but never nearer the screen edge than --swing (how far the rock carries
-   their lower end) past the edge margin; the selfie is about as wide as it is tall, the standing pair .44 of its height */
+.stk-selfie{top:50%;margin-top:calc(-.35 * var(--h));}
+/* just outside the left end of the date line, but never nearer the screen edge than --swing past the edge margin;
+   the selfie is about as wide as it is tall */
 .stk-selfie{--in:.45s;--d:-.2s;right:min(100% + 2 * var(--stk-gap) + var(--swing), 50vw + 50% - var(--h) - clamp(18px,2.6vw,42px) - var(--swing));}
-.stk-standing{--h:calc(var(--k) * 1.35 * var(--stk-lg));--tilt:calc(-1 * var(--stk-tilt));--in:.75s;--d:-2.1s;left:min(100% + 2 * var(--stk-gap) + var(--swing), 50vw + 50% - .44 * var(--h) - clamp(18px,2.6vw,42px) - var(--swing));}
-/* tablets and phones: no room beside the dates, so the pair drops just below them, at the column's two edges */
+/* tablets and phones: no room beside the dates, so it drops below the RSVP button (its gap, then ~49px tall), centred */
 @media (max-width:900px) and (min-height:560px){
-  .stk-selfie,.stk-standing{top:calc(100% + var(--stk-gap));margin-top:0;}
-  .stk-selfie{right:auto;left:max(0px, var(--swing) - clamp(22px,7vw,88px));}
-  .stk-standing{left:auto;right:max(0px, var(--swing) - clamp(22px,7vw,88px));}
+  .stk-selfie{top:calc(100% + clamp(24px,3vw,40px) + 49px + 1.5 * var(--stk-gap));margin-top:0;right:auto;left:calc(50% - .5 * var(--h));}
 }
+/* short phones: smaller, so it clears the scroll cue */
+@media (max-width:900px) and (min-height:560px) and (max-height:719px){ .stk-selfie{--h:calc(var(--k) * var(--stk));} }
 
 /* ---------- sections: each swaps cards in place from an index ---------- */
 .journey{
@@ -631,8 +609,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </nav>
 
 <header class="hero" id="top">
-<h1 data-px="0.20" data-px-hero>Kajal y Adarsh<picture class="stk stk-hero stk-dog" aria-hidden="true"><source type="image/webp" srcset="img/sticker-dog-sm.webp 220w, img/sticker-dog.webp 340w" sizes="(max-width:900px) 120px, 190px"><img src="img/sticker-dog.png" width="340" height="380" alt="" decoding="async"></picture></h1>
-<p class="stamp" data-px="0.10" data-px-hero>Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico<a class="rsvp-send cover-rsvp" href="#rsvp">RSVP</a><picture class="stk stk-hero stk-standing" aria-hidden="true"><source type="image/webp" srcset="img/sticker-standing-sm.webp 220w, img/sticker-standing.webp 340w" sizes="(max-width:900px) 80px, 124px"><img src="img/sticker-standing.png" width="340" height="774" alt="" decoding="async"></picture><picture class="stk stk-hero stk-selfie" aria-hidden="true">
+<h1 data-px="0.20" data-px-hero>Kajal y Adarsh</h1>
+<p class="stamp" data-px="0.10" data-px-hero>Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico<a class="rsvp-send cover-rsvp" href="#rsvp">RSVP</a><picture class="stk stk-hero stk-selfie" aria-hidden="true">
 <source type="image/webp" srcset="img/sticker-selfie-sm.webp 220w, img/sticker-selfie.webp 340w" sizes="(max-width:900px) 130px, 210px">
 <img src="img/sticker-selfie.png" width="340" height="338" alt="" decoding="async">
 </picture></p>
@@ -652,7 +630,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="event">
 <h3>Welcome Party</h3>
 <p class="when">5–9 PM · Indoor/outdoor</p>
-<p>Join us for an evening of drinks, dinner, and a warm welcome to Mexico City.</p>
+<p>Join us for a warm welcome to Mexico City.</p>
 <p>The venue is approximately a 10-minute walk from Andaz. Transportation will be available for older guests.</p></div>
 </div>
 <picture class="stk stk-mendhi" aria-hidden="true"><source type="image/webp" srcset="img/sticker-mendhi-sm.webp 220w, img/sticker-mendhi.webp 340w" sizes="150px"><img src="img/sticker-mendhi.png" width="340" height="469" alt="" loading="lazy" decoding="async"></picture>
