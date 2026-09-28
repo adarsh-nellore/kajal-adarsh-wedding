@@ -347,9 +347,9 @@ a:focus-visible{outline:none;}
 .leg h3{margin-top:0;}
 .leg p + h3{margin-top:32px;}
 .leg p{max-width:none;}
-.leg ul{margin:10px 0 0;padding-left:1.2em;}
-.leg li + li{margin-top:6px;}
-.leg ul + p{margin-top:19px;}
+.leg ul:not(.swatches){margin:10px 0 0;padding-left:1.2em;}
+.leg ul:not(.swatches) li + li{margin-top:6px;}
+.leg ul:not(.swatches) + p{margin-top:19px;}
 .journey[data-pin] .leg{display:grid;grid-template-columns:auto 1fr;gap:clamp(22px,3vw,48px);align-items:start;}
 .journey[data-pin] .leg-body{max-width:30rem;}
 .day{color:var(--gold);}
@@ -742,7 +742,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <article class="leg" data-tab="After Party">
 <div class="leg-body">
 <picture><source srcset="img/look-reception-sm.webp 900w, img/look-reception.webp 1800w" sizes="(max-width:760px) 100vw, 44rem" type="image/webp"><img src="img/look-reception.png" width="900" height="521" decoding="async" alt="Six guests in black tie optional wear in jewel tones and dark colors: gowns, sarees, tuxedos and dark suits."></picture>
-<ul class="swatches" aria-label="Suggested colors"><li style="--c:#000000"></li><li style="--c:#0A2782"></li><li style="--c:#611228"></li><li style="--c:#7D4B7D"></li><li style="--c:#2E473A"></li><li style="--c:#205960"></li></ul>
+<ul class="swatches" aria-label="Suggested colors"><li style="--c:#000000"></li><li style="--c:#0A2782"></li><li style="--c:#611228"></li><li style="--c:#7D4B7D"></li><li style="--c:#2E473A"></li><li style="--c:#205960"></li><li style="--c:#3A2419"></li><li style="--c:#2B2D33"></li></ul>
 <p class="when">Formal Black Tie Optional</p>
 <p>Think classic &amp; glamorous.<br>Gowns, sarees, tuxedos &amp; dark suits.<br>Jewel tones and dark colors.</p>
 </div>
