@@ -244,17 +244,20 @@ a:focus-visible{outline:none;}
     bottom:calc(100% + 3 * var(--stk-gap) + 1.2 * var(--k) * var(--stk-lg) + .5 * var(--swing));
   }
 }
-/* short phones: no row to spare up there, so it drops between the pair under the dates (three lines at 1.5), at the base sticker size */
+/* short phones: no row to spare up there, so it drops between the pair under the dates (three lines at 1.5)
+   and the RSVP button (its gap, then 1.2 lines of 24px plus 20px of padding and border), at the base sticker size */
 @media (max-width:760px) and (min-height:560px) and (max-height:719px){
   .stk-dog{
     --h:calc(var(--k) * var(--stk));
     bottom:auto;
-    top:calc(100% + clamp(30px,4vw,52px) + 4.5 * clamp(19px,2.4vw,26px) + var(--stk-gap));
+    top:calc(100% + clamp(30px,4vw,52px) + 4.5 * clamp(19px,2.4vw,26px) + clamp(24px,3vw,40px) + 49px + var(--stk-gap));
   }
 }
 /* where that room would leave it smaller than --stk, it sits out */
 @media (min-width:1181px) and (max-width:1327px) and (max-height:830px),(min-width:901px) and (max-height:680px){ .stk-dog{display:none;} }
 .stamp{position:relative;}
+/* hangs below the dates out of the flow, so the name, dates and stickers keep their places */
+.cover-rsvp{position:absolute;top:calc(100% + clamp(24px,3vw,40px));left:50%;transform:translateX(-50%);text-decoration:none;white-space:nowrap;}
 .stk-selfie,.stk-standing{top:50%;margin-top:calc(-.35 * var(--h));}
 /* just outside the ends of the date line, but never nearer the screen edge than --swing (how far the rock carries
    their lower end) past the edge margin; the selfie is about as wide as it is tall, the standing pair .44 of its height */
@@ -613,7 +616,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
 <header class="hero" id="top">
 <h1 data-px="0.20" data-px-hero>Kajal y Adarsh<picture class="stk stk-hero stk-dog" aria-hidden="true"><source type="image/webp" srcset="img/sticker-dog-sm.webp 220w, img/sticker-dog.webp 340w" sizes="(max-width:900px) 120px, 190px"><img src="img/sticker-dog.png" width="340" height="380" alt="" decoding="async"></picture></h1>
-<p class="stamp" data-px="0.10" data-px-hero>Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico<picture class="stk stk-hero stk-standing" aria-hidden="true"><source type="image/webp" srcset="img/sticker-standing-sm.webp 220w, img/sticker-standing.webp 340w" sizes="(max-width:900px) 80px, 124px"><img src="img/sticker-standing.png" width="340" height="774" alt="" decoding="async"></picture><picture class="stk stk-hero stk-selfie" aria-hidden="true">
+<p class="stamp" data-px="0.10" data-px-hero>Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico<a class="rsvp-send cover-rsvp" href="#rsvp">RSVP</a><picture class="stk stk-hero stk-standing" aria-hidden="true"><source type="image/webp" srcset="img/sticker-standing-sm.webp 220w, img/sticker-standing.webp 340w" sizes="(max-width:900px) 80px, 124px"><img src="img/sticker-standing.png" width="340" height="774" alt="" decoding="async"></picture><picture class="stk stk-hero stk-selfie" aria-hidden="true">
 <source type="image/webp" srcset="img/sticker-selfie-sm.webp 220w, img/sticker-selfie.webp 340w" sizes="(max-width:900px) 130px, 210px">
 <img src="img/sticker-selfie.png" width="340" height="338" alt="" decoding="async">
 </picture></p>
@@ -689,7 +692,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <article class="leg" data-tab="Flying">
 <div class="leg-body">
 <p>Please fly into MEX (Mexico City International Airport). MEX is approximately 30–40 minutes from the hotel, depending on traffic.</p>
-<p>NLU (Felipe Ángeles International Airport) is farther from the hotel and can take approximately 1.5–2 hours depending on traffic, so we recommend flying into MEX when possible.</p>
 <p>Please note that our Welcome Event begins at 5:00 p.m. on Friday, so plan your arrival accordingly!</p>
 <p>If you’re traveling from Southern California, you may also consider flying into Tijuana (TIJ) and crossing the border. Just keep in mind that crossing the border adds some extra time and fees.</p>
 <h3>A few passport reminders</h3>
