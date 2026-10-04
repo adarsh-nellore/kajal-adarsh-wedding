@@ -122,12 +122,25 @@ Deno.serve(async (req: Request) => {
   const [r] = (await claim.json()) as Rsvp[];
   if (!r) return json({ ok: true, skipped: "not found, too old, or already notified" });
 
-  const couple = await send(
-    TO,
-    `RSVP: ${r.name} ${r.attending ? "accepts" : "declines"}`,
-    render("New RSVP", `${r.name} replied on ${new Date(r.created_at).toUTCString()}.`, r),
-    r.email,
-  );
+  // One message per address, so a rejected recipient (e.g. while sending from
+  // onboarding@resend.dev) doesn't block the other.
+  const subject = `RSVP: ${r.name} ${r.attending ? "accepts" : "declines"}`;
+  const body = render("New RSVP", `${r.name} replied on ${new Date(r.created_at).toUTCString()}.`, r);
+  const couple: Record<string, Awaited<ReturnType<typeof send>>> = {};
+  for (const to of TO) couple[to] = await send([to], subject, body, r.email);
+  const anyOk = Object.values(couple).some((c) => c.ok);
+
+  if (!anyOk) {
+    await fetch(`${SUPABASE_URL}/rest/v1/wedding_rsvps?id=eq.${id}`, {
+      method: "PATCH",
+      headers: {
+        "apikey": SERVICE_KEY,
+        "Authorization": `Bearer ${SERVICE_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ notified_at: null }),
+    });
+  }
 
   let guest = null;
   if (r.send_copy) {
@@ -145,7 +158,7 @@ Deno.serve(async (req: Request) => {
     );
   }
 
-  return json({ ok: couple.ok, couple, guest }, couple.ok ? 200 : 502);
+  return json({ ok: anyOk, couple, guest }, anyOk ? 200 : 502);
 });
 
 function json(body: unknown, status = 200): Response {
