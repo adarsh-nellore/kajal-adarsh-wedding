@@ -929,13 +929,16 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p class="err" id="rsvp-events-err"></p>
 </fieldset>
 <div class="field">
-<label for="rsvp-dietary">Dietary restrictions <span class="opt">(optional)</span></label>
-<input id="rsvp-dietary" name="dietary" type="text" autocomplete="off">
+<label for="rsvp-dietary">Dietary restrictions or allergies <span class="opt">(optional)</span></label>
+<input id="rsvp-dietary" name="dietary" type="text" autocomplete="off" maxlength="1000">
 </div>
 </div>
 <div class="field">
 <label for="rsvp-note">A note to us <span class="opt">(optional)</span></label>
-<textarea id="rsvp-note" name="note" rows="2"></textarea>
+<textarea id="rsvp-note" name="note" rows="2" maxlength="4000"></textarea>
+</div>
+<div class="field">
+<label class="check"><input type="checkbox" name="copy" id="rsvp-copy"><span>Please send me a copy of my RSVP responses</span></label>
 </div>
 <div class="send"><button type="submit" class="rsvp-send">Send reply</button></div>
 <p class="err" id="rsvp-send-err" role="alert"></p>
@@ -1167,10 +1170,40 @@ picture{margin-block:clamp(52px,8vw,104px);}
     var form = document.querySelector('.rsvp-form');
     if(!form) return;
 
-    /* The backend hook. Resolve when the reply is saved, reject if it fails. Supabase drops in here, e.g.
-         return supabase.from('rsvps').insert(data).then(function(r){ if(r.error) throw r.error; });   */
+    /* Publishable key: RLS on wedding_rsvps allows insert only, no reads. */
+    var SUPABASE_URL = 'https://zfhhknasebbhaifabszd.supabase.co';
+    var SUPABASE_KEY = 'sb_publishable_dJcPYQhdaQyWeJ-VAmc9QA_pD7eIyJB';
+    function uuid(){
+      if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c){
+        var r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 3 | 8)).toString(16);
+      });
+    }
     function submit(data){
-      return new Promise(function(resolve){ setTimeout(resolve, reduce ? 0 : 700); });
+      var row = {
+        id: uuid(),
+        name: data.name,
+        email: data.email,
+        attending: data.attending,
+        guests: data.guests,
+        events: data.events,
+        dietary: data.dietary || null,
+        note: data.note || null,
+        send_copy: data.copy,
+        user_agent: (navigator.userAgent || '').slice(0, 1000)
+      };
+      var headers = {'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json'};
+      return fetch(SUPABASE_URL + '/rest/v1/wedding_rsvps', {
+        method: 'POST',
+        headers: Object.assign({'Prefer': 'return=minimal'}, headers),
+        body: JSON.stringify(row)
+      }).then(function(res){
+        if(!res.ok) return res.text().then(function(t){ throw new Error('RSVP insert failed: ' + res.status + ' ' + t.slice(0, 200)); });
+        fetch(SUPABASE_URL + '/functions/v1/notify-wedding-rsvp', {
+          method: 'POST', headers: headers, body: JSON.stringify({id: row.id}), keepalive: true
+        }).catch(function(){});
+      });
     }
 
     var done = document.querySelector('.rsvp-done');
@@ -1182,7 +1215,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
       email: document.getElementById('rsvp-email'),
       guests: document.getElementById('rsvp-guests'),
       dietary: document.getElementById('rsvp-dietary'),
-      note: document.getElementById('rsvp-note')
+      note: document.getElementById('rsvp-note'),
+      copy: document.getElementById('rsvp-copy')
     };
     var radios = Array.prototype.slice.call(form.querySelectorAll('input[name="attending"]'));
     var boxes = Array.prototype.slice.call(form.querySelectorAll('input[name="events"]'));
@@ -1241,7 +1275,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
         guests: going ? Number(f.guests.value) : 0,
         events: going ? boxes.filter(function(b){ return b.checked; }).map(function(b){ return b.value; }) : [],
         dietary: going ? f.dietary.value.trim() : '',
-        note: f.note.value.trim()
+        note: f.note.value.trim(),
+        copy: f.copy.checked
       };
 
       send.disabled = true;
