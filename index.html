@@ -326,13 +326,12 @@ a:focus-visible{outline:none;}
   line-height:1.2;
   letter-spacing:.01em;
   white-space:nowrap;
-  color:transparent;
-  -webkit-text-stroke:1px rgba(212,160,78,.36);
+  color:rgba(212,160,78,.4);
   cursor:pointer;
-  transition:color .45s cubic-bezier(.2,.7,.3,1),-webkit-text-stroke-color .45s cubic-bezier(.2,.7,.3,1);
+  transition:color .45s cubic-bezier(.2,.7,.3,1);
 }
-.tab:hover{-webkit-text-stroke-color:var(--gold);}
-.tab[aria-selected="true"]{color:var(--gold);-webkit-text-stroke-color:var(--gold);}
+.tab:hover{color:rgba(212,160,78,.75);}
+.tab[aria-selected="true"]{color:var(--gold);}
 .tab:focus-visible{outline:1px solid var(--gold);outline-offset:6px;border-radius:2px;}
 /* fingers need ~44px: widen the hit area invisibly, with just enough row gap that neighbours don't overlap */
 @media (pointer:coarse){
@@ -566,8 +565,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .choices{display:flex;flex-wrap:wrap;gap:6px clamp(20px,2.4vw,34px);margin-top:8px;}
 .choice,.check{position:relative;cursor:pointer;}
 .choice input,.check input{position:absolute;left:0;top:0;width:1px;height:1px;margin:0;opacity:0;pointer-events:none;}
-.choice:hover .tab{-webkit-text-stroke-color:var(--gold);}
-.choice input:checked + .tab{color:var(--gold);-webkit-text-stroke-color:var(--gold);}
+.choice:hover .tab{color:rgba(212,160,78,.75);}
+.choice input:checked + .tab{color:var(--gold);}
 .choice input:focus-visible + .tab{outline:1px solid var(--gold);outline-offset:6px;border-radius:2px;}
 
 /* events: a small diamond, the nav's bead, lights up when chosen */
