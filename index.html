@@ -7,7 +7,7 @@
 <meta name="description" content="Kajal &amp; Adarsh are getting married in Mexico City, 19–21 February 2027.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jaini&family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jaini&family=Cormorant+Garamond:wght@500;600&family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
   --ground:#0A0908;   /* near-black — the paper the ink sits on */
@@ -15,6 +15,7 @@
   --gold:#D4A04E;    /* headings (8.6:1) */
   --white:#EAE3D6;   /* everything else — off-white, warmed to sit with the gold (15:1) */
   --head:'Jaini','EB Garamond',Georgia,serif;
+  --sub:'Cormorant Garamond','EB Garamond',Georgia,serif;
   --body:'EB Garamond',Georgia,'Times New Roman',serif;
   /* the one gap between the end of a section and the next heading */
   --gap:clamp(96px,13vw,168px);
@@ -282,7 +283,7 @@ a:focus-visible{outline:none;}
 .journey h2{margin-bottom:clamp(14px,1.8vw,22px);}
 .lede{margin-bottom:clamp(18px,2.4vw,28px);}
 
-/* the index: big-type names, outlined until chosen */
+/* the index: big-type names, muted until chosen */
 .tabs{
   display:flex;
   flex-wrap:wrap;
@@ -294,18 +295,17 @@ a:focus-visible{outline:none;}
   background:none;
   border:0;
   padding:0;
-  font-family:var(--head);
-  font-size:clamp(26px,3.2vw,38px);
+  font-family:var(--sub);
+  font-weight:600;
+  font-size:clamp(25px,3vw,36px);
   line-height:1.2;
-  letter-spacing:.01em;
   white-space:nowrap;
-  color:transparent;
-  -webkit-text-stroke:1px rgba(212,160,78,.55);
+  color:rgba(212,160,78,.55);
   cursor:pointer;
-  transition:color .45s cubic-bezier(.2,.7,.3,1),-webkit-text-stroke-color .45s cubic-bezier(.2,.7,.3,1);
+  transition:color .45s cubic-bezier(.2,.7,.3,1);
 }
-.tab:hover{-webkit-text-stroke-color:var(--gold);}
-.tab[aria-selected="true"]{color:var(--gold);-webkit-text-stroke-color:var(--gold);}
+.tab:hover{color:rgba(212,160,78,.85);}
+.tab[aria-selected="true"]{color:var(--gold);}
 .tab:focus-visible{outline:1px solid var(--gold);outline-offset:6px;border-radius:2px;}
 /* fingers need ~44px: widen the hit area invisibly, with just enough row gap that neighbours don't overlap */
 @media (pointer:coarse){
@@ -350,7 +350,7 @@ a:focus-visible{outline:none;}
 .journey[data-pin] .leg{display:grid;grid-template-columns:auto 1fr;gap:clamp(22px,3vw,48px);align-items:start;}
 .journey[data-pin] .leg-body{max-width:30rem;}
 .day{color:var(--gold);}
-.day b{display:block;font-family:var(--head);font-weight:400;font-size:clamp(64px,8vw,120px);line-height:.82;}
+.day b{display:block;font-family:var(--sub);font-weight:500;font-variant-numeric:lining-nums;font-size:clamp(64px,8vw,120px);line-height:.82;}
 .when{color:var(--gold);font-size:1.15em;font-weight:500;}
 @media (max-width:560px){ .journey[data-pin] .leg{grid-template-columns:1fr;gap:4px;} .day b{font-size:72px;} }
 
@@ -535,12 +535,12 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .err{margin-top:6px;font-size:16px;line-height:1.5;color:var(--gold);}
 .err:empty{display:none;}
 
-/* yes / no: the section index's outlined names, filled once chosen */
+/* yes / no: the section index's muted names, full gold once chosen */
 .choices{display:flex;flex-wrap:wrap;gap:6px clamp(20px,2.4vw,34px);margin-top:8px;}
 .choice,.check{position:relative;cursor:pointer;}
 .choice input,.check input{position:absolute;left:0;top:0;width:1px;height:1px;margin:0;opacity:0;pointer-events:none;}
-.choice:hover .tab{-webkit-text-stroke-color:var(--gold);}
-.choice input:checked + .tab{color:var(--gold);-webkit-text-stroke-color:var(--gold);}
+.choice:hover .tab{color:rgba(212,160,78,.85);}
+.choice input:checked + .tab{color:var(--gold);}
 .choice input:focus-visible + .tab{outline:1px solid var(--gold);outline-offset:6px;border-radius:2px;}
 
 /* events: a small diamond, the nav's bead, lights up when chosen */
@@ -568,10 +568,10 @@ picture{margin-block:clamp(52px,8vw,104px);}
   border:1px solid rgba(212,160,78,.55);
   border-radius:0;
   padding:10px 30px 8px;
-  font-family:var(--head);
-  font-size:clamp(24px,2.6vw,30px);
+  font-family:var(--sub);
+  font-weight:600;
+  font-size:clamp(23px,2.5vw,28px);
   line-height:1.2;
-  letter-spacing:.01em;
   color:var(--gold);
   cursor:pointer;
   transition:border-color .35s cubic-bezier(.2,.7,.3,1),background-color .35s cubic-bezier(.2,.7,.3,1);
