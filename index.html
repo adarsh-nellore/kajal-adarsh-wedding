@@ -1396,15 +1396,12 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
   /* scrolling steps one section at a time, like flicking through a feed. A section taller than the screen scrolls
      freely until the next one comes into view; frames stop centred. The tail of a trackpad's coast is swallowed */
-  var SNAP_MS = 850;
-  var snapEls = Array.prototype.slice.call(document.querySelectorAll('.hero, .frame, .journey, .rsvp, .wall'));
+  var SNAP_MS = 650;
+  var snapEls = Array.prototype.slice.call(document.querySelectorAll('.hero, .journey, .rsvp'));
   function snapTarget(dir){
     var y = window.scrollY, h = window.innerHeight, max = document.documentElement.scrollHeight - h;
     var stops = snapEls.map(function(el){
-      var r = el.getBoundingClientRect(), s;
-      if(el.classList.contains('frame') || el.classList.contains('wall')){ s = r.top + y + r.height / 2 - h / 2; }
-      else { s = stopOf(el); }
-      return {at:Math.max(0, Math.min(max, Math.round(s))), end:r.bottom + y};
+      return {at:Math.max(0, Math.min(max, Math.round(stopOf(el)))), end:el.getBoundingClientRect().bottom + y};
     }).sort(function(a, b){ return a.at - b.at; });
     var i, cur = null;
     if(dir > 0){
@@ -1429,13 +1426,17 @@ picture{margin-block:clamp(52px,8vw,104px);}
   }
   function snapSkip(e){ return reduce || menuOpen() || (e.target.closest && e.target.closest('.mnav, textarea')); }
 
-  var snapping = false, quietT = 0, wAcc = 0, wT = 0;
+  /* a fresh flick is a pause, or deltas climbing three times running, which a fading coast doesn't do */
+  var snapping = false, quietT = 0, wAcc = 0, wT = 0, wAbs = 0, wRise = 0;
   window.addEventListener('wheel', function(e){
     if(e.ctrlKey || Math.abs(e.deltaY) <= Math.abs(e.deltaX) || snapSkip(e)) return;
-    var now = Date.now();
+    var now = Date.now(), a = Math.abs(e.deltaY);
+    wRise = a > wAbs ? wRise + 1 : 0;
+    wAbs = a;
     if(snapping){
-      if(anim || now - quietT < 160){ quietT = now; e.preventDefault(); return; }
+      if(anim || (now - quietT < 120 && !(wRise >= 3 && a > 8))){ quietT = now; e.preventDefault(); return; }
       snapping = false;
+      wAcc = 0;
     }
     var to = snapTarget(e.deltaY > 0 ? 1 : -1);
     if(to === null) return;
