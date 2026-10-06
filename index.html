@@ -731,7 +731,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
   font:inherit;
   transition:border-color .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s cubic-bezier(.2,.7,.3,1);
 }
-.rsvp textarea{min-height:74px;resize:vertical;}
+.rsvp textarea{min-height:0;resize:none;overflow:hidden;field-sizing:content;}
 .rsvp input[type="number"]{width:6rem;-moz-appearance:textfield;appearance:textfield;}
 .rsvp input[type="number"]::-webkit-inner-spin-button,.rsvp input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 .rsvp input:focus,.rsvp textarea:focus{outline:none;border-bottom-color:var(--gold);box-shadow:0 1px 0 var(--gold);}
@@ -1168,7 +1168,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 <div class="field">
 <label for="rsvp-note">A note to us <span class="opt">(optional)</span></label>
-<textarea id="rsvp-note" name="note" rows="2" maxlength="4000"></textarea>
+<textarea id="rsvp-note" name="note" rows="1" maxlength="4000"></textarea>
 </div>
 <div class="field">
 <label class="check"><input type="checkbox" name="copy" id="rsvp-copy"><span>Please send me a copy of my RSVP responses</span></label>
@@ -1535,6 +1535,12 @@ picture{margin-block:clamp(52px,8vw,104px);}
     };
     var radios = Array.prototype.slice.call(form.querySelectorAll('input[name="attending"]'));
     var boxes = Array.prototype.slice.call(form.querySelectorAll('input[name="events"]'));
+    if (!CSS.supports('field-sizing', 'content')) {
+      f.note.addEventListener('input', function () {
+        f.note.style.height = 'auto';
+        f.note.style.height = f.note.scrollHeight + 'px';
+      });
+    }
     var tried = false;
 
     function attending(){
