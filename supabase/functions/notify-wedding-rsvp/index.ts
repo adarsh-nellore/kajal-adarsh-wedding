@@ -22,7 +22,7 @@ const TO = ["adarsh.nellore@gmail.com", "949kjp@gmail.com"];
 
 const EVENTS: Record<string, string> = {
   "welcome-party": "Welcome Party · Friday 19th",
-  "saatak-haldi": "Saatak & Haldi · Saturday 20th",
+  "saatak-haldi": "Ganesh Puja & Haldi · Saturday 20th",
   "baarat-wedding": "Baarat & Wedding · Sunday 21st",
   "after-party": "After Party · Sunday 21st",
 };
