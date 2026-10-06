@@ -253,8 +253,8 @@ a:focus-visible{outline:none;}
 .stk-ganesh{--h:calc(1.3 * var(--stk-lg));--d:-4.2s;}
 .stk-martini{--h:calc(1.3 * var(--stk-lg));--tilt:calc(-1 * var(--stk-tilt));--d:-2.6s;}
 /* second stickers sit just below and left of the first, clear of it; their cards grow so the rail doesn't clip them */
-.stk-samosa{--h:var(--stk);--d:-3.6s;top:calc(1.22 * var(--stk-lg));left:calc(100% - .35 * var(--stk));}
-.stk-cake{--h:var(--stk);--d:-.8s;top:calc(1.56 * var(--stk-lg));left:100%;}
+.stk-samosa{--h:var(--stk);--d:-3.6s;top:calc(1.22 * var(--stk-lg));left:calc(100% + .6 * var(--stk-gap));}
+.stk-cake{--h:var(--stk);--d:-.8s;top:calc(1.56 * var(--stk-lg));left:calc(100% + .6 * var(--stk-gap));}
 @media (min-width:1000px){
   .leg:has(.stk-samosa){min-height:calc(1.22 * var(--stk-lg) + 1.2 * var(--stk));}
   .leg:has(.stk-cake){min-height:calc(1.56 * var(--stk-lg) + 1.25 * var(--stk));}
