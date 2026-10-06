@@ -77,6 +77,15 @@ body::after{
   background-size:340px 340px;
   opacity:.4;
 }
+/* a fine gold lattice over the whole page, like the weave of a cloth */
+body > .lattice{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M0 0L24 24M24 0L0 24' stroke='%23CDA45E' stroke-width='.6' stroke-opacity='.075' fill='none'/%3E%3C/svg%3E") 0 0/24px 24px;
+}
+@media (prefers-contrast:more){ body > .lattice{display:none;} }
 
 /* texture is decoration — drop it when the viewer asks for more contrast */
 @media (prefers-contrast:more){
@@ -322,61 +331,6 @@ a:focus-visible{outline:none;}
    as cards swap) never cuts a light off; the frame hung after a section paints over that overhang, and the mask fades
    every light out top and bottom so nothing seams */
 .hero,.journey,.rsvp{isolation:isolate;}
-.hero::before,.journey::before,.rsvp::before{
-  content:"";
-  position:absolute;
-  top:calc(-.5 * var(--gap));
-  bottom:calc(-1 * var(--gap));
-  left:0;right:0;
-  z-index:-1;
-  pointer-events:none;
-  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 120px,#000 62%,transparent);
-          mask-image:linear-gradient(to bottom,transparent,#000 120px,#000 62%,transparent);
-}
-/* the hero sits inside the body's column, so its light reaches out to the screen edges */
-.hero::before{
-  top:0;bottom:0;
-  left:calc(50% - 50vw);right:calc(50% - 50vw);
-  background:radial-gradient(ellipse min(60rem,110vw) min(32rem,55vh) at 50% 50%,rgba(var(--gold-rgb),.065),transparent 70%);
-  -webkit-mask-image:none;
-          mask-image:none;
-}
-/* Events: a glow from the top left */
-.light-events::before{
-  background:radial-gradient(ellipse min(56rem,130vw) 26rem at 8% 220px,rgba(var(--gold-rgb),.085),transparent 70%);
-}
-/* Stay: a soft slanted beam falling from above */
-.light-stay::before{
-  background:
-    radial-gradient(ellipse min(24rem,60vw) 16rem at 58% 60px,rgba(var(--gold-rgb),.06),transparent 72%),
-    linear-gradient(97deg,transparent calc(58% - min(16rem,38vw)),rgba(var(--gold-rgb),.05) 58%,transparent calc(58% + min(16rem,38vw)));
-  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 140px,rgba(0,0,0,.4) 55%,transparent);
-          mask-image:linear-gradient(to bottom,transparent,#000 140px,rgba(0,0,0,.4) 55%,transparent);
-}
-/* Attire: a fine woven lattice, like the weave of a cloth, fading out from the middle */
-.light-attire::before{
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M0 0L22 22M22 0L0 22' stroke='%23CDA45E' stroke-width='.7' stroke-opacity='.1' fill='none'/%3E%3C/svg%3E") 0 0/22px 22px,
-    radial-gradient(ellipse 60% 50% at 50% 50%,rgba(var(--gold-rgb),.03),transparent 75%);
-  -webkit-mask-image:radial-gradient(ellipse 72% 62% at 50% 50%,#000 10%,transparent 72%);
-          mask-image:radial-gradient(ellipse 72% 62% at 50% 50%,#000 10%,transparent 72%);
-}
-/* FAQs: a low glow from the bottom right */
-.light-faq::before{
-  background:radial-gradient(ellipse min(54rem,130vw) 28rem at 92% calc(100% - 260px),rgba(var(--gold-rgb),.08),transparent 70%);
-  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 120px,#000 55%,transparent);
-          mask-image:linear-gradient(to bottom,transparent,#000 120px,#000 55%,transparent);
-}
-/* RSVP: a spotlight from above, with a faint pool where it lands */
-.rsvp::before{
-  bottom:0;
-  background:
-    radial-gradient(ellipse min(30rem,80vw) min(46rem,110vh) at 50% 40px,rgba(var(--gold-rgb),.085),transparent 70%),
-    radial-gradient(ellipse min(40rem,95vw) 12rem at 50% calc(100% - 160px),rgba(var(--gold-rgb),.035),transparent 70%);
-}
-/* on a phone each light fills most of the screen, so it steps down to stay a hint */
-@media (max-width:600px){ .hero::before,.journey::before,.rsvp::before{opacity:.7;} }
-@media (prefers-contrast:more){ .hero::before,.journey::before,.rsvp::before{display:none;} }
 
 /* the index: big-type names, outlined until chosen */
 .tabs{
@@ -840,6 +794,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </style>
 </head>
 <body>
+<div class="lattice" aria-hidden="true"></div>
 
 <nav>
 <a href="#weekend">Events</a>
