@@ -430,11 +430,11 @@ a:focus-visible{outline:none;}
 .wall figure{position:absolute;margin:0;left:var(--x);top:var(--y);width:var(--w);rotate:var(--r,0deg);}
 .wall picture{display:block;margin:0;}
 .wall img{display:block;width:100%;height:auto;filter:drop-shadow(0 14px 22px rgba(0,0,0,.6));}
-.wall-frida{--x:36%;--y:9.8%;--w:34%;--r:-.2deg;}
-.wall-lotus{--x:3%;--y:6.7%;--w:29%;--r:.3deg;}
-.wall-marigold{--x:10%;--y:52.7%;--w:22%;--r:-.25deg;}
-.wall-agave{--x:74%;--y:.4%;--w:23%;--r:.25deg;}
-.wall-umbrellas{--x:74%;--y:59.2%;--w:20%;--r:-.2deg;}
+.wall-frida{--x:36%;--y:9.8%;--w:34%;--r:0deg;}
+.wall-lotus{--x:3%;--y:6.7%;--w:29%;--r:0deg;}
+.wall-marigold{--x:10%;--y:52.7%;--w:22%;--r:0deg;}
+.wall-agave{--x:74%;--y:.4%;--w:23%;--r:0deg;}
+.wall-umbrellas{--x:74%;--y:59.2%;--w:20%;--r:0deg;}
 @media (max-width:640px){
   .wall{aspect-ratio:auto;display:grid;grid-template-columns:1fr 1fr;gap:22px 18px;align-items:center;}
   .wall figure{position:static;width:auto;}
@@ -456,15 +456,15 @@ a:focus-visible{outline:none;}
 }
 /* hung from a nail: pivots from the top, a smaller swing than the stickers' rock */
 @keyframes frame-sway{
-  from{rotate:.5deg;}
-  to{rotate:-.5deg;}
+  from{rotate:.2deg;}
+  to{rotate:-.2deg;}
 }
 @media (prefers-reduced-motion:reduce){ .frame img{animation:none;} }
 /* extra room above for the stickers that sit among the Events cards */
-.frame-dance{--w:min(30rem,78vw);--r:-1deg;--d:-1s;margin-top:calc(var(--gap) + clamp(56px,7vw,112px));}
-.frame-market{--w:min(30rem,78vw);--r:.8deg;--d:-4s;}
-.frame-tacos{--w:min(30rem,78vw);--r:1deg;--d:-2.5s;}
-.frame-cliff{--w:min(38.75rem,88vw);--r:-.8deg;--d:-5.2s;}
+.frame-dance{--w:min(30rem,78vw);--r:-.3deg;--d:-1s;margin-top:calc(var(--gap) + clamp(56px,7vw,112px));}
+.frame-market{--w:min(30rem,78vw);--r:.25deg;--d:-4s;}
+.frame-tacos{--w:min(30rem,78vw);--r:.3deg;--d:-2.5s;}
+.frame-cliff{--w:min(38.75rem,88vw);--r:-.25deg;--d:-5.2s;}
 /* index mode: one card at a time, stacked in a single cell; the rail eases to the chosen card's height */
 .journey.index .journey-rail{display:grid;overflow:hidden;transition:height .55s cubic-bezier(.2,.7,.3,1);}
 .journey.index .leg{grid-area:1/1;align-self:start;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s .3s;}
