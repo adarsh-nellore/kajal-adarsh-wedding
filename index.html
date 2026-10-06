@@ -15,6 +15,8 @@
   /* two ink colours only — everything on the page is one or the other */
   --gold:#CDA45E;    /* headings (9:1); a touch cooler than amber so phone screens don't push it orange */
   --gold-rgb:205,164,94;
+  --camel:#C49E78;
+  --camel-rgb:196,158,120;
   --white:#EAE3D6;   /* everything else — off-white, warmed to sit with the gold (15:1) */
   --head:'Jaini','EB Garamond',Georgia,serif;
   --body:'EB Garamond',Georgia,'Times New Roman',serif;
@@ -393,12 +395,12 @@ a:focus-visible{outline:none;}
   line-height:1.2;
   letter-spacing:.01em;
   white-space:nowrap;
-  color:rgba(var(--gold-rgb),.52);
+  color:rgba(var(--camel-rgb),.52);
   cursor:pointer;
   transition:color .45s cubic-bezier(.2,.7,.3,1);
 }
-.tab:hover{color:rgba(var(--gold-rgb),.8);}
-.tab[aria-selected="true"]{color:var(--gold);}
+.tab:hover{color:rgba(var(--camel-rgb),.8);}
+.tab[aria-selected="true"]{color:var(--camel);}
 .tab:focus-visible{outline:1px solid var(--gold);outline-offset:6px;border-radius:2px;}
 /* fingers need ~44px: widen the hit area invisibly, with just enough row gap that neighbours don't overlap */
 @media (pointer:coarse){
@@ -458,7 +460,7 @@ a:focus-visible{outline:none;}
 .leg ul.gems li + li{margin-top:6px;}
 .leg ul.gems li::before{content:"";position:absolute;left:.25em;top:.9em;width:6px;height:6px;background:var(--gold);transform:translateY(-50%) rotate(45deg);}
 .attire-note{width:min(30rem, var(--col));max-width:none;margin:clamp(24px,3vw,40px) auto 0;font-size:.8em;line-height:1.55;text-align:center;color:rgba(234,227,214,.55);}
-.lead{color:var(--gold);font-weight:500;}
+.lead{color:var(--camel);font-weight:500;}
 .leg p.links{text-align:center;}
 .journey.attire .leg-body{padding-bottom:12px;}
 .swatches{display:flex;flex-wrap:wrap;gap:10px;list-style:none;margin:22px 0 0;padding:0;}
