@@ -1394,83 +1394,25 @@ picture{margin-block:clamp(52px,8vw,104px);}
     anim = window.requestAnimationFrame(frame);
   }
 
-  /* scrolling steps one section at a time, like flicking through a feed. A section taller than the screen scrolls
-     freely until the next one comes into view; frames stop centred. The tail of a trackpad's coast is swallowed */
-  var SNAP_MS = 650;
-  var snapEls = Array.prototype.slice.call(document.querySelectorAll('.hero, .journey, .rsvp'));
-  function snapTarget(dir){
-    var y = window.scrollY, h = window.innerHeight, max = document.documentElement.scrollHeight - h;
-    var stops = snapEls.map(function(el){
-      return {at:Math.max(0, Math.min(max, Math.round(stopOf(el)))), end:el.getBoundingClientRect().bottom + y};
-    }).sort(function(a, b){ return a.at - b.at; });
-    var i, cur = null;
-    if(dir > 0){
-      for(i = 0; i < stops.length; i++){
-        if(stops[i].at <= y + 4){ cur = stops[i]; continue; }
-        /* go on once the section on screen has been seen to its end */
-        return (!cur || cur.end <= y + h + 40 || stops[i].at - y <= h) ? stops[i].at : null;
-      }
-    } else {
-      for(i = stops.length - 1; i >= 0; i--){
-        if(stops[i].at > y + 4) continue;
-        /* partway into this section: back to its top if that's within a screen, else scroll freely */
-        if(y - stops[i].at > 4) return y - stops[i].at <= h ? stops[i].at : null;
-        /* at its top: back to the one before, showing that one's end if it's taller than the screen */
-        if(i === 0) return null;
-        var prev = stops[i - 1];
-        if(prev.end - prev.at <= h + 80) return prev.at;
-        return Math.max(prev.at, Math.min(stops[i].at - 1, Math.round(prev.end - h + 40)));
-      }
-    }
-    return null;
+  /* scrolling is free; once it comes to rest with a section heading just off its mark, the page eases it into place.
+     Resting partway through a section leaves it be, and nothing happens while a finger is still down */
+  var snapEls = Array.prototype.slice.call(document.querySelectorAll('.journey, .rsvp'));
+  var touching = false, settleT = 0, lastSettleY = -1;
+  function settle(){
+    if(reduce || touching || anim || menuOpen()) return;
+    var y = window.scrollY, h = window.innerHeight, reach = Math.min(160, h * 0.18), best = null;
+    if(Math.abs(y - lastSettleY) < 2) return;
+    snapEls.forEach(function(el){
+      var at = Math.round(stopOf(el));
+      if(Math.abs(at - y) <= reach && (best === null || Math.abs(at - y) < Math.abs(best - y))){ best = at; }
+    });
+    if(best !== null && Math.abs(best - y) > 2){ lastSettleY = best; glide(best, 450); }
   }
-  function snapSkip(e){ return reduce || menuOpen() || (e.target.closest && e.target.closest('.mnav, textarea')); }
-
-  /* a fresh flick is a pause, or deltas climbing three times running, which a fading coast doesn't do */
-  var snapping = false, quietT = 0, wAcc = 0, wT = 0, wAbs = 0, wRise = 0;
-  window.addEventListener('wheel', function(e){
-    if(e.ctrlKey || Math.abs(e.deltaY) <= Math.abs(e.deltaX) || snapSkip(e)) return;
-    var now = Date.now(), a = Math.abs(e.deltaY);
-    wRise = a > wAbs ? wRise + 1 : 0;
-    wAbs = a;
-    if(snapping){
-      if(anim || (now - quietT < 120 && !(wRise >= 3 && a > 8))){ quietT = now; e.preventDefault(); return; }
-      snapping = false;
-      wAcc = 0;
-    }
-    var to = snapTarget(e.deltaY > 0 ? 1 : -1);
-    if(to === null) return;
-    e.preventDefault();
-    if(now - wT > 200){ wAcc = 0; }
-    wT = now;
-    wAcc += e.deltaY;
-    if(Math.abs(wAcc) < 20) return;
-    wAcc = 0;
-    snapping = true;
-    quietT = now;
-    glide(to, SNAP_MS);
-  }, {passive:false});
-
-  var tX = 0, tY = 0, tDecided = false, tSnap = null;
-  window.addEventListener('touchstart', function(e){
-    tSnap = null;
-    tDecided = e.touches.length !== 1;
-    tX = e.touches[0].clientX; tY = e.touches[0].clientY;
-  }, {passive:true});
-  window.addEventListener('touchmove', function(e){
-    if(anim && snapping){ e.preventDefault(); return; }
-    if(!tDecided){
-      tDecided = true;
-      var dx = e.touches[0].clientX - tX, dy = e.touches[0].clientY - tY;
-      if(Math.abs(dy) >= Math.abs(dx) && dy !== 0 && !snapSkip(e)){ tSnap = snapTarget(dy < 0 ? 1 : -1); }
-    }
-    if(tSnap !== null){ e.preventDefault(); }
-  }, {passive:false});
-  window.addEventListener('touchend', function(e){
-    if(tSnap === null) return;
-    if(Math.abs(e.changedTouches[0].clientY - tY) > 30){ snapping = true; glide(tSnap, SNAP_MS); }
-    tSnap = null;
-  }, {passive:true});
+  function settleSoon(){ window.clearTimeout(settleT); settleT = window.setTimeout(settle, 160); }
+  window.addEventListener('scroll', function(){ if(!anim){ settleSoon(); } }, {passive:true});
+  window.addEventListener('touchstart', function(){ touching = true; window.clearTimeout(settleT); }, {passive:true});
+  window.addEventListener('touchend', function(){ touching = false; settleSoon(); }, {passive:true});
+  window.addEventListener('touchcancel', function(){ touching = false; }, {passive:true});
 
   /* phones and tablets: the top bar and its menu */
   var mnav = document.querySelector('.mnav');
