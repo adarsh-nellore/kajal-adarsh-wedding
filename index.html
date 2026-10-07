@@ -415,8 +415,14 @@ a:focus-visible{outline:none;}
 .journey.index.attire .leg-body{width:auto;}
 .attire .leg-body p{max-width:38.75rem;margin-inline:0;}
 .attire .when + p{margin-top:6px;}
-.leg p.callout{padding:14px 18px;border:.5px solid rgba(var(--gold-rgb),.45);border-radius:4px;}
-.leg p.callout ~ p{padding-inline:18.5px;}
+.leg .callout{margin-top:1em;padding:16px 18px 18px;border:.5px solid rgba(var(--gold-rgb),.45);border-radius:4px;background:rgba(var(--gold-rgb),.04);}
+.leg .callout p{margin:0;}
+.leg .callout ~ p{padding-inline:18.5px;}
+.leg .callout + p{margin-top:1.4em;}
+.leg a.book{display:inline-block;margin-top:14px;padding:.12em 18px .24em;border:1px solid rgba(var(--gold-rgb),.55);background:none;font-family:var(--head);font-size:clamp(19px,1.9vw,22px);line-height:1.2;color:var(--gold);transition:border-color .35s cubic-bezier(.2,.7,.3,1),background-color .35s cubic-bezier(.2,.7,.3,1);}
+.leg a.book::after{content:" \2197";font-size:.8em;}
+.leg a.book:hover{border-color:var(--gold);background-color:rgba(var(--gold-rgb),.08);}
+.leg a.book:focus-visible{outline:1px solid var(--gold);outline-offset:4px;}
 .leg a.snapshot-link{display:block;background:none;padding:0;}
 .leg-body .snapshot{display:block;width:min(25rem,88%);height:auto;margin:6px auto clamp(14px,1.6vw,20px);padding:clamp(6px,.7vw,9px);background:#EAE3D6;border-radius:4px;rotate:-.8deg;box-shadow:0 10px 22px rgba(0,0,0,.5);}
 .leg ul.gems{list-style:none;padding:0;margin:10px 0 0;}
@@ -921,8 +927,11 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <article class="leg" data-tab="Hotel">
 <div class="leg-body">
 <a class="snapshot-link" href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener" aria-label="Book at Andaz Mexico City Condesa"><img class="snapshot" src="img/andaz.webp" width="1024" height="683" alt="Lounge at Andaz Mexico City Condesa" loading="lazy" decoding="async"></a>
-<p class="links"><a href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener">Booking Link</a> · <a href="https://maps.app.goo.gl/VpuFjPGXvN67A7yP8" target="_blank" rel="noopener">Directions</a></p>
-<p class="callout"><strong class="lead">Room Block:</strong> We’ve arranged a hotel block at <a href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener">Andaz Mexico City Condesa</a>, a Hyatt hotel. The rate is available Tuesday, Feb. 16 – Wednesday, Feb. 24.</p>
+<p class="links"><a href="https://maps.app.goo.gl/VpuFjPGXvN67A7yP8" target="_blank" rel="noopener">Directions</a></p>
+<div class="callout">
+<p><strong class="lead">Room Block:</strong> We’ve arranged a hotel block at Andaz Mexico City Condesa, a Hyatt hotel. The rate is available Tuesday, Feb. 16 – Wednesday, Feb. 24.</p>
+<a class="book" href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener">Booking Link</a>
+</div>
 <p><strong class="lead">Breakfast:</strong> Provided at Andaz for hotel guests on Saturday, Sunday, and Monday mornings.</p>
 <p><strong class="lead">Transportation:</strong> All wedding shuttles leave from Andaz Condesa. If you stay elsewhere, please be within a short walk.</p>
 </div>
