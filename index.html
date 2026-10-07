@@ -729,8 +729,20 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .rsvp-form{margin-top:var(--inner);}
 .rsvp fieldset{border:0;margin:0;padding:0;min-width:0;}
 .rsvp legend{padding:0;}
-.field + .field,.rsvp-yes,.rsvp-yes + .field{margin-top:clamp(30px,3.8vw,44px);}
-.field > label,.field > legend{display:block;}
+/* three steps, each under a small Jaini heading; groups sit further apart than the fields inside them */
+.group + .group,.send{margin-top:clamp(40px,5vw,56px);padding-top:clamp(36px,4.4vw,48px);border-top:1px solid rgba(var(--gold-rgb),.15);}
+/* floated so a fieldset's legend sits inside its padding rather than on its top border */
+.rsvp .group-h{float:left;width:100%;display:flex;align-items:baseline;gap:14px;margin-bottom:clamp(16px,2vw,22px);font-family:var(--head);font-size:clamp(23px,2.6vw,30px);line-height:1.2;letter-spacing:.01em;color:var(--gold);}
+.group-h .num{font-size:.78em;color:rgba(var(--camel-rgb),.6);}
+.group-h + *{clear:both;}
+.field + .field{margin-top:clamp(24px,2.8vw,32px);}
+.pair{display:grid;gap:clamp(24px,2.8vw,32px) clamp(28px,3.4vw,44px);}
+.pair > .field + .field{margin-top:0;}
+@media (min-width:700px){ .pair{grid-template-columns:1fr 1fr;} }
+/* what accepting opens up hangs off the choice, on a hairline */
+.rsvp-yes{margin-top:clamp(28px,3.4vw,38px);padding-left:clamp(18px,2.2vw,26px);border-left:1px solid rgba(var(--gold-rgb),.22);}
+.field > label,.field > legend{display:block;font-size:17px;line-height:28px;color:rgba(234,227,214,.74);}
+.field > label.check{font-size:inherit;line-height:inherit;color:inherit;}
 .opt{opacity:.6;}
 .rsvp input[type="text"],.rsvp input[type="email"],.rsvp input[type="number"],.rsvp textarea{
   display:block;
@@ -780,7 +792,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .check input:checked + span::before{background:var(--gold);border-color:var(--gold);box-shadow:0 0 10px rgba(var(--gold-rgb),.45);}
 .check input:focus-visible + span{outline:1px solid var(--gold);outline-offset:4px;border-radius:2px;}
 
-.send{margin-top:clamp(40px,5vw,56px);}
+.rsvp-form .rsvp-send{border-color:var(--gold);background-color:rgba(var(--gold-rgb),.22);color:#EAE3D6;}
+.rsvp-form .rsvp-send:hover{background-color:rgba(var(--gold-rgb),.34);}
 .rsvp-send{
   appearance:none;
   background:none;
@@ -1147,6 +1160,9 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p class="lede rv">Kindly reply by December 1.</p>
 <picture class="stk stk-hats" data-px="-0.04" aria-hidden="true"><source type="image/webp" srcset="img/sticker-hats-sm.webp 220w, img/sticker-hats.webp 340w" sizes="190px"><img src="img/sticker-hats.png" width="340" height="329" alt="" loading="lazy" decoding="async"></picture>
 <form class="rsvp-form rv" novalidate>
+<fieldset class="group">
+<legend class="group-h"><span class="num" aria-hidden="true">1</span>Your details</legend>
+<div class="pair">
 <div class="field">
 <label for="rsvp-name">Full name(s)</label>
 <input id="rsvp-name" name="name" type="text" autocomplete="name" aria-describedby="rsvp-name-err" required>
@@ -1157,8 +1173,11 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <input id="rsvp-email" name="email" type="email" autocomplete="email" aria-describedby="rsvp-email-err" required>
 <p class="err" id="rsvp-email-err"></p>
 </div>
-<fieldset class="field" aria-describedby="rsvp-attending-err">
-<legend>Will you be joining us?</legend>
+</div>
+</fieldset>
+<div class="group">
+<fieldset aria-describedby="rsvp-attending-err">
+<legend class="group-h"><span class="num" aria-hidden="true">2</span>Will you be joining us?</legend>
 <div class="choices">
 <label class="choice"><input type="radio" name="attending" value="yes" required><span class="tab">Joyfully accept</span></label>
 <label class="choice"><input type="radio" name="attending" value="no"><span class="tab">Regretfully decline</span></label>
@@ -1186,6 +1205,9 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <input id="rsvp-dietary" name="dietary" type="text" autocomplete="off" maxlength="1000">
 </div>
 </div>
+</div>
+<fieldset class="group">
+<legend class="group-h"><span class="num" aria-hidden="true">3</span>Anything else?</legend>
 <div class="field">
 <label for="rsvp-note">A note to us <span class="opt">(optional)</span></label>
 <textarea id="rsvp-note" name="note" rows="1" maxlength="4000"></textarea>
@@ -1193,6 +1215,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="field">
 <label class="check"><input type="checkbox" name="copy" id="rsvp-copy"><span>Please send me a copy of my RSVP responses</span></label>
 </div>
+</fieldset>
 <div class="send"><button type="submit" class="rsvp-send">Send reply</button></div>
 <p class="err" id="rsvp-send-err" role="alert"></p>
 </form>
