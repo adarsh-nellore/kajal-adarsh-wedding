@@ -21,7 +21,7 @@
   --head:'Jaini','EB Garamond',Georgia,serif;
   --body:'EB Garamond',Georgia,'Times New Roman',serif;
   /* the one gap between the end of a section and the next heading */
-  --gap:clamp(96px,13vw,168px);
+  --gap:clamp(80px,9vw,150px);
   /* stickers: one height, one larger size (hero pair, full-length figure), one distance from their text, one tilt */
   --stk:clamp(68px,8vw,116px);
   --stk-lg:calc(1.35 * var(--stk));
@@ -34,7 +34,8 @@
   --riso-coarse:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='340'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' seed='4' stitchTiles='stitch' result='n'/%3E%3CfeColorMatrix in='n' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0' result='a'/%3E%3CfeComponentTransfer in='a' result='t'%3E%3CfeFuncA type='discrete' tableValues='0 0 0 1'/%3E%3C/feComponentTransfer%3E%3CfeFlood flood-color='%23161616' result='ink'/%3E%3CfeComposite in='ink' in2='t' operator='in'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
 }
 *{box-sizing:border-box;}
-html{overflow-x:clip;}
+/* no scroll anchoring: the tab script moves the scroll itself when a section above the screen shrinks */
+html{overflow-x:clip;overflow-anchor:none;}
 /* only once loaded: otherwise the browser's restore-on-reload glides and fights the first scroll */
 html.ready{scroll-behavior:smooth;}
 h2[id]{scroll-margin-top:clamp(24px,6vh,64px);}
@@ -490,9 +491,14 @@ a:focus-visible{outline:none;}
 .frame{
   display:block;
   width:var(--w);
-  margin:var(--gap) auto 0;
+  margin:calc(var(--above, 1) * var(--gap)) auto 0;
   rotate:var(--r);
 }
+/* each frame owns the room on both sides of it, measured from the foot of the section above (its chosen card) and to
+   the next heading; --above/--below vary that a little per frame so the rhythm reads as hung by hand, not ruled.
+   The 14px below makes up for a tilted frame's corner */
+.interlude{margin-bottom:calc(var(--below, 1) * var(--gap) + 14px);}
+.interlude + section,.interlude + section h2{margin-top:0;}
 .frame picture{display:block;margin:0;}
 .frame img{
   display:block;width:100%;height:auto;
@@ -506,18 +512,19 @@ a:focus-visible{outline:none;}
   to{rotate:-.2deg;}
 }
 @media (prefers-reduced-motion:reduce){ .frame img{animation:none;} }
-/* extra room above for the stickers that sit among the Events cards */
-.frame-dance{--w:min(30rem,78vw);--r:-.3deg;--d:-1s;margin-top:calc(var(--gap) + clamp(56px,7vw,112px));}
-.frame-market{--w:min(30rem,78vw);--r:.25deg;--d:-4s;}
-.frame-tacos{--w:min(30rem,78vw);--r:.3deg;--d:-2.5s;}
-.frame-cliff{--w:min(38.75rem,88vw);--r:-.25deg;--d:-5.2s;}
-/* a tabbed section always keeps room for its tallest card, so most cards already leave space at its foot:
-   the frame after it hangs closer to make up for that */
-/* index mode: one card at a time, all stacked in a single cell, so the rail always holds its tallest card and nothing
-   below a section moves when its cards swap; each card sits at the top of the cell */
+.frame-dance{--w:min(30rem,78vw);--r:-.3deg;--d:-1s;--above:1.1;}
+.frame-market{--w:min(30rem,78vw);--r:.25deg;--d:-4s;--above:.92;}
+.frame-tacos{--w:min(30rem,78vw);--r:.3deg;--d:-2.5s;--above:1.04;}
+.frame-cliff{--w:min(38.75rem,88vw);--r:-.25deg;--d:-5.2s;--above:.96;}
+.interlude:has(.frame-dance){--below:.94;}
+.interlude:has(.frame-market){--below:1.08;}
+.interlude:has(.frame-tacos){--below:.9;}
+/* more under the cliff: RSVP's sticker rides above its heading, and on wide screens it should clear the frame too */
+.interlude:has(.frame-cliff){--below:1.02;}
+@media (min-width:1000px){ .interlude:has(.frame-cliff){--below:1.36;} }
+/* index mode: one card at a time, all stacked in a single cell, each at the top of it. The script sizes the cell to the
+   chosen card, but only ever shrinks it while its foot is off screen, so nothing in view below a section moves */
 .journey.index .journey-rail{display:grid;overflow:hidden;}
-/* sections whose cards differ a lot in height ease to the chosen card instead, so a short card leaves no hole */
-.journey.index[data-fit] .journey-rail{transition:height .45s cubic-bezier(.2,.7,.3,1);}
 .journey.index .leg{grid-area:1/1;align-self:start;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s .3s;}
 .journey.index .leg.on{opacity:1;visibility:visible;transition:opacity .3s ease;}
 .journey.index .leg-body>*{opacity:0;transform:translateX(28px);}
@@ -1355,16 +1362,46 @@ picture{margin-block:clamp(52px,8vw,104px);}
     });
     pin.insertBefore(tabs, rail);
 
-    var fits = journey.hasAttribute('data-fit');
-    function fit(){
-      if(!fits || J.cur < 0) return;
-      var h = legs[J.cur].offsetHeight + 'px';
-      if(rail.style.height !== h){ rail.style.height = h; }
+    /* the cell takes the chosen card's height. It grows at once, but shrinks only while its foot is out of view: below
+       the screen, or above it with the scroll moved back by the same amount. Until then it waits (J.pending) and the
+       scroll handler retries, so nothing in view below the section ever moves when a shorter card is picked */
+    var railH = 0;
+    J.pending = false;
+    function setH(h){
+      railH = h;
+      rail.style.height = h + 'px';
+      if(lenis){ lenis.resize(); }
     }
-    if(fits){
+    function settle(want, idle){
+      var bottom = rail.getBoundingClientRect().bottom, vh = window.innerHeight, d = railH - want;
+      var below = document.documentElement.scrollHeight - window.scrollY - vh;
+      /* moving the scroll mid-fling would stop an iOS fling (or the browser's own smooth scroll) dead, so those wait
+         for the scroll to rest; the weighted wheel scroll is carried along instead */
+      if(bottom <= 0 && (idle || (lenis && !touchScroll && lenis.isScrolling !== 'native'))){
+        var target = lenis ? lenis.targetScroll : 0;
+        setH(want);
+        shiftScroll(d, target);
+      }
+      else if(bottom >= vh && d <= below){ setH(want); }
+      else { J.pending = true; }
+    }
+    function fit(){
+      if(J.cur < 0) return;
+      var want = legs[J.cur].offsetHeight;
+      J.pending = false;
+      if(want === railH) return;
+      if(want > railH){ setH(want); } else { settle(want); }
+    }
+    J.settle = function(idle){
+      if(!J.pending) return;
+      J.pending = false;
+      settle(legs[J.cur].offsetHeight, idle);
+    };
+    if('ResizeObserver' in window){
+      var legRO = new ResizeObserver(function(){ fit(); });
+      legs.forEach(function(l){ legRO.observe(l); });
+    } else {
       Array.prototype.forEach.call(rail.querySelectorAll('img'), function(img){ img.addEventListener('load', fit); });
-      /* the page got shorter or longer: let the smooth scroll recompute where the page ends */
-      rail.addEventListener('transitionend', function(e){ if(e.target === rail && lenis){ lenis.resize(); } });
     }
 
     function mark(i){
@@ -1430,6 +1467,30 @@ picture{margin-block:clamp(52px,8vw,104px);}
     fitAll();
   }, {passive:true});
   if(document.fonts && document.fonts.ready){ document.fonts.ready.then(fitAll); }
+  function settleAll(idle){ for(var i = 0; i < journeys.length; i++){ journeys[i].settle(idle === true); } }
+  var touchScroll = false, settleIdle = 0;
+  window.addEventListener('touchstart', function(){ touchScroll = true; }, {passive:true});
+  window.addEventListener('wheel', function(){ touchScroll = false; }, {passive:true});
+  window.addEventListener('keydown', function(){ touchScroll = false; });
+  function onScrollSettle(){
+    settleAll(false);
+    clearTimeout(settleIdle);
+    settleIdle = setTimeout(function(){ settleAll(true); }, 150);
+  }
+  /* a section above the screen got shorter: move the scroll (and any smooth scroll in flight) back by as much, in the
+     same frame, so what's on screen stays put */
+  function shiftScroll(d, target){
+    if(!d) return;
+    if(!lenis){ window.scrollBy({top: -d, behavior: 'instant'}); return; }
+    var a = lenis.animate;
+    if(!a || !a.isRunning){ lenis.scrollTo(lenis.scroll - d, {immediate:true, force:true}); return; }
+    /* a weighted scroll is under way: carry it (and where it's headed) back too, so it keeps gliding */
+    a.value -= d; a.from -= d; a.to -= d;
+    lenis.animatedScroll = window.scrollY - d;
+    lenis.targetScroll = target - d;
+    lenis.preventNextNativeScrollEvent();
+    window.scrollTo({top: window.scrollY - d, behavior: 'instant'});
+  }
 
   /* sideways gestures step the cards of whichever section spans that height of the screen, wherever the pointer is
      across it; the one-line name rows scroll sideways themselves, so gestures over them are left alone */
@@ -1513,6 +1574,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
     /* sideways swipes step through a section's cards, so they're left alone */
     virtualScroll: function(d){ return Math.abs(d.deltaY) >= Math.abs(d.deltaX) && !heroHandoff(d); }
   }) : null;
+  if(lenis){ lenis.on('scroll', onScrollSettle); }
+  window.addEventListener('scroll', onScrollSettle, {passive:true});
   /* from the top of the opening screen, the first downward wheel or trackpad gesture carries you to Events (as the
      cue does) and its leftover momentum is absorbed, so a single flick lands on the first section instead of sailing
      past it. Decided when the gesture starts, never as a correction afterwards; touch keeps its native momentum */
