@@ -718,7 +718,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
   .snap-r img,.snap-l img,.snap-c img{margin-inline:auto;}
 }
 
-/* ---------- RSVP: a plain form on the page — underlined fields, nothing boxed ---------- */
+/* ---------- RSVP: a plain form on the page — quiet outlined fields ---------- */
 /* same text column as the index sections; not a .journey, so the tab script leaves it alone */
 .rsvp{width:100vw;margin-left:calc(50% - 50vw);padding-inline:max(22px, calc(50vw - 19.375rem));}
 .rsvp h2{margin-bottom:clamp(14px,1.8vw,22px);}
@@ -746,25 +746,42 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .field > label,.field > legend{display:block;font-size:17px;line-height:28px;color:rgba(234,227,214,.74);}
 .field > label.check{font-size:inherit;line-height:inherit;color:inherit;}
 .opt{opacity:.6;}
+/* boxed fields: the label rests inside the box like a placeholder, then floats to the top edge
+   once focused or filled (input precedes its label so the sibling selectors can see its state) */
+.box{position:relative;}
 .rsvp input[type="text"],.rsvp input[type="email"],.rsvp input[type="number"],.rsvp textarea{
   display:block;
   width:100%;
-  margin:2px 0 0;
-  padding:6px 0 8px;
-  background:transparent;
-  border:0;
-  border-bottom:1px solid rgba(234,227,214,.3);
-  border-radius:0;
+  margin:0;
+  padding:25px 15px 8px;
+  background:rgba(234,227,214,.03);
+  border:1px solid rgba(var(--gold-rgb),.35);
+  border-radius:4px;
   color:var(--white);
-  font:inherit;
-  transition:border-color .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s cubic-bezier(.2,.7,.3,1);
+  font-family:var(--body);
+  font-size:18px;
+  line-height:26px;
+  transition:border-color .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s cubic-bezier(.2,.7,.3,1),background-color .35s cubic-bezier(.2,.7,.3,1);
 }
-.rsvp textarea{min-height:0;resize:none;overflow:hidden;field-sizing:content;}
-.rsvp input[type="number"]{width:6rem;-moz-appearance:textfield;appearance:textfield;}
+.rsvp .box > label{
+  position:absolute;left:16px;right:16px;top:17px;
+  font-size:18px;line-height:26px;color:rgba(234,227,214,.6);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  pointer-events:none;
+  transition:top .25s cubic-bezier(.2,.7,.3,1),font-size .25s cubic-bezier(.2,.7,.3,1),line-height .25s cubic-bezier(.2,.7,.3,1),color .25s;
+}
+.rsvp .box > :focus + label,.rsvp .box > :not(:placeholder-shown) + label,.rsvp .box > :-webkit-autofill + label{top:7px;font-size:14px;line-height:18px;}
+.rsvp .box > :focus + label{color:var(--gold);}
+.rsvp input::placeholder,.rsvp textarea::placeholder{color:transparent;}
+.rsvp textarea{min-height:120px;resize:none;overflow:hidden;field-sizing:content;}
+.rsvp input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
+.box-num{max-width:18rem;}
 .rsvp input[type="number"]::-webkit-inner-spin-button,.rsvp input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
-.rsvp input:focus,.rsvp textarea:focus{outline:none;border-bottom-color:var(--gold);box-shadow:0 1px 0 var(--gold);}
-.rsvp [aria-invalid="true"]{border-bottom-color:var(--gold);}
-.rsvp input:-webkit-autofill{-webkit-text-fill-color:var(--white);caret-color:var(--white);transition:background-color 600000s 0s;}
+.rsvp input:hover,.rsvp textarea:hover{border-color:rgba(var(--gold-rgb),.55);}
+.rsvp .box > [aria-invalid="true"]{border-color:var(--gold);background-color:rgba(var(--gold-rgb),.07);}
+.rsvp input:focus,.rsvp textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
+.rsvp input:-webkit-autofill,.rsvp input:-webkit-autofill:hover,.rsvp input:-webkit-autofill:focus{-webkit-text-fill-color:var(--white);caret-color:var(--white);-webkit-box-shadow:0 0 0 100px #181817 inset;transition:background-color 600000s 0s,border-color .35s;}
+.rsvp input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 100px #181817 inset,0 0 0 1px var(--gold);}
 .err{margin-top:6px;font-size:16px;line-height:1.5;color:var(--gold);}
 .err:empty{display:none;}
 
@@ -1174,13 +1191,17 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <legend class="group-h">Your details</legend>
 <div class="pair">
 <div class="field">
+<div class="box">
+<input id="rsvp-name" name="name" type="text" autocomplete="name" aria-describedby="rsvp-name-err" placeholder=" " required>
 <label for="rsvp-name">Full name(s)</label>
-<input id="rsvp-name" name="name" type="text" autocomplete="name" aria-describedby="rsvp-name-err" required>
+</div>
 <p class="err" id="rsvp-name-err"></p>
 </div>
 <div class="field">
+<div class="box">
+<input id="rsvp-email" name="email" type="email" autocomplete="email" aria-describedby="rsvp-email-err" placeholder=" " required>
 <label for="rsvp-email">Email</label>
-<input id="rsvp-email" name="email" type="email" autocomplete="email" aria-describedby="rsvp-email-err" required>
+</div>
 <p class="err" id="rsvp-email-err"></p>
 </div>
 </div>
@@ -1196,8 +1217,10 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </fieldset>
 <div class="rsvp-yes" hidden>
 <div class="field">
+<div class="box box-num">
+<input id="rsvp-guests" name="guests" type="number" inputmode="numeric" min="1" max="10" value="1" aria-describedby="rsvp-guests-err" placeholder=" ">
 <label for="rsvp-guests">Number of guests, including you</label>
-<input id="rsvp-guests" name="guests" type="number" inputmode="numeric" min="1" max="10" value="1" aria-describedby="rsvp-guests-err">
+</div>
 <p class="err" id="rsvp-guests-err"></p>
 </div>
 <fieldset class="field" aria-describedby="rsvp-events-err">
@@ -1211,16 +1234,20 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p class="err" id="rsvp-events-err"></p>
 </fieldset>
 <div class="field">
+<div class="box">
+<input id="rsvp-dietary" name="dietary" type="text" autocomplete="off" maxlength="1000" placeholder=" ">
 <label for="rsvp-dietary">Dietary restrictions or allergies <span class="opt">(optional)</span></label>
-<input id="rsvp-dietary" name="dietary" type="text" autocomplete="off" maxlength="1000">
+</div>
 </div>
 </div>
 </div>
 <fieldset class="group">
 <legend class="group-h">Anything else?</legend>
 <div class="field">
+<div class="box">
+<textarea id="rsvp-note" name="note" rows="1" maxlength="4000" placeholder=" "></textarea>
 <label for="rsvp-note">A note to us <span class="opt">(optional)</span></label>
-<textarea id="rsvp-note" name="note" rows="1" maxlength="4000"></textarea>
+</div>
 </div>
 <div class="field">
 <label class="check"><input type="checkbox" name="copy" id="rsvp-copy"><span>Please send me a copy of my RSVP responses</span></label>
