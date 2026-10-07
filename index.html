@@ -415,19 +415,20 @@ a:focus-visible{outline:none;}
 .journey.index.attire .leg-body{width:auto;}
 .attire .leg-body p{max-width:38.75rem;margin-inline:0;}
 .attire .when + p{margin-top:6px;}
-.leg .callout{margin-top:20px;padding:18px 20px 20px;border:.5px solid rgba(var(--gold-rgb),.45);border-radius:4px;background:rgba(var(--gold-rgb),.04);}
-.leg a.snapshot-link + .callout{margin-top:0;}
+.leg .callout{margin-top:4px;border:.5px solid rgba(var(--gold-rgb),.45);border-radius:4px;overflow:hidden;}
+.leg .callout-body{padding:18px 20px 20px;}
 .leg .callout p{margin:0;}
-.leg .callout + p{margin-top:24px;}
-.leg .ctas{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px 12px;margin-top:16px;}
+.leg .callout-foot{padding:6px 20px 18px;font-size:.92em;line-height:1.6;color:#EAE3D6;}
+.leg .callout-foot p + p{margin-top:8px;}
+.leg .ctas{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:10px 12px;margin-top:16px;}
 .leg a.book{display:inline-flex;align-items:center;padding:.12em 18px .24em;border:1px solid rgba(var(--gold-rgb),.55);background:none;font-family:var(--head);font-size:clamp(19px,1.9vw,22px);line-height:1.2;color:var(--gold);transition:border-color .35s cubic-bezier(.2,.7,.3,1),background-color .35s cubic-bezier(.2,.7,.3,1);}
-.leg a.book.primary::after{content:" \2197";font-size:.8em;}
+.leg a.book.primary::after{content:"";flex:none;width:.72em;height:.72em;margin-left:6px;background-color:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6'/%3E%3Cpath d='M10 14 21 3'/%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6'/%3E%3Cpath d='M10 14 21 3'/%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3C/svg%3E") center/contain no-repeat;}
 .leg a.book:hover{border-color:var(--gold);background-color:rgba(var(--gold-rgb),.08);}
 .leg a.book.primary{border-color:var(--gold);background-color:rgba(var(--gold-rgb),.22);color:#EAE3D6;}
 .leg a.book.primary:hover{border-color:var(--gold);background-color:rgba(var(--gold-rgb),.34);}
 .leg a.book:focus-visible{outline:1px solid var(--gold);outline-offset:4px;}
-.leg a.snapshot-link{display:block;background:none;padding:0;margin:4px 0 20px;}
-.leg-body .snapshot{display:block;box-sizing:border-box;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;margin:0;padding:clamp(6px,.7vw,8px);background:#EAE3D6;border-radius:4px;box-shadow:0 10px 22px rgba(0,0,0,.5);}
+.leg a.snapshot-link{display:block;background:none;padding:0;}
+.leg-body .snapshot{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;}
 .leg ul.gems{list-style:none;padding:0;margin:10px 0 0;}
 .leg ul.gems li{position:relative;padding-left:1.3em;}
 .leg ul.gems li + li{margin-top:6px;}
@@ -928,13 +929,17 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="journey-rail">
 <article class="leg" data-tab="Hotel">
 <div class="leg-body">
-<a class="snapshot-link" href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener" aria-label="Book at Andaz Mexico City Condesa"><img class="snapshot" src="img/andaz.webp" width="1024" height="683" alt="Lounge at Andaz Mexico City Condesa" loading="lazy" decoding="async"></a>
 <div class="callout">
+<a class="snapshot-link" href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener" aria-label="Book at Andaz Mexico City Condesa"><img class="snapshot" src="img/andaz.webp" width="1024" height="683" alt="Lounge at Andaz Mexico City Condesa" loading="lazy" decoding="async"></a>
+<div class="callout-body">
 <p><strong class="lead">Room Block:</strong> We’ve arranged a hotel block at Andaz Mexico City Condesa, a Hyatt hotel. The rate is available Tuesday, Feb. 16 – Wednesday, Feb. 24.</p>
 <div class="ctas"><a class="book primary" href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener">Booking Link</a><a class="book" href="https://maps.app.goo.gl/VpuFjPGXvN67A7yP8" target="_blank" rel="noopener">Directions</a></div>
 </div>
+<div class="callout-foot">
 <p><strong class="lead">Breakfast:</strong> Provided at Andaz for hotel guests on Saturday, Sunday, and Monday mornings.</p>
 <p><strong class="lead">Transportation:</strong> All wedding shuttles leave from Andaz Condesa. If you stay elsewhere, please be within a short walk.</p>
+</div>
+</div>
 </div>
 </article>
 <article class="leg" data-tab="Flying">
@@ -1417,8 +1422,31 @@ picture{margin-block:clamp(52px,8vw,104px);}
   var lenis = !reduce && window.Lenis ? new window.Lenis({
     lerp: 0.07, wheelMultiplier: 0.85, autoRaf: true,
     /* sideways swipes step through a section's cards, so they're left alone */
-    virtualScroll: function(d){ return Math.abs(d.deltaY) >= Math.abs(d.deltaX); }
+    virtualScroll: function(d){ return Math.abs(d.deltaY) >= Math.abs(d.deltaX) && !heroHandoff(d); }
   }) : null;
+  /* from the top of the opening screen, the first downward wheel or trackpad gesture carries you to Events (as the
+     cue does) and its leftover momentum is absorbed, so a single flick lands on the first section instead of sailing
+     past it. Decided when the gesture starts, never as a correction afterwards; touch keeps its native momentum */
+  var handing = false, handQuiet = 0;
+  function heroHandoff(d){
+    if(d.event.type !== 'wheel') return false;
+    if(handing){ d.event.preventDefault(); handQuiet = performance.now(); return true; }
+    if(d.deltaY <= 0 || menuOpen()) return false;
+    var hero = document.querySelector('.hero'), first = document.getElementById('weekend');
+    if(!hero || !first || lenis.targetScroll > hero.offsetHeight * 0.4) return false;
+    var to = stopOf(first);
+    if(to <= lenis.targetScroll + 8) return false;
+    var t0 = performance.now();
+    handing = true; handQuiet = t0;
+    d.event.preventDefault();
+    lenis.scrollTo(to, {duration: 1.1, easing: inOut});
+    /* hand control back once the glide is over and the wheel has gone quiet (capped, in case the glide is cut short) */
+    (function release(){
+      var now = performance.now();
+      if((now - t0 > 1150 && now - handQuiet > 160) || now - t0 > 2600){ handing = false; } else { setTimeout(release, 60); }
+    })();
+    return true;
+  }
   var mnav = document.querySelector('.mnav');
   var mbar = mnav.querySelector('.mbar');
   var smallScreen = window.matchMedia('(max-width:1180px)');
