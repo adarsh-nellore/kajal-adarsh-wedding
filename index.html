@@ -37,11 +37,13 @@
 html{overflow-x:clip;}
 /* only once loaded: otherwise the browser's restore-on-reload glides and fights the first scroll */
 html.ready{scroll-behavior:smooth;}
-/* proximity: a scroll that would end near a section heading lands on it as part of its own momentum;
-   further away, and inside long sections, scrolling stays free */
-html.ready{scroll-snap-type:y proximity;}
-.hero,h2[id]{scroll-snap-align:start;}
 h2[id]{scroll-margin-top:clamp(24px,6vh,64px);}
+/* touch screens: a flick that would end near a section heading lands on it within its own momentum
+   (mouse and trackpad get a slower, scripted landing instead) */
+@media (pointer:coarse){
+  html.ready{scroll-snap-type:y proximity;}
+  .hero,h2[id]{scroll-snap-align:start;}
+}
 @media (prefers-reduced-motion:reduce){html.ready{scroll-behavior:auto;scroll-snap-type:none;}}
 
 /* ---------- risograph texture ----------
@@ -1379,7 +1381,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
   }
   /* where the top bar shows, headings stop this far down so it never covers them (matches their scroll-margin-top) */
   function barClear(){ return mbar && smallScreen.matches ? mbar.offsetHeight + 28 : 0; }
-  function glide(to, ms){
+  /* v: starting speed in px/ms, so a glide can pick up a scroll mid-motion and carry it to rest without a seam */
+  function glide(to, ms, v){
     var html = document.documentElement, from = window.scrollY, t0 = 0, last = from;
     to = Math.max(0, Math.min(html.scrollHeight - window.innerHeight, Math.round(to)));
     if(anim){ window.cancelAnimationFrame(anim); anim = null; }
@@ -1392,13 +1395,74 @@ picture{margin-block:clamp(52px,8vw,104px);}
       /* the scrollbar was grabbed mid-glide: let go */
       if(Math.abs(window.scrollY - last) > 3){ done(); return; }
       if(!t0){ t0 = now; }
-      var t = Math.min(1, (now - t0) / ms), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(2 - 2 * t, 3) / 2;
+      var t = Math.min(1, (now - t0) / ms), e;
+      if(v === undefined){ e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(2 - 2 * t, 3) / 2; }
+      else { e = (-2 * t * t * t + 3 * t * t) + (t * t * t - 2 * t * t + t) * (v * ms) / (to - from); }
       last = Math.round(from + (to - from) * e);
       window.scrollTo(0, last);
       if(t < 1){ anim = window.requestAnimationFrame(frame); } else { done(); }
     }
     anim = window.requestAnimationFrame(frame);
   }
+  function stopGlide(){
+    if(!anim) return;
+    window.cancelAnimationFrame(anim);
+    anim = null;
+    document.documentElement.style.scrollBehavior = '';
+    document.documentElement.style.scrollSnapType = '';
+  }
+
+  /* soft landings for mouse and trackpad: scrolling is free, but once a flick starts to coast down near a
+     section heading, the page takes over at the same speed and lets it come to rest on the heading.
+     A slow scroll that stops between headings is left exactly where it is, and any new input takes control
+     straight back. Touch screens use CSS snapping instead: a page can't reliably interrupt their momentum */
+  var coarse = window.matchMedia('(pointer: coarse)').matches;
+  var landEls = Array.prototype.slice.call(document.querySelectorAll('.hero, .journey, .rsvp'));
+  var touching = false, landed = false, peak = 0, samples = [], lastWheelT = 0, lastWheelAbs = 0, restT = 0;
+  function rearm(){ landed = false; peak = 0; samples = []; }
+  function speedNow(){
+    var a = samples[0], b = samples[samples.length - 1];
+    return samples.length < 3 || b.t - a.t < 24 ? 0 : (b.y - a.y) / (b.t - a.t);
+  }
+  function tryLand(){
+    var v = speedNow(), sp = Math.abs(v), h = window.innerHeight, y = window.scrollY, best = null, bestD = Infinity;
+    peak = Math.max(peak, sp);
+    if(sp < 0.08 || sp > 1.6 || sp > peak * 0.85) return;
+    landEls.forEach(function(el){
+      var d = Math.round(stopOf(el)) - y, ahead = (d > 0) === (v > 0), reach = ahead ? h * 0.45 : h * 0.1;
+      if(Math.abs(d) > 2 && Math.abs(d) <= reach && Math.abs(d) < bestD){ best = d; bestD = Math.abs(d); }
+    });
+    if(best === null) return;
+    var ahead = (best > 0) === (v > 0), ms = ahead ? 2 * bestD / sp : 850;
+    if(ahead && ms > 1200){ ms = 1200; }
+    if(ahead && ms < 800){ ms = Math.min(800, 3 * bestD / sp); }
+    if(ms < 380) return;
+    landed = true;
+    samples = [];
+    glide(y + best, ms, v);
+  }
+  window.addEventListener('scroll', function(){
+    if(anim) return;
+    window.clearTimeout(restT);
+    restT = window.setTimeout(rearm, 220);
+    var now = performance.now();
+    samples.push({t:now, y:window.scrollY});
+    while(samples.length > 2 && now - samples[0].t > 70){ samples.shift(); }
+    if(!coarse && !reduce && !touching && !landed && !menuOpen()){ tryLand(); }
+  }, {passive:true});
+  window.addEventListener('wheel', function(e){
+    var now = performance.now(), abs = Math.abs(e.deltaY), fresh = now - lastWheelT > 120 || abs > lastWheelAbs * 1.5 + 4;
+    lastWheelT = now;
+    lastWheelAbs = abs;
+    if(anim){
+      /* the tail of the same flick keeps arriving as wheel events: swallow it so it doesn't fight the landing */
+      if(fresh){ stopGlide(); } else { e.preventDefault(); return; }
+    }
+    if(fresh){ rearm(); }
+  }, {passive:false});
+  window.addEventListener('touchstart', function(){ touching = true; stopGlide(); rearm(); }, {passive:true});
+  window.addEventListener('touchend', function(){ touching = false; }, {passive:true});
+  window.addEventListener('touchcancel', function(){ touching = false; }, {passive:true});
 
   /* phones and tablets: the top bar and its menu */
   var mnav = document.querySelector('.mnav');
