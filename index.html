@@ -332,8 +332,8 @@ a:focus-visible{outline:none;}
 .lede{margin-bottom:clamp(18px,2.4vw,28px);}
 
 /* ---------- a faint light behind each section, different in each. Pseudo-elements behind the content (each section isolated),
-   gradients only. Each runs a little into the gap above and a whole gap below, so the section's own height (which changes
-   as cards swap) never cuts a light off; the frame hung after a section paints over that overhang, and the mask fades
+   gradients only. Each runs a little into the gap above and a whole gap below, so the section's edge never cuts a
+   light off; the frame hung after a section paints over that overhang, and the mask fades
    every light out top and bottom so nothing seams */
 .hero,.journey,.rsvp{isolation:isolate;}
 
@@ -483,8 +483,13 @@ a:focus-visible{outline:none;}
 .frame-market{--w:min(30rem,78vw);--r:.25deg;--d:-4s;}
 .frame-tacos{--w:min(30rem,78vw);--r:.3deg;--d:-2.5s;}
 .frame-cliff{--w:min(38.75rem,88vw);--r:-.25deg;--d:-5.2s;}
-/* index mode: one card at a time, stacked in a single cell; the rail eases to the chosen card's height */
-.journey.index .journey-rail{display:grid;overflow:hidden;transition:height .55s cubic-bezier(.2,.7,.3,1);}
+/* a tabbed section always keeps room for its tallest card, so most cards already leave space at its foot:
+   the frame after it hangs closer to make up for that */
+.journey + .interlude .frame{margin-top:calc(var(--gap) * .5);}
+.journey + .interlude .frame-dance{margin-top:calc(var(--gap) * .5 + clamp(56px,7vw,112px));}
+/* index mode: one card at a time, all stacked in a single cell, so the rail always holds its tallest card and nothing
+   below a section moves when its cards swap; each card sits at the top of the cell */
+.journey.index .journey-rail{display:grid;overflow:hidden;}
 .journey.index .leg{grid-area:1/1;align-self:start;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s .3s;}
 .journey.index .leg.on{opacity:1;visibility:visible;transition:opacity .3s ease;}
 .journey.index .leg-body>*{opacity:0;transform:translateX(28px);}
@@ -494,7 +499,7 @@ a:focus-visible{outline:none;}
   transition:opacity .6s cubic-bezier(.2,.7,.3,1),transform .6s cubic-bezier(.2,.7,.3,1);
   transition-delay:calc(var(--i,0) * 70ms);
 }
-@media (prefers-reduced-motion:reduce){ .tab,.journey.index .journey-rail,.journey.index .leg,.journey.index .leg .leg-body>*{transition:none !important;} }
+@media (prefers-reduced-motion:reduce){ .tab,.journey.index .leg,.journey.index .leg .leg-body>*{transition:none !important;} }
 
 /* date + place under the name */
 .stamp{
@@ -934,7 +939,9 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </section>
 
+<div class="interlude">
 <figure class="frame frame-dance rv"><picture data-px="0.04"><source type="image/webp" srcset="img/frame-dance-sm.webp 560w, img/frame-dance-md.webp 900w, img/frame-dance.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-dance.png" width="700" height="823" alt="Dancers in swirling pink and orange skirts" loading="lazy" decoding="async"></picture></figure>
+</div>
 
 <section class="journey light-stay" aria-label="Travel">
 <div class="journey-pin">
@@ -973,7 +980,9 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </section>
 
+<div class="interlude">
 <figure class="frame frame-market rv"><picture data-px="0.04"><source type="image/webp" srcset="img/frame-market-sm.webp 560w, img/frame-market-md.webp 900w, img/frame-market.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-market.png" width="700" height="863" alt="A woman carrying flowers through a marigold market" loading="lazy" decoding="async"></picture></figure>
+</div>
 
 <section class="journey attire light-attire" data-pin aria-label="Attire">
 <div class="journey-pin">
@@ -993,7 +1002,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <ul class="swatches" aria-label="Suggested colors"><li style="--c:#D94678"></li><li style="--c:#F46860"></li><li style="--c:#F57E59"></li><li style="--c:#DFAA50"></li><li style="--c:#D8D086"></li><li style="--c:#B4EF90"></li><li style="--c:#75D9DF"></li><li style="--c:#4981FD"></li></ul>
 <p class="when">Semi-Formal Western or Indian</p>
 <ul class="gems"><li>Playful Indo-western outfits.</li><li>Bright, solid colors encouraged. Dress for sunshine!</li><li>Wear shoes you feel comfy walking in. Avoid stiletto heels.</li></ul>
-<p class="ps" aria-hidden="true">P.S. Images are for inspiration. We’d love for you to wear something that feels like you, fits your personal style, and that you feel comfortable in.</p>
+<p class="ps">P.S. Images are for inspiration. We’d love for you to wear something that feels like you, fits your personal style, and that you feel comfortable in.</p>
 </div>
 </article>
 <article class="leg" data-tab="Baarat &amp; Wedding">
@@ -1002,7 +1011,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <ul class="swatches" aria-label="Suggested colors"><li style="--c:#D0A2A2"></li><li style="--c:#C26B64"></li><li style="--c:#B06133"></li><li style="--c:#DEA581"></li><li style="--c:#C6B88B"></li><li style="--c:#A6A783"></li><li style="--c:#AFC1A2"></li><li style="--c:#98AAA3"></li></ul>
 <p class="when">Formal Indian</p>
 <ul class="gems"><li>Earthy &amp; pastel tones. Florals encouraged!</li><li>Lehengas, sarees, sherwanis &amp; suits.</li><li>We will be indoors.</li></ul>
-<p class="ps" aria-hidden="true">P.S. Images are for inspiration. We’d love for you to wear something that feels like you, fits your personal style, and that you feel comfortable in.</p>
+<p class="ps">P.S. Images are for inspiration. We’d love for you to wear something that feels like you, fits your personal style, and that you feel comfortable in.</p>
 </div>
 </article>
 <article class="leg" data-tab="After Party">
@@ -1011,14 +1020,16 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <ul class="swatches" aria-label="Suggested colors"><li style="--c:#000000"></li><li style="--c:#0A2782"></li><li style="--c:#611228"></li><li style="--c:#7D4B7D"></li><li style="--c:#2E473A"></li><li style="--c:#205960"></li><li style="--c:#3A2419"></li><li style="--c:#2B2D33"></li></ul>
 <p class="when">Formal Black Tie Optional</p>
 <ul class="gems"><li>Think classic &amp; glamorous.</li><li>Gowns, sarees, tuxedos &amp; dark suits.</li><li>Jewel tones and dark colors.</li></ul>
-<p class="ps" aria-hidden="true">P.S. Images are for inspiration. We’d love for you to wear something that feels like you, fits your personal style, and that you feel comfortable in.</p>
+<p class="ps">P.S. Images are for inspiration. We’d love for you to wear something that feels like you, fits your personal style, and that you feel comfortable in.</p>
 </div>
 </article>
 </div>
 </div>
 </section>
 
+<div class="interlude">
 <figure class="frame frame-tacos rv"><picture data-px="0.04"><source type="image/webp" srcset="img/frame-tacos-sm.webp 560w, img/frame-tacos-md.webp 900w, img/frame-tacos.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-tacos.png" width="700" height="884" alt="Kajal and Adarsh eating tacos" loading="lazy" decoding="async"></picture></figure>
+</div>
 
 <section class="journey light-faq" aria-label="FAQs">
 <div class="journey-pin">
@@ -1156,7 +1167,9 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </section>
 
+<div class="interlude">
 <figure class="frame frame-cliff rv"><picture data-px="0.04"><source type="image/webp" srcset="img/frame-cliff-sm.webp 560w, img/frame-cliff-md.webp 900w, img/frame-cliff.webp 1400w" sizes="(max-width:700px) 88vw, 620px"><img src="img/frame-cliff.png" width="700" height="554" alt="Kajal and Adarsh sitting on a rock above the sea" loading="lazy" decoding="async"></picture></figure>
+</div>
 
 <section class="rsvp" aria-label="RSVP">
 <h2 id="rsvp">RSVP</h2>
@@ -1292,12 +1305,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
     });
     pin.insertBefore(tabs, rail);
 
-    function fit(){ rail.style.height = legs[J.cur].offsetHeight + 'px'; }
-    var imgs = rail.querySelectorAll('img');
-    Array.prototype.forEach.call(imgs, function(img){
-      img.addEventListener('load', function(){ if(J.cur >= 0){ fit(); } });
-    });
-
     function mark(i){
       if(i === J.cur) return;
       J.cur = i;
@@ -1309,7 +1316,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
         l.classList.toggle('on', j === i);
         l.inert = j !== i;
       });
-      fit();
       if(oneLine){ reveal(btns[i]); }
     }
 
@@ -1351,7 +1357,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
     mark(0);
     J.el = journey;
     J.go = go;
-    J.measure = fit;
     return J;
   });
 
@@ -1399,19 +1404,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
   function ready(){ setTimeout(function(){ document.documentElement.classList.add('ready'); }, 300); }
   if(document.readyState === 'complete'){ ready(); } else { window.addEventListener('load', ready); }
-
-  function measureAll(){ journeys.forEach(function(J){ J.measure(); }); }
-  /* phones fire resize as the address bar slides; re-measuring then would yank the page, so only react to real resizes */
-  var lastW = window.innerWidth, lastH = window.innerHeight;
-  window.addEventListener('resize', function(){
-    if(window.innerWidth === lastW && Math.abs(window.innerHeight - lastH) < 120) return;
-    lastW = window.innerWidth;
-    lastH = window.innerHeight;
-    measureAll();
-  }, {passive:true});
-  measureAll();
-
-  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(measureAll); }
 
   var anim = null;
   function pad(){ return Math.min(64, Math.max(24, window.innerHeight * 0.06)); }
