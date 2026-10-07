@@ -485,11 +485,13 @@ a:focus-visible{outline:none;}
 .frame-cliff{--w:min(38.75rem,88vw);--r:-.25deg;--d:-5.2s;}
 /* a tabbed section always keeps room for its tallest card, so most cards already leave space at its foot:
    the frame after it hangs closer to make up for that */
-.journey + .interlude .frame{margin-top:calc(var(--gap) * .5);}
-.journey + .interlude .frame-dance{margin-top:calc(var(--gap) * .5 + clamp(56px,7vw,112px));}
+.journey:not([data-fit]) + .interlude .frame{margin-top:calc(var(--gap) * .5);}
+.journey:not([data-fit]) + .interlude .frame-dance{margin-top:calc(var(--gap) * .5 + clamp(56px,7vw,112px));}
 /* index mode: one card at a time, all stacked in a single cell, so the rail always holds its tallest card and nothing
    below a section moves when its cards swap; each card sits at the top of the cell */
 .journey.index .journey-rail{display:grid;overflow:hidden;}
+/* sections whose cards differ a lot in height ease to the chosen card instead, so a short card leaves no hole */
+.journey.index[data-fit] .journey-rail{transition:height .45s cubic-bezier(.2,.7,.3,1);}
 .journey.index .leg{grid-area:1/1;align-self:start;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s .3s;}
 .journey.index .leg.on{opacity:1;visibility:visible;transition:opacity .3s ease;}
 .journey.index .leg-body>*{opacity:0;transform:translateX(28px);}
@@ -499,7 +501,7 @@ a:focus-visible{outline:none;}
   transition:opacity .6s cubic-bezier(.2,.7,.3,1),transform .6s cubic-bezier(.2,.7,.3,1);
   transition-delay:calc(var(--i,0) * 70ms);
 }
-@media (prefers-reduced-motion:reduce){ .tab,.journey.index .leg,.journey.index .leg .leg-body>*{transition:none !important;} }
+@media (prefers-reduced-motion:reduce){ .tab,.journey.index .journey-rail,.journey.index .leg,.journey.index .leg .leg-body>*{transition:none !important;} }
 
 /* date + place under the name */
 .stamp{
@@ -941,7 +943,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <figure class="frame frame-dance rv"><picture data-px="0.04"><source type="image/webp" srcset="img/frame-dance-sm.webp 560w, img/frame-dance-md.webp 900w, img/frame-dance.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-dance.png" width="700" height="823" alt="Dancers in swirling pink and orange skirts" loading="lazy" decoding="async"></picture></figure>
 </div>
 
-<section class="journey light-stay" aria-label="Travel">
+<section class="journey light-stay" data-fit aria-label="Travel">
 <div class="journey-pin">
 <h2 id="stay">Travel</h2>
 <div class="journey-rail">
@@ -1029,7 +1031,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <figure class="frame frame-tacos rv"><picture data-px="0.04"><source type="image/webp" srcset="img/frame-tacos-sm.webp 560w, img/frame-tacos-md.webp 900w, img/frame-tacos.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-tacos.png" width="700" height="884" alt="Kajal and Adarsh eating tacos" loading="lazy" decoding="async"></picture></figure>
 </div>
 
-<section class="journey light-faq" aria-label="FAQs">
+<section class="journey light-faq" data-fit aria-label="FAQs">
 <div class="journey-pin">
 <h2 id="faq">FAQs</h2>
 <div class="journey-rail">
@@ -1303,6 +1305,18 @@ picture{margin-block:clamp(52px,8vw,104px);}
     });
     pin.insertBefore(tabs, rail);
 
+    var fits = journey.hasAttribute('data-fit');
+    function fit(){
+      if(!fits || J.cur < 0) return;
+      var h = legs[J.cur].offsetHeight + 'px';
+      if(rail.style.height !== h){ rail.style.height = h; }
+    }
+    if(fits){
+      Array.prototype.forEach.call(rail.querySelectorAll('img'), function(img){ img.addEventListener('load', fit); });
+      /* the page got shorter or longer: let the smooth scroll recompute where the page ends */
+      rail.addEventListener('transitionend', function(e){ if(e.target === rail && lenis){ lenis.resize(); } });
+    }
+
     function mark(i){
       if(i === J.cur) return;
       J.cur = i;
@@ -1314,6 +1328,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
         l.classList.toggle('on', j === i);
         l.inert = j !== i;
       });
+      fit();
       if(oneLine){ reveal(btns[i]); }
     }
 
@@ -1355,8 +1370,18 @@ picture{margin-block:clamp(52px,8vw,104px);}
     mark(0);
     J.el = journey;
     J.go = go;
+    J.fit = fit;
     return J;
   });
+  function fitAll(){ journeys.forEach(function(J){ J.fit(); }); }
+  /* phones fire resize as the address bar slides; re-measuring then would yank the page, so only react to real resizes */
+  var fitW = window.innerWidth;
+  window.addEventListener('resize', function(){
+    if(window.innerWidth === fitW) return;
+    fitW = window.innerWidth;
+    fitAll();
+  }, {passive:true});
+  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(fitAll); }
 
   /* sideways gestures step the cards of whichever section spans that height of the screen, wherever the pointer is
      across it; the one-line name rows scroll sideways themselves, so gestures over them are left alone */
