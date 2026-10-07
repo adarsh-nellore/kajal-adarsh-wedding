@@ -415,19 +415,19 @@ a:focus-visible{outline:none;}
 .journey.index.attire .leg-body{width:auto;}
 .attire .leg-body p{max-width:38.75rem;margin-inline:0;}
 .attire .when + p{margin-top:6px;}
-.leg .callout{margin-top:1em;padding:16px 18px 18px;border:.5px solid rgba(var(--gold-rgb),.45);border-radius:4px;background:rgba(var(--gold-rgb),.04);}
+.leg .callout{margin-top:20px;padding:18px 20px 20px;border:.5px solid rgba(var(--gold-rgb),.45);border-radius:4px;background:rgba(var(--gold-rgb),.04);}
+.leg a.snapshot-link + .callout{margin-top:0;}
 .leg .callout p{margin:0;}
-.leg .callout ~ p{padding-inline:18.5px;}
-.leg .callout + p{margin-top:1.4em;}
-.leg .ctas{display:flex;flex-wrap:wrap;gap:10px 12px;margin-top:14px;}
-.leg a.book{display:inline-block;padding:.12em 18px .24em;border:1px solid rgba(var(--gold-rgb),.55);background:none;font-family:var(--head);font-size:clamp(19px,1.9vw,22px);line-height:1.2;color:var(--gold);transition:border-color .35s cubic-bezier(.2,.7,.3,1),background-color .35s cubic-bezier(.2,.7,.3,1);}
+.leg .callout + p{margin-top:24px;}
+.leg .ctas{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px 12px;margin-top:16px;}
+.leg a.book{display:inline-flex;align-items:center;padding:.12em 18px .24em;border:1px solid rgba(var(--gold-rgb),.55);background:none;font-family:var(--head);font-size:clamp(19px,1.9vw,22px);line-height:1.2;color:var(--gold);transition:border-color .35s cubic-bezier(.2,.7,.3,1),background-color .35s cubic-bezier(.2,.7,.3,1);}
 .leg a.book.primary::after{content:" \2197";font-size:.8em;}
 .leg a.book:hover{border-color:var(--gold);background-color:rgba(var(--gold-rgb),.08);}
 .leg a.book.primary{border-color:var(--gold);background-color:rgba(var(--gold-rgb),.22);color:#EAE3D6;}
 .leg a.book.primary:hover{border-color:var(--gold);background-color:rgba(var(--gold-rgb),.34);}
 .leg a.book:focus-visible{outline:1px solid var(--gold);outline-offset:4px;}
-.leg a.snapshot-link{display:block;background:none;padding:0;}
-.leg-body .snapshot{display:block;width:min(25rem,88%);height:auto;margin:6px auto clamp(14px,1.6vw,20px);padding:clamp(6px,.7vw,9px);background:#EAE3D6;border-radius:4px;rotate:-.8deg;box-shadow:0 10px 22px rgba(0,0,0,.5);}
+.leg a.snapshot-link{display:block;background:none;padding:0;margin:4px 0 20px;}
+.leg-body .snapshot{display:block;box-sizing:border-box;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;margin:0;padding:clamp(6px,.7vw,8px);background:#EAE3D6;border-radius:4px;box-shadow:0 10px 22px rgba(0,0,0,.5);}
 .leg ul.gems{list-style:none;padding:0;margin:10px 0 0;}
 .leg ul.gems li{position:relative;padding-left:1.3em;}
 .leg ul.gems li + li{margin-top:6px;}
@@ -855,13 +855,13 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 
 <header class="hero" id="top">
-<h1 data-px="0.12" data-px-hero>Kajal y Adarsh</h1>
-<p class="stamp" data-px="0.06" data-px-hero>Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico<a class="rsvp-send cover-rsvp" href="#rsvp">RSVP</a><picture class="stk stk-hero stk-selfie" aria-hidden="true">
+<h1 data-px="0.07" data-px-hero>Kajal y Adarsh</h1>
+<p class="stamp" data-px="0.035" data-px-hero>Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico<a class="rsvp-send cover-rsvp" href="#rsvp">RSVP</a><picture class="stk stk-hero stk-selfie" aria-hidden="true">
 <source type="image/webp" srcset="img/sticker-selfie-sm.webp 220w, img/sticker-selfie.webp 340w" sizes="(max-width:900px) 130px, 210px">
 <img src="img/sticker-selfie.png" width="340" height="338" alt="" decoding="async">
 </picture></p>
-<picture class="stk stk-hero stk-hearts" data-px="0.17" data-px-hero aria-hidden="true"><source type="image/webp" srcset="img/sticker-hearts-sm.webp 220w, img/sticker-hearts.webp 340w" sizes="(max-width:900px) 150px, 250px"><img src="img/sticker-hearts.png" width="340" height="288" alt="" decoding="async"></picture>
-<picture class="stk stk-hero stk-couple" data-px="0.17" data-px-hero>
+<picture class="stk stk-hero stk-hearts" data-px="0.1" data-px-hero aria-hidden="true"><source type="image/webp" srcset="img/sticker-hearts-sm.webp 220w, img/sticker-hearts.webp 340w" sizes="(max-width:900px) 150px, 250px"><img src="img/sticker-hearts.png" width="340" height="288" alt="" decoding="async"></picture>
+<picture class="stk stk-hero stk-couple" data-px="0.1" data-px-hero>
 <source type="image/webp" srcset="img/sticker-couple-sm.webp 220w, img/sticker-couple.webp 340w" sizes="(max-width:900px) 130px, 210px">
 <img src="img/sticker-couple.png" width="340" height="355" alt="Kajal and Adarsh" decoding="async">
 </picture>
@@ -879,7 +879,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p>Join us for a warm welcome to Mexico City, with mendhi artists on hand for anyone who would like henna.</p>
 <p>The venue is approximately a 10-minute walk from the hotel. Shuttles will be available for older guests.</p></div>
 </div>
-<picture class="stk stk-mendhi" data-px="-0.06" aria-hidden="true"><source type="image/webp" srcset="img/sticker-mendhi-sm.webp 220w, img/sticker-mendhi.webp 340w" sizes="150px"><img src="img/sticker-mendhi.png" width="340" height="469" alt="" loading="lazy" decoding="async"></picture>
+<picture class="stk stk-mendhi" data-px="-0.035" aria-hidden="true"><source type="image/webp" srcset="img/sticker-mendhi-sm.webp 220w, img/sticker-mendhi.webp 340w" sizes="150px"><img src="img/sticker-mendhi.png" width="340" height="469" alt="" loading="lazy" decoding="async"></picture>
 </article>
 <article class="leg" data-tab="Saturday Daytime">
 <div class="day"><b>2.20</b></div>
@@ -890,8 +890,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p>We’ll begin in the morning with a Ganesh Puja to bless the start of the wedding, followed by the Haldi in the afternoon, with food and plenty of color.</p>
 <p>Shuttles leave the hotel at 9 AM and return approximately 4 PM.</p></div>
 </div>
-<picture class="stk stk-haldi" data-px="-0.05" aria-hidden="true"><source type="image/webp" srcset="img/sticker-haldi-sm.webp 220w, img/sticker-haldi.webp 340w" sizes="200px"><img src="img/sticker-haldi.png" width="340" height="270" alt="" loading="lazy" decoding="async"></picture>
-<picture class="stk stk-samosa" data-px="-0.08" aria-hidden="true"><source type="image/webp" srcset="img/sticker-samosa-sm.webp 220w, img/sticker-samosa.webp 340w" sizes="160px"><img src="img/sticker-samosa.png" width="340" height="257" alt="" loading="lazy" decoding="async"></picture>
+<picture class="stk stk-haldi" data-px="-0.03" aria-hidden="true"><source type="image/webp" srcset="img/sticker-haldi-sm.webp 220w, img/sticker-haldi.webp 340w" sizes="200px"><img src="img/sticker-haldi.png" width="340" height="270" alt="" loading="lazy" decoding="async"></picture>
+<picture class="stk stk-samosa" data-px="-0.05" aria-hidden="true"><source type="image/webp" srcset="img/sticker-samosa-sm.webp 220w, img/sticker-samosa.webp 340w" sizes="160px"><img src="img/sticker-samosa.png" width="340" height="257" alt="" loading="lazy" decoding="async"></picture>
 </article>
 <article class="leg" data-tab="Sunday Daytime">
 <div class="day"><b>2.21</b></div>
@@ -902,7 +902,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p>We want all of our loved ones there with us for this important moment in our lives. Join us for the Baarat, the wedding ceremony, and the celebration that follows.</p>
 <p>Shuttles leave the hotel at 9:30 AM and return approximately 3 PM.</p></div>
 </div>
-<picture class="stk stk-ganesh" data-px="-0.06" aria-hidden="true"><source type="image/webp" srcset="img/sticker-ganesh-sm.webp 220w, img/sticker-ganesh.webp 340w" sizes="150px"><img src="img/sticker-ganesh.png" width="340" height="496" alt="" loading="lazy" decoding="async"></picture>
+<picture class="stk stk-ganesh" data-px="-0.035" aria-hidden="true"><source type="image/webp" srcset="img/sticker-ganesh-sm.webp 220w, img/sticker-ganesh.webp 340w" sizes="150px"><img src="img/sticker-ganesh.png" width="340" height="496" alt="" loading="lazy" decoding="async"></picture>
 </article>
 <article class="leg" data-tab="Sunday Evening">
 <div class="day"><b>2.21</b></div>
@@ -913,14 +913,14 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p>An elegant evening of music and dancing to close out the weekend in style.</p>
 <p>Shuttles leave the hotel at 6:30 PM.</p></div>
 </div>
-<picture class="stk stk-martini" data-px="-0.05" aria-hidden="true"><source type="image/webp" srcset="img/sticker-martini-sm.webp 220w, img/sticker-martini.webp 340w" sizes="130px"><img src="img/sticker-martini.png" width="340" height="550" alt="" loading="lazy" decoding="async"></picture>
-<picture class="stk stk-cake" data-px="-0.08" aria-hidden="true"><source type="image/webp" srcset="img/sticker-cake-sm.webp 220w, img/sticker-cake.webp 340w" sizes="140px"><img src="img/sticker-cake.png" width="340" height="281" alt="" loading="lazy" decoding="async"></picture>
+<picture class="stk stk-martini" data-px="-0.03" aria-hidden="true"><source type="image/webp" srcset="img/sticker-martini-sm.webp 220w, img/sticker-martini.webp 340w" sizes="130px"><img src="img/sticker-martini.png" width="340" height="550" alt="" loading="lazy" decoding="async"></picture>
+<picture class="stk stk-cake" data-px="-0.05" aria-hidden="true"><source type="image/webp" srcset="img/sticker-cake-sm.webp 220w, img/sticker-cake.webp 340w" sizes="140px"><img src="img/sticker-cake.png" width="340" height="281" alt="" loading="lazy" decoding="async"></picture>
 </article>
 </div>
 </div>
 </section>
 
-<figure class="frame frame-dance rv"><picture data-px="0.07"><source type="image/webp" srcset="img/frame-dance-sm.webp 560w, img/frame-dance-md.webp 900w, img/frame-dance.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-dance.png" width="700" height="823" alt="Dancers in swirling pink and orange skirts" loading="lazy" decoding="async"></picture></figure>
+<figure class="frame frame-dance rv"><picture data-px="0.04"><source type="image/webp" srcset="img/frame-dance-sm.webp 560w, img/frame-dance-md.webp 900w, img/frame-dance.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-dance.png" width="700" height="823" alt="Dancers in swirling pink and orange skirts" loading="lazy" decoding="async"></picture></figure>
 
 <section class="journey light-stay" aria-label="Travel">
 <div class="journey-pin">
@@ -955,7 +955,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </section>
 
-<figure class="frame frame-market rv"><picture data-px="0.07"><source type="image/webp" srcset="img/frame-market-sm.webp 560w, img/frame-market-md.webp 900w, img/frame-market.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-market.png" width="700" height="863" alt="A woman carrying flowers through a marigold market" loading="lazy" decoding="async"></picture></figure>
+<figure class="frame frame-market rv"><picture data-px="0.04"><source type="image/webp" srcset="img/frame-market-sm.webp 560w, img/frame-market-md.webp 900w, img/frame-market.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-market.png" width="700" height="863" alt="A woman carrying flowers through a marigold market" loading="lazy" decoding="async"></picture></figure>
 
 <section class="journey attire light-attire" data-pin aria-label="Attire">
 <div class="journey-pin">
@@ -997,7 +997,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </section>
 
-<figure class="frame frame-tacos rv"><picture data-px="0.07"><source type="image/webp" srcset="img/frame-tacos-sm.webp 560w, img/frame-tacos-md.webp 900w, img/frame-tacos.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-tacos.png" width="700" height="884" alt="Kajal and Adarsh eating tacos" loading="lazy" decoding="async"></picture></figure>
+<figure class="frame frame-tacos rv"><picture data-px="0.04"><source type="image/webp" srcset="img/frame-tacos-sm.webp 560w, img/frame-tacos-md.webp 900w, img/frame-tacos.webp 1400w" sizes="(max-width:700px) 78vw, 480px"><img src="img/frame-tacos.png" width="700" height="884" alt="Kajal and Adarsh eating tacos" loading="lazy" decoding="async"></picture></figure>
 
 <section class="journey light-faq" aria-label="FAQs">
 <div class="journey-pin">
@@ -1135,12 +1135,12 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </section>
 
-<figure class="frame frame-cliff rv"><picture data-px="0.07"><source type="image/webp" srcset="img/frame-cliff-sm.webp 560w, img/frame-cliff-md.webp 900w, img/frame-cliff.webp 1400w" sizes="(max-width:700px) 88vw, 620px"><img src="img/frame-cliff.png" width="700" height="554" alt="Kajal and Adarsh sitting on a rock above the sea" loading="lazy" decoding="async"></picture></figure>
+<figure class="frame frame-cliff rv"><picture data-px="0.04"><source type="image/webp" srcset="img/frame-cliff-sm.webp 560w, img/frame-cliff-md.webp 900w, img/frame-cliff.webp 1400w" sizes="(max-width:700px) 88vw, 620px"><img src="img/frame-cliff.png" width="700" height="554" alt="Kajal and Adarsh sitting on a rock above the sea" loading="lazy" decoding="async"></picture></figure>
 
 <section class="rsvp" aria-label="RSVP">
 <h2 id="rsvp">RSVP</h2>
 <p class="lede rv">Kindly reply by December 1.</p>
-<picture class="stk stk-hats" data-px="-0.07" aria-hidden="true"><source type="image/webp" srcset="img/sticker-hats-sm.webp 220w, img/sticker-hats.webp 340w" sizes="190px"><img src="img/sticker-hats.png" width="340" height="329" alt="" loading="lazy" decoding="async"></picture>
+<picture class="stk stk-hats" data-px="-0.04" aria-hidden="true"><source type="image/webp" srcset="img/sticker-hats-sm.webp 220w, img/sticker-hats.webp 340w" sizes="190px"><img src="img/sticker-hats.png" width="340" height="329" alt="" loading="lazy" decoding="async"></picture>
 <form class="rsvp-form rv" novalidate>
 <div class="field">
 <label for="rsvp-name">Full name(s)</label>
@@ -1194,11 +1194,11 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="rsvp-done" role="status" aria-live="polite"></div>
 </section>
 <div class="wall" aria-label="Gallery wall">
-<figure class="wall-lotus" data-px="0.03"><picture><source type="image/webp" srcset="img/wall-lotus-sm.webp 400w, img/wall-lotus.webp 720w" sizes="(max-width:640px) 45vw, 22rem"><img src="img/wall-lotus.png" width="720" height="528" alt="Painting of pink lotus flowers in a gilt frame" loading="lazy" decoding="async"></picture></figure>
-<figure class="wall-marigold" data-px="0.055"><picture><source type="image/webp" srcset="img/wall-marigold-sm.webp 400w, img/wall-marigold.webp 720w" sizes="(max-width:640px) 45vw, 22rem"><img src="img/wall-marigold.png" width="720" height="732" alt="Marigolds and lotus blossoms in baskets" loading="lazy" decoding="async"></picture></figure>
-<figure class="wall-frida" data-px="-0.02"><picture><source type="image/webp" srcset="img/wall-frida-sm.webp 400w, img/wall-frida.webp 720w" sizes="(max-width:640px) 45vw, 22rem"><img src="img/wall-frida.png" width="720" height="937" alt="Portrait of Frida Kahlo with roses in her hair" loading="lazy" decoding="async"></picture></figure>
-<figure class="wall-agave" data-px="0.025"><picture><source type="image/webp" srcset="img/wall-agave-sm.webp 400w, img/wall-agave.webp 720w" sizes="(max-width:640px) 45vw, 22rem"><img src="img/wall-agave.png" width="720" height="888" alt="Bougainvillea over a pink wall above agave plants" loading="lazy" decoding="async"></picture></figure>
-<figure class="wall-umbrellas" data-px="0.04"><picture><source type="image/webp" srcset="img/wall-umbrellas-sm.webp 400w, img/wall-umbrellas.webp 720w" sizes="(max-width:640px) 45vw, 22rem"><img src="img/wall-umbrellas.png" width="720" height="800" alt="Paper umbrellas and lanterns strung above a street" loading="lazy" decoding="async"></picture></figure>
+<figure class="wall-lotus" data-px="0.018"><picture><source type="image/webp" srcset="img/wall-lotus-sm.webp 400w, img/wall-lotus.webp 720w" sizes="(max-width:640px) 45vw, 22rem"><img src="img/wall-lotus.png" width="720" height="528" alt="Painting of pink lotus flowers in a gilt frame" loading="lazy" decoding="async"></picture></figure>
+<figure class="wall-marigold" data-px="0.033"><picture><source type="image/webp" srcset="img/wall-marigold-sm.webp 400w, img/wall-marigold.webp 720w" sizes="(max-width:640px) 45vw, 22rem"><img src="img/wall-marigold.png" width="720" height="732" alt="Marigolds and lotus blossoms in baskets" loading="lazy" decoding="async"></picture></figure>
+<figure class="wall-frida" data-px="-0.012"><picture><source type="image/webp" srcset="img/wall-frida-sm.webp 400w, img/wall-frida.webp 720w" sizes="(max-width:640px) 45vw, 22rem"><img src="img/wall-frida.png" width="720" height="937" alt="Portrait of Frida Kahlo with roses in her hair" loading="lazy" decoding="async"></picture></figure>
+<figure class="wall-agave" data-px="0.015"><picture><source type="image/webp" srcset="img/wall-agave-sm.webp 400w, img/wall-agave.webp 720w" sizes="(max-width:640px) 45vw, 22rem"><img src="img/wall-agave.png" width="720" height="888" alt="Bougainvillea over a pink wall above agave plants" loading="lazy" decoding="async"></picture></figure>
+<figure class="wall-umbrellas" data-px="0.024"><picture><source type="image/webp" srcset="img/wall-umbrellas-sm.webp 400w, img/wall-umbrellas.webp 720w" sizes="(max-width:640px) 45vw, 22rem"><img src="img/wall-umbrellas.png" width="720" height="800" alt="Paper umbrellas and lanterns strung above a street" loading="lazy" decoding="async"></picture></figure>
 </div>
 
 <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
@@ -1724,7 +1724,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
       var vhNow = window.innerHeight, line = barClear() || pad(), y = window.scrollY;
       var maxY = document.documentElement.scrollHeight - vhNow;
       magZone = vhNow * 0.55;
-      magMax = Math.min(56, vhNow * 0.055);
+      magMax = Math.min(30, vhNow * 0.03);
       mags.forEach(function(m){
         m.rest = Math.max(0, Math.min(maxY, m.h.getBoundingClientRect().top - m.el._mag + y - line));
       });
@@ -1764,7 +1764,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
   function place(){
     /* the tile repeats every 18px, so the fixed layer only ever needs to slide within one tile */
-    if(lattice){ lattice.style.transform = 'translate3d(0,' + (-((window.scrollY * 0.15) % 18)).toFixed(2) + 'px,0)'; }
+    if(lattice){ lattice.style.transform = 'translate3d(0,' + (-((window.scrollY * 0.1) % 18)).toFixed(2) + 'px,0)'; }
     for(var i=0;i<layers.length;i++){
       var el = layers[i];
       var speed = parseFloat(el.getAttribute('data-px')) || 0;
