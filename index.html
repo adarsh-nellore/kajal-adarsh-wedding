@@ -320,6 +320,21 @@ a:focus-visible{outline:none;}
 /* phones: the selfie is the only thing below the button, so it can take the room down to the scroll cue */
 @media (max-width:700px) and (min-height:720px){ .stk-selfie{--h:calc(1.65 * var(--k) * var(--stk-lg));} }
 @media (max-width:700px) and (min-height:560px) and (max-height:719px){ .stk-selfie{--h:calc(1.35 * var(--k) * var(--stk));} }
+/* phones: the name as large as the width allows — two lines when there's the height for it, otherwise one full-width line.
+   --hf is its size, --lift raises the centred block so the selfie clears the scroll cue; the pair above keeps its spread from --f */
+@media (max-width:700px) and (min-height:720px){
+  .hero{--hf:clamp(76px,21vw,112px);--lift:48px;padding-bottom:calc(clamp(48px,8vh,96px) + 2 * var(--lift));}
+  .hero h1{font-size:var(--hf);line-height:1;max-width:2.6em;margin-inline:auto;}
+  .stk-hero{--mid:calc(50% - var(--lift) - (clamp(30px,4vw,52px) + 3 * clamp(19px,2.4vw,26px)) / 2);}
+  .stk-couple,.stk-hearts{top:calc(var(--mid) - var(--hf) - 1.5 * var(--stk-gap) - 1.05 * var(--h));}
+}
+@media (max-width:700px) and (max-height:719px){
+  .hero{--hf:17vw;}
+  .hero h1{font-size:var(--hf);}
+}
+@media (max-width:700px) and (min-height:560px) and (max-height:719px){
+  .stk-couple,.stk-hearts{top:calc(var(--mid) - .52 * var(--hf) - 2 * var(--stk-gap) - 1.05 * var(--h));}
+}
 
 /* ---------- sections: each swaps cards in place from an index ---------- */
 .journey{
