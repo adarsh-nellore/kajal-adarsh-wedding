@@ -489,7 +489,7 @@ a:focus-visible{outline:none;}
 .journey.index .journey-rail{display:grid;overflow:hidden;}
 /* sections whose cards differ a lot in height ease to the chosen card instead, so a short card leaves no hole */
 .journey.index[data-fit] .journey-rail{transition:height .45s cubic-bezier(.2,.7,.3,1);}
-.journey.index .leg{grid-area:1/1;align-self:start;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s .3s;}
+.journey.index .leg{grid-area:1/1;align-self:center;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s .3s;}
 .journey.index .leg.on{opacity:1;visibility:visible;transition:opacity .3s ease;}
 .journey.index .leg-body>*{opacity:0;transform:translateX(28px);}
 .journey.index .leg.on .leg-body>*{
