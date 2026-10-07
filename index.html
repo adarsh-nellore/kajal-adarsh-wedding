@@ -1453,23 +1453,34 @@ picture{margin-block:clamp(52px,8vw,104px);}
   /* from the top of the opening screen, the first downward wheel or trackpad gesture carries you to Events (as the
      cue does) and its leftover momentum is absorbed, so a single flick lands on the first section instead of sailing
      past it. Decided when the gesture starts, never as a correction afterwards; touch keeps its native momentum */
-  var handing = false, handQuiet = 0;
+  var handing = false, handQuiet = 0, handT0 = 0, handLast = 0, handRise = 0;
   function heroHandoff(d){
     if(d.event.type !== 'wheel') return false;
-    if(handing){ d.event.preventDefault(); handQuiet = performance.now(); return true; }
+    if(handing){
+      /* only the first gesture's coast is absorbed: a pause, an upward scroll or deltas climbing again (past the
+         gesture's own run-up) is a fresh swipe, and it takes over at once */
+      var now = performance.now(), a = Math.abs(d.deltaY);
+      handRise = a > handLast ? handRise + 1 : 0;
+      var fresh = d.deltaY < 0 || now - handQuiet > 140 || (now - handT0 > 300 && handRise >= 3 && a > 10);
+      handQuiet = now; handLast = a;
+      if(!fresh){ d.event.preventDefault(); return true; }
+      handing = false;
+      return false;
+    }
     if(d.deltaY <= 0 || menuOpen()) return false;
     var hero = document.querySelector('.hero'), first = document.getElementById('weekend');
     if(!hero || !first || lenis.targetScroll > hero.offsetHeight * 0.4) return false;
     var to = stopOf(first);
     if(to <= lenis.targetScroll + 8) return false;
     var t0 = performance.now();
-    handing = true; handQuiet = t0;
+    handing = true; handQuiet = handT0 = t0; handLast = Math.abs(d.deltaY); handRise = 0;
     d.event.preventDefault();
     lenis.scrollTo(to, {duration: 1.1, easing: inOut});
     /* hand control back once the glide is over and the wheel has gone quiet (capped, in case the glide is cut short) */
     (function release(){
       var now = performance.now();
-      if((now - t0 > 1150 && now - handQuiet > 160) || now - t0 > 2600){ handing = false; } else { setTimeout(release, 60); }
+      if(!handing) return;
+      if((now - t0 > 1150 && now - handQuiet > 140) || now - t0 > 2600){ handing = false; } else { setTimeout(release, 60); }
     })();
     return true;
   }
