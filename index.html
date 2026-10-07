@@ -429,7 +429,6 @@ a:focus-visible{outline:none;}
 .leg ul.gems li{position:relative;padding-left:1.3em;}
 .leg ul.gems li + li{margin-top:6px;}
 .leg ul.gems li::before{content:"";position:absolute;left:.25em;top:.9em;width:6px;height:6px;background:var(--gold);transform:translateY(-50%) rotate(45deg);}
-.attire-note{width:min(30rem, var(--col));max-width:none;margin:clamp(24px,3vw,40px) auto 0;font-size:.8em;line-height:1.55;text-align:center;color:rgba(234,227,214,.55);}
 .lead{color:var(--camel);font-weight:500;}
 .leg p.links{text-align:center;}
 .journey.attire .leg-body{padding-bottom:12px;}
@@ -959,6 +958,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <section class="journey attire light-attire" data-pin aria-label="Attire">
 <div class="journey-pin">
 <h2 id="attire">Attire</h2>
+<p class="lede">Images are for inspiration. We’d love for you to wear something that feels like you, fits your personal style, and that you feel comfortable in.</p>
 <div class="journey-rail">
 <article class="leg" data-tab="Welcome Party">
 <div class="leg-body">
@@ -992,7 +992,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </article>
 </div>
-<p class="attire-note">Images are for inspiration. We’d love for you to wear something that feels like you, fits your personal style, and that you feel comfortable in.</p>
 </div>
 </section>
 
@@ -1385,7 +1384,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
   function pad(){ return Math.min(64, Math.max(24, window.innerHeight * 0.06)); }
   function stopOf(el){
     if(el.classList.contains('hero')) return 0;
-    return el.getBoundingClientRect().top + window.scrollY - (barClear() || pad());
+    return el.getBoundingClientRect().top - magOff(el) + window.scrollY - (barClear() || pad());
   }
   /* where the top bar shows, headings stop this far down so it never covers them (matches their scroll-margin-top) */
   function barClear(){ return mbar && smallScreen.matches ? mbar.offsetHeight + 28 : 0; }
@@ -1411,47 +1410,13 @@ picture{margin-block:clamp(52px,8vw,104px);}
   }
   function inOut(t){ return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(2 - 2 * t, 3) / 2; }
 
-  /* weighted scrolling (Lenis) with section landings: a mouse or trackpad scroll eases out slowly, and when the
-     input stops near a section heading the still-moving scroll is steered onto it rather than corrected afterwards.
-     Touch keeps the phone's own momentum and settles onto a nearby heading once it comes to rest */
+  /* weighted scrolling (Lenis): a mouse or trackpad scroll eases out slowly; touch keeps the phone's own momentum.
+     The scroll position is never corrected afterwards */
   var lenis = !reduce && window.Lenis ? new window.Lenis({
     lerp: 0.07, wheelMultiplier: 0.85, autoRaf: true,
     /* sideways swipes step through a section's cards, so they're left alone */
     virtualScroll: function(d){ return Math.abs(d.deltaY) >= Math.abs(d.deltaX); }
   }) : null;
-  if(lenis){
-    var landEls = Array.prototype.slice.call(document.querySelectorAll('.hero, .journey, .rsvp'));
-    var touching = false, touchedAt = -1e9, landT = 0;
-    var landing = function(from){
-      var reach = window.innerHeight * 0.45, best = null;
-      landEls.forEach(function(el){
-        var at = Math.round(stopOf(el));
-        if(Math.abs(at - from) <= reach && (best === null || Math.abs(at - from) < Math.abs(best - from))){ best = at; }
-      });
-      return best !== null && Math.abs(best - from) > 2 ? best : null;
-    };
-    lenis.on('virtual-scroll', function(e){
-      if(e.event.type.indexOf('touch') === 0) return;
-      window.clearTimeout(landT);
-      landT = window.setTimeout(function(){
-        if(menuOpen()) return;
-        var to = landing(lenis.targetScroll);
-        if(to !== null){ lenis.scrollTo(to, {lerp: 0.06}); }
-      }, 140);
-    });
-    window.addEventListener('touchstart', function(){ touching = true; window.clearTimeout(landT); }, {passive:true});
-    window.addEventListener('touchend', function(){ touching = false; touchedAt = performance.now(); }, {passive:true});
-    window.addEventListener('touchcancel', function(){ touching = false; touchedAt = performance.now(); }, {passive:true});
-    window.addEventListener('scroll', function(){
-      if(lenis.isScrolling !== 'native' || (!touching && performance.now() - touchedAt > 2500)) return;
-      window.clearTimeout(landT);
-      landT = window.setTimeout(function(){
-        if(touching || menuOpen() || lenis.isScrolling === 'smooth') return;
-        var to = landing(window.scrollY);
-        if(to !== null){ lenis.scrollTo(to, {duration: 0.9, easing: function(t){ return 1 - Math.pow(1 - t, 3); }}); }
-      }, 160);
-    }, {passive:true});
-  }
   var mnav = document.querySelector('.mnav');
   var mbar = mnav.querySelector('.mbar');
   var smallScreen = window.matchMedia('(max-width:1180px)');
@@ -1466,7 +1431,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
     var line = window.innerHeight * 0.42, cur = -1;
     menuLinks.forEach(function(a, i){
       var t = document.getElementById(a.getAttribute('href').slice(1));
-      if(t && t.getBoundingClientRect().top <= line){ cur = i; }
+      if(t && t.getBoundingClientRect().top - magOff(t) <= line){ cur = i; }
     });
     if(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4){ cur = menuLinks.length - 1; }
     menuLinks.forEach(function(a, i){
@@ -1685,7 +1650,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
         done.appendChild(p);
         done.appendChild(again);
         h.focus({preventScroll:true});
-        window.scrollTo({top: done.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.3, behavior: reduce ? 'auto' : 'smooth'});
+        window.scrollTo({top: done.getBoundingClientRect().top - magOff(done) + window.scrollY - window.innerHeight * 0.3, behavior: reduce ? 'auto' : 'smooth'});
       }, function(){
         sendErr.textContent = 'Something went wrong sending your reply. Please try again, or reach out to us directly.';
       }).then(function(){
@@ -1708,7 +1673,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
     cueDown.classList.toggle('gone', window.scrollY > 40);
     rail.classList.toggle('show', stamp.getBoundingClientRect().bottom < 0);
     for(var i=0;i<marks.length;i++){
-      if(marks[i] && marks[i].getBoundingClientRect().top <= line){ current = i; }
+      if(marks[i] && marks[i].getBoundingClientRect().top - magOff(marks[i]) <= line){ current = i; }
     }
     /* the last section is too short to reach the line, so claim it at the bottom of the page */
     if(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4){ current = marks.length - 1; }
@@ -1735,6 +1700,59 @@ picture{margin-block:clamp(52px,8vw,104px);}
   }, {passive:true});
   markCurrent();
 
+  /* arrival: as a section's heading nears its resting line in the direction of the scroll, the section runs a little
+     ahead and then eases into place, so it lands with a soft snap. Purely visual and keyed to the scroll position
+     (weighted by a direction that turns over gently), so it never moves the page and holds still once scrolling stops.
+     Rects read elsewhere subtract the section's offset (magOff) to stay on its resting layout */
+  var mags = reduce ? [] : Array.prototype.slice.call(document.querySelectorAll('.journey, .rsvp')).map(function(s){
+    s._mag = 0;
+    s.style.willChange = 'translate';
+    return {el: s, h: s.querySelector('h2'), rest: 0};
+  });
+  function magOff(el){
+    var s = el.closest && el.closest('.journey, .rsvp');
+    return s && s._mag || 0;
+  }
+  if(mags.length){
+    var magZone = 0, magMax = 0, magDir = 1, magY = -1, magT = 0;
+    var smooth = function(t){ t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
+    /* 0 at the line and at the edge of the zone, peaking 42% of the way out; gentle enough that the heading never stalls */
+    var magShape = function(u){ return u >= 1 ? 0 : u > 0.42 ? smooth((1 - u) / 0.58) : smooth(u / 0.42); };
+    var magMeasure = function(){
+      var vhNow = window.innerHeight, line = barClear() || pad(), y = window.scrollY;
+      var maxY = document.documentElement.scrollHeight - vhNow;
+      magZone = vhNow * 0.55;
+      magMax = Math.min(96, vhNow * 0.1);
+      mags.forEach(function(m){
+        m.rest = Math.max(0, Math.min(maxY, m.h.getBoundingClientRect().top - m.el._mag + y - line));
+      });
+    };
+    var magnet = function(){
+      var y = lenis ? lenis.scroll : window.scrollY, now = performance.now(), dy = y - magY;
+      if(magY >= 0 && Math.abs(dy) > 0.3){
+        magDir += ((dy > 0 ? 1 : -1) - magDir) * (1 - Math.exp(-Math.min(64, now - magT) / 140));
+      }
+      magY = y; magT = now;
+      var down = smooth(magDir), up = smooth(-magDir);
+      mags.forEach(function(m){
+        var d = m.rest - y, off = 0;
+        if(d > 0){ off = -magMax * magShape(d / magZone) * down; }
+        else if(d < 0){ off = magMax * magShape(-d / magZone) * up; }
+        if(Math.abs(off - m.el._mag) < 0.01) return;
+        m.el._mag = off;
+        m.el.style.translate = '0 ' + off.toFixed(2) + 'px';
+      });
+    };
+    var magRefresh = function(){ magMeasure(); magnet(); };
+    if(lenis){ lenis.on('scroll', magnet); }
+    window.addEventListener('scroll', magnet, {passive:true});
+    window.addEventListener('resize', magRefresh, {passive:true});
+    window.addEventListener('load', magRefresh);
+    if(document.fonts && document.fonts.ready){ document.fonts.ready.then(magRefresh); }
+    if('ResizeObserver' in window){ new ResizeObserver(magRefresh).observe(document.body); }
+    magRefresh();
+  }
+
   /* parallax, in depth order: the lattice drifts far behind at a quarter of the scroll; photo frames lag a little;
      stickers run slightly ahead; the gallery wall's pictures each sit at their own depth.
      Positive speeds lag the scroll, negative ones lead it, measured from viewport centre */
@@ -1756,7 +1774,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
         var r = el.getBoundingClientRect();
         /* skip anything far outside the viewport */
         if(r.bottom < -vh || r.top > vh*2){ continue; }
-        shift = ((r.top + r.height/2) - vh/2) * -speed;
+        shift = ((r.top - magOff(el) + r.height/2) - vh/2) * -speed;
       }
       el.style.transform = 'translate3d(0,' + shift.toFixed(2) + 'px,0)';
     }
