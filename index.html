@@ -113,6 +113,7 @@ body{
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
 }
+@media (max-width:480px){ body{font-size:18px;line-height:30px;} }
 
 h1,h2,h3{font-weight:400;margin:0;letter-spacing:.01em;}
 h1,h2,h3{color:var(--gold);}
@@ -363,9 +364,11 @@ a:focus-visible{outline:none;}
 .tab:focus-visible{outline:1px solid var(--gold);outline-offset:6px;border-radius:2px;}
 /* fingers need ~44px: widen the hit area invisibly, with just enough row gap that neighbours don't overlap */
 @media (pointer:coarse){
-  .tabs,.rsvp .choices{row-gap:14px;}
-  .tab{position:relative;}
-  .tab::after{content:"";position:absolute;inset:-7px -10px;}
+  .tabs,.rsvp .choices{row-gap:18px;}
+  .tab{position:relative;-webkit-tap-highlight-color:transparent;}
+  .tab::after{content:"";position:absolute;inset:-9px -10px;}
+  .leg a.book{position:relative;-webkit-tap-highlight-color:transparent;}
+  .leg a.book::after{content:"";position:absolute;inset:-6px -2px;}
 }
 /* Events' and Attire's names stay on one line, running to the screen edge and sliding sideways if they don't fit */
 .journey[data-pin] .tabs{
@@ -391,6 +394,32 @@ a:focus-visible{outline:none;}
 .journey[data-pin] .tabs.moved:not(.more){
   -webkit-mask-image:linear-gradient(to right,transparent,#000 48px);
           mask-image:linear-gradient(to right,transparent,#000 48px);
+}
+@media (max-width:700px){
+  .light-faq .tabs{
+    flex-wrap:nowrap;
+    width:calc(100vw - var(--edge));
+    padding:8px var(--edge) 8px 8px;
+    margin-top:-8px;
+    margin-left:calc(var(--edge) - 8px);
+    margin-bottom:calc(var(--inner) - 8px);
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    scrollbar-width:none;
+  }
+  .light-faq .tabs::-webkit-scrollbar{display:none;}
+  .light-faq .tabs.more{
+    -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 96px),transparent);
+            mask-image:linear-gradient(to right,#000 calc(100% - 96px),transparent);
+  }
+  .light-faq .tabs.more.moved{
+    -webkit-mask-image:linear-gradient(to right,transparent,#000 48px,#000 calc(100% - 96px),transparent);
+            mask-image:linear-gradient(to right,transparent,#000 48px,#000 calc(100% - 96px),transparent);
+  }
+  .light-faq .tabs.moved:not(.more){
+    -webkit-mask-image:linear-gradient(to right,transparent,#000 48px);
+            mask-image:linear-gradient(to right,transparent,#000 48px);
+  }
 }
 
 .journey-rail{display:flex;flex-direction:column;gap:clamp(56px,8vw,96px);padding-inline:var(--edge);}
@@ -1270,6 +1299,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <script>
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var coarse = window.matchMedia('(pointer: coarse)').matches;
 
   /* always open at the top: a leftover #section or a restored position would drop you mid-Weekend */
   if('scrollRestoration' in history){ history.scrollRestoration = 'manual'; }
@@ -1299,7 +1329,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
     var pin = journey.querySelector('.journey-pin');
     var rail = journey.querySelector('.journey-rail');
     var legs = Array.prototype.slice.call(rail.children);
-    var oneLine = journey.hasAttribute('data-pin');
     var J = {cur:-1};
     journey.classList.add('index');
 
@@ -1350,7 +1379,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
         l.inert = j !== i;
       });
       fit();
-      if(oneLine){ reveal(btns[i]); }
+      reveal(btns[i]);
     }
 
     /* keep the lit name readable in a one-line row: nudge the row only if it's under an edge fade */
@@ -1367,12 +1396,10 @@ picture{margin-block:clamp(52px,8vw,104px);}
       else if(r + 104 > tabs.scrollLeft + tabs.clientWidth) to = r + 104 - tabs.clientWidth;
       if(to !== null){ tabs.scrollTo({left: Math.max(0, to), behavior: reduce ? 'auto' : 'smooth'}); }
     }
-    if(oneLine){
-      tabs.addEventListener('scroll', edges, {passive:true});
-      window.addEventListener('resize', edges, {passive:true});
-      if(document.fonts && document.fonts.ready){ document.fonts.ready.then(edges); }
-      edges();
-    }
+    tabs.addEventListener('scroll', edges, {passive:true});
+    window.addEventListener('resize', edges, {passive:true});
+    if(document.fonts && document.fonts.ready){ document.fonts.ready.then(edges); }
+    edges();
 
     function go(i){ mark(Math.max(0, Math.min(legs.length - 1, i))); }
 
@@ -1825,7 +1852,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
       var vhNow = window.innerHeight, line = barClear() || pad(), y = window.scrollY;
       var maxY = document.documentElement.scrollHeight - vhNow;
       magZone = vhNow * 0.55;
-      magMax = Math.min(30, vhNow * 0.03);
+      magMax = Math.min(30, vhNow * 0.03) * (coarse ? 0.4 : 1);
       mags.forEach(function(m){
         m.rest = Math.max(0, Math.min(maxY, m.h.getBoundingClientRect().top - m.el._mag + y - line));
       });
@@ -1861,7 +1888,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
      Positive speeds lag the scroll, negative ones lead it, measured from viewport centre */
   if(reduce) return;
 
-  var vh = window.innerHeight, ticking = false, lattice = document.querySelector('body > .lattice');
+  var vh = window.innerHeight, pxW = window.innerWidth, ticking = false, lattice = document.querySelector('body > .lattice');
+  var depth = coarse ? 0.5 : 1;
 
   function place(){
     /* the tile repeats every 18px, so the fixed layer only ever needs to slide within one tile */
@@ -1872,12 +1900,12 @@ picture{margin-block:clamp(52px,8vw,104px);}
       var shift;
       if(el.hasAttribute('data-px-hero')){
         /* hero: keyed to scroll distance so it rests at zero on load */
-        shift = (window.scrollY || document.documentElement.scrollTop) * speed;
+        shift = (window.scrollY || document.documentElement.scrollTop) * speed * depth;
       } else {
         var r = el.getBoundingClientRect();
         /* skip anything far outside the viewport */
         if(r.bottom < -vh || r.top > vh*2){ continue; }
-        shift = ((r.top - magOff(el) + r.height/2) - vh/2) * -speed;
+        shift = ((r.top - magOff(el) + r.height/2) - vh/2) * -speed * depth;
       }
       el.style.transform = 'translate3d(0,' + shift.toFixed(2) + 'px,0)';
     }
@@ -1889,7 +1917,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
   }, {passive:true});
 
   window.addEventListener('resize', function(){
-    vh = window.innerHeight;
+    var h = window.innerHeight;
+    if(window.innerWidth !== pxW || Math.abs(h - vh) > vh * 0.25){ pxW = window.innerWidth; vh = h; }
     if(!ticking){ ticking = true; window.requestAnimationFrame(place); }
   }, {passive:true});
 
