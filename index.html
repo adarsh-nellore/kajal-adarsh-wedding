@@ -1394,22 +1394,34 @@ picture{margin-block:clamp(52px,8vw,104px);}
     anim = window.requestAnimationFrame(frame);
   }
 
-  /* scrolling is free; once it comes to rest with a section heading just off its mark, the page eases it into place.
-     Resting partway through a section leaves it be, and nothing happens while a finger is still down */
-  var snapEls = Array.prototype.slice.call(document.querySelectorAll('.journey, .rsvp'));
-  var touching = false, settleT = 0, lastSettleY = -1;
+  /* scrolling is free; once it comes to rest near a section heading, the page carries it into place.
+     A heading up ahead in the direction of travel is reached for from further away than one already passed.
+     Resting deep inside a section leaves it be, and nothing happens while a finger is still down */
+  var snapEls = Array.prototype.slice.call(document.querySelectorAll('.hero, .journey, .rsvp'));
+  var touching = false, settleT = 0, lastSettleY = -1, prevY = window.scrollY, dir = 0;
   function settle(){
     if(reduce || touching || anim || menuOpen()) return;
-    var y = window.scrollY, h = window.innerHeight, reach = Math.min(160, h * 0.18), best = null;
+    var y = window.scrollY, h = window.innerHeight, best = null, bestCost = Infinity;
     if(Math.abs(y - lastSettleY) < 2) return;
     snapEls.forEach(function(el){
-      var at = Math.round(stopOf(el));
-      if(Math.abs(at - y) <= reach && (best === null || Math.abs(at - y) < Math.abs(best - y))){ best = at; }
+      var at = Math.round(stopOf(el)), d = at - y, ahead = dir === 0 || (d > 0) === (dir > 0);
+      var reach = h * (ahead ? 0.5 : 0.28), cost = Math.abs(d) * (ahead ? 1 : 1.6);
+      if(Math.abs(d) <= reach && cost < bestCost){ best = at; bestCost = cost; }
     });
-    if(best !== null && Math.abs(best - y) > 2){ lastSettleY = best; glide(best, 450); }
+    if(best !== null && Math.abs(best - y) > 2){
+      lastSettleY = best;
+      glide(best, Math.min(750, 380 + Math.abs(best - y) * 0.9));
+    }
   }
-  function settleSoon(){ window.clearTimeout(settleT); settleT = window.setTimeout(settle, 160); }
-  window.addEventListener('scroll', function(){ if(!anim){ settleSoon(); } }, {passive:true});
+  function settleSoon(){ window.clearTimeout(settleT); settleT = window.setTimeout(settle, 140); }
+  window.addEventListener('scroll', function(){
+    var y = window.scrollY;
+    if(!anim){
+      if(Math.abs(y - prevY) > 1){ dir = y > prevY ? 1 : -1; }
+      settleSoon();
+    }
+    prevY = y;
+  }, {passive:true});
   window.addEventListener('touchstart', function(){ touching = true; window.clearTimeout(settleT); }, {passive:true});
   window.addEventListener('touchend', function(){ touching = false; settleSoon(); }, {passive:true});
   window.addEventListener('touchcancel', function(){ touching = false; }, {passive:true});
