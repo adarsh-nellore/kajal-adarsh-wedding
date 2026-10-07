@@ -739,12 +739,10 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .group + .group,.send{margin-top:clamp(48px,6vw,68px);}
 /* floated so the legend lays out like a normal block heading inside its fieldset */
 .rsvp .group-h{float:left;width:100%;display:flex;align-items:baseline;gap:14px;margin-bottom:clamp(16px,2vw,22px);font-family:var(--head);font-size:clamp(23px,2.6vw,30px);line-height:1.2;letter-spacing:.01em;color:var(--gold);}
-.group-h .num{font-size:.78em;color:rgba(var(--camel-rgb),.6);}
 .group-h + *{clear:both;}
 .field + .field{margin-top:clamp(24px,2.8vw,32px);}
 .pair{display:grid;gap:clamp(24px,2.8vw,32px) clamp(28px,3.4vw,44px);}
 .pair > .field + .field{margin-top:0;}
-@media (min-width:700px){ .pair{grid-template-columns:1fr 1fr;} }
 .rsvp-yes{margin-top:clamp(28px,3.4vw,38px);}
 .field > label,.field > legend{display:block;font-size:17px;line-height:28px;color:rgba(234,227,214,.74);}
 .field > label.check{font-size:inherit;line-height:inherit;color:inherit;}
@@ -1177,7 +1175,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <picture class="stk stk-hats" data-px="-0.04" aria-hidden="true"><source type="image/webp" srcset="img/sticker-hats-sm.webp 220w, img/sticker-hats.webp 340w" sizes="190px"><img src="img/sticker-hats.png" width="340" height="329" alt="" loading="lazy" decoding="async"></picture>
 <form class="rsvp-form rv" novalidate>
 <fieldset class="group">
-<legend class="group-h"><span class="num" aria-hidden="true">1</span>Your details</legend>
+<legend class="group-h">Your details</legend>
 <div class="pair">
 <div class="field">
 <label for="rsvp-name">Full name(s)</label>
@@ -1193,7 +1191,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </fieldset>
 <div class="group">
 <fieldset aria-describedby="rsvp-attending-err">
-<legend class="group-h"><span class="num" aria-hidden="true">2</span>Will you be joining us?</legend>
+<legend class="group-h">Will you be joining us?</legend>
 <div class="choices">
 <label class="choice"><input type="radio" name="attending" value="yes" required><span class="tab">Joyfully accept</span></label>
 <label class="choice"><input type="radio" name="attending" value="no"><span class="tab">Regretfully decline</span></label>
@@ -1223,7 +1221,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </div>
 <fieldset class="group">
-<legend class="group-h"><span class="num" aria-hidden="true">3</span>Anything else?</legend>
+<legend class="group-h">Anything else?</legend>
 <div class="field">
 <label for="rsvp-note">A note to us <span class="opt">(optional)</span></label>
 <textarea id="rsvp-note" name="note" rows="1" maxlength="4000"></textarea>
