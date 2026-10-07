@@ -37,7 +37,12 @@
 html{overflow-x:clip;}
 /* only once loaded: otherwise the browser's restore-on-reload glides and fights the first scroll */
 html.ready{scroll-behavior:smooth;}
-@media (prefers-reduced-motion:reduce){html.ready{scroll-behavior:auto;}}
+/* proximity: a scroll that would end near a section heading lands on it as part of its own momentum;
+   further away, and inside long sections, scrolling stays free */
+html.ready{scroll-snap-type:y proximity;}
+.hero,h2[id]{scroll-snap-align:start;}
+h2[id]{scroll-margin-top:clamp(24px,6vh,64px);}
+@media (prefers-reduced-motion:reduce){html.ready{scroll-behavior:auto;scroll-snap-type:none;}}
 
 /* ---------- risograph texture ----------
    Turbulence is thresholded into HARD grain (feFuncA discrete) and flooded
@@ -1381,7 +1386,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
     if(Math.abs(to - from) < 1) return;
     ms = ms || 650;
     html.style.scrollBehavior = 'auto';
-    function done(){ anim = null; html.style.scrollBehavior = ''; }
+    html.style.scrollSnapType = 'none';
+    function done(){ anim = null; html.style.scrollBehavior = ''; html.style.scrollSnapType = ''; }
     function frame(now){
       /* the scrollbar was grabbed mid-glide: let go */
       if(Math.abs(window.scrollY - last) > 3){ done(); return; }
@@ -1393,38 +1399,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
     }
     anim = window.requestAnimationFrame(frame);
   }
-
-  /* scrolling is free; once it comes to rest near a section heading, the page carries it into place.
-     A heading up ahead in the direction of travel is reached for from further away than one already passed.
-     Resting deep inside a section leaves it be, and nothing happens while a finger is still down */
-  var snapEls = Array.prototype.slice.call(document.querySelectorAll('.hero, .journey, .rsvp'));
-  var touching = false, settleT = 0, lastSettleY = -1, prevY = window.scrollY, dir = 0;
-  function settle(){
-    if(reduce || touching || anim || menuOpen()) return;
-    var y = window.scrollY, h = window.innerHeight, best = null, bestCost = Infinity;
-    if(Math.abs(y - lastSettleY) < 2) return;
-    snapEls.forEach(function(el){
-      var at = Math.round(stopOf(el)), d = at - y, ahead = dir === 0 || (d > 0) === (dir > 0);
-      var reach = h * (ahead ? 0.5 : 0.28), cost = Math.abs(d) * (ahead ? 1 : 1.6);
-      if(Math.abs(d) <= reach && cost < bestCost){ best = at; bestCost = cost; }
-    });
-    if(best !== null && Math.abs(best - y) > 2){
-      lastSettleY = best;
-      glide(best, Math.min(750, 380 + Math.abs(best - y) * 0.9));
-    }
-  }
-  function settleSoon(){ window.clearTimeout(settleT); settleT = window.setTimeout(settle, 140); }
-  window.addEventListener('scroll', function(){
-    var y = window.scrollY;
-    if(!anim){
-      if(Math.abs(y - prevY) > 1){ dir = y > prevY ? 1 : -1; }
-      settleSoon();
-    }
-    prevY = y;
-  }, {passive:true});
-  window.addEventListener('touchstart', function(){ touching = true; window.clearTimeout(settleT); }, {passive:true});
-  window.addEventListener('touchend', function(){ touching = false; settleSoon(); }, {passive:true});
-  window.addEventListener('touchcancel', function(){ touching = false; }, {passive:true});
 
   /* phones and tablets: the top bar and its menu */
   var mnav = document.querySelector('.mnav');
