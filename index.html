@@ -39,6 +39,9 @@ html{overflow-x:clip;}
 html.ready{scroll-behavior:smooth;}
 h2[id]{scroll-margin-top:clamp(24px,6vh,64px);}
 @media (prefers-reduced-motion:reduce){html.ready{scroll-behavior:auto;}}
+html.lenis,html.lenis body{height:auto;}
+html.lenis.ready{scroll-behavior:auto;}
+.lenis.lenis-stopped{overflow:clip;}
 
 /* ---------- risograph texture ----------
    Turbulence is thresholded into HARD grain (feFuncA discrete) and flooded
@@ -1188,6 +1191,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <figure class="wall-umbrellas" data-px="0.07"><picture><source type="image/webp" srcset="img/wall-umbrellas-sm.webp 400w, img/wall-umbrellas.webp 720w" sizes="(max-width:640px) 45vw, 22rem"><img src="img/wall-umbrellas.png" width="720" height="800" alt="Paper umbrellas and lanterns strung above a street" loading="lazy" decoding="async"></picture></figure>
 </div>
 
+<script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
 <script>
 (function(){
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1377,6 +1381,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
   /* where the top bar shows, headings stop this far down so it never covers them (matches their scroll-margin-top) */
   function barClear(){ return mbar && smallScreen.matches ? mbar.offsetHeight + 28 : 0; }
   function glide(to, ms){
+    if(lenis){ lenis.scrollTo(to, {duration: (ms || 650) / 1000, easing: inOut}); return; }
     var html = document.documentElement, from = window.scrollY, t0 = 0, last = from;
     to = Math.max(0, Math.min(html.scrollHeight - window.innerHeight, Math.round(to)));
     if(anim){ window.cancelAnimationFrame(anim); anim = null; }
@@ -1395,8 +1400,49 @@ picture{margin-block:clamp(52px,8vw,104px);}
     }
     anim = window.requestAnimationFrame(frame);
   }
+  function inOut(t){ return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(2 - 2 * t, 3) / 2; }
 
-  /* phones and tablets: the top bar and its menu */
+  /* weighted scrolling (Lenis) with section landings: a mouse or trackpad scroll eases out slowly, and when the
+     input stops near a section heading the still-moving scroll is steered onto it rather than corrected afterwards.
+     Touch keeps the phone's own momentum and settles onto a nearby heading once it comes to rest */
+  var lenis = !reduce && window.Lenis ? new window.Lenis({
+    lerp: 0.07, wheelMultiplier: 0.85, autoRaf: true,
+    /* sideways swipes step through a section's cards, so they're left alone */
+    virtualScroll: function(d){ return Math.abs(d.deltaY) >= Math.abs(d.deltaX); }
+  }) : null;
+  if(lenis){
+    var landEls = Array.prototype.slice.call(document.querySelectorAll('.hero, .journey, .rsvp'));
+    var touching = false, touchedAt = -1e9, landT = 0;
+    var landing = function(from){
+      var reach = window.innerHeight * 0.45, best = null;
+      landEls.forEach(function(el){
+        var at = Math.round(stopOf(el));
+        if(Math.abs(at - from) <= reach && (best === null || Math.abs(at - from) < Math.abs(best - from))){ best = at; }
+      });
+      return best !== null && Math.abs(best - from) > 2 ? best : null;
+    };
+    lenis.on('virtual-scroll', function(e){
+      if(e.event.type.indexOf('touch') === 0) return;
+      window.clearTimeout(landT);
+      landT = window.setTimeout(function(){
+        if(menuOpen()) return;
+        var to = landing(lenis.targetScroll);
+        if(to !== null){ lenis.scrollTo(to, {lerp: 0.06}); }
+      }, 140);
+    });
+    window.addEventListener('touchstart', function(){ touching = true; window.clearTimeout(landT); }, {passive:true});
+    window.addEventListener('touchend', function(){ touching = false; touchedAt = performance.now(); }, {passive:true});
+    window.addEventListener('touchcancel', function(){ touching = false; touchedAt = performance.now(); }, {passive:true});
+    window.addEventListener('scroll', function(){
+      if(lenis.isScrolling !== 'native' || (!touching && performance.now() - touchedAt > 2500)) return;
+      window.clearTimeout(landT);
+      landT = window.setTimeout(function(){
+        if(touching || menuOpen() || lenis.isScrolling === 'smooth') return;
+        var to = landing(window.scrollY);
+        if(to !== null){ lenis.scrollTo(to, {duration: 0.9, easing: function(t){ return 1 - Math.pow(1 - t, 3); }}); }
+      }, 160);
+    }, {passive:true});
+  }
   var mnav = document.querySelector('.mnav');
   var mbar = mnav.querySelector('.mbar');
   var smallScreen = window.matchMedia('(max-width:1180px)');
@@ -1423,6 +1469,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
     if(open){ markMenu(); }
     mnav.classList.toggle('open', open);
     document.documentElement.classList.toggle('mnav-open', open);
+    if(lenis){ if(open){ lenis.stop(); } else { lenis.start(); } }
     menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     menuToggle.firstElementChild.textContent = open ? 'Close' : 'Menu';
     behindMenu.forEach(function(el){ el.inert = open; });
