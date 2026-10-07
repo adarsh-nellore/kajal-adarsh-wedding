@@ -416,12 +416,11 @@ a:focus-visible{outline:none;}
 .attire .leg-body p{max-width:38.75rem;margin-inline:0;}
 .attire .when + p{margin-top:6px;}
 .attire .leg-body p.ps{margin:16px 0 0;font-size:.9em;line-height:1.6;color:rgba(var(--camel-rgb),.85);}
-.leg .callout{margin-top:4px;border-radius:4px;overflow:hidden;}
-.leg .callout .snapshot{border-radius:4px;}
-.leg .callout-body{margin-top:14px;padding:18px 20px 20px;border:.5px solid rgba(var(--gold-rgb),.45);border-radius:4px;}
+.leg .callout{margin-top:0;padding:18px 20px 20px;border:.5px solid rgba(var(--gold-rgb),.45);border-radius:4px;}
 .leg .callout p{margin:0;}
-.leg .callout-foot{padding:6px 20px 18px;font-size:.92em;line-height:1.6;color:#EAE3D6;}
-.leg .callout-foot p + p{margin-top:8px;}
+.leg .callout ~ p{padding-inline:20.5px;}
+.leg .callout + p{margin-top:clamp(28px,3vw,36px);}
+.leg .callout ~ p + p{margin-top:16px;}
 .leg .ctas{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:10px 12px;margin-top:16px;}
 .leg a.book{display:inline-flex;align-items:center;padding:.12em 18px .24em;border:1px solid rgba(var(--gold-rgb),.55);background:none;font-family:var(--head);font-size:clamp(19px,1.9vw,22px);line-height:1.2;color:var(--gold);transition:border-color .35s cubic-bezier(.2,.7,.3,1),background-color .35s cubic-bezier(.2,.7,.3,1);}
 .leg a.book:hover{border-color:var(--gold);background-color:rgba(var(--gold-rgb),.08);}
@@ -429,7 +428,7 @@ a:focus-visible{outline:none;}
 .leg a.book.primary:hover{border-color:var(--gold);background-color:rgba(var(--gold-rgb),.34);}
 .leg a.book:focus-visible{outline:1px solid var(--gold);outline-offset:4px;}
 .leg a.snapshot-link{display:block;background:none;padding:0;}
-.leg-body .snapshot{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;}
+.leg-body .snapshot{display:block;width:min(25rem,88%);height:auto;margin:10px auto clamp(32px,3.6vw,44px);padding:clamp(6px,.7vw,9px);background:#EAE3D6;border-radius:4px;rotate:-.8deg;box-shadow:0 10px 22px rgba(0,0,0,.5);}
 .leg ul.gems{list-style:none;padding:0;margin:10px 0 0;}
 .leg ul.gems li{position:relative;padding-left:1.3em;}
 .leg ul.gems li + li{margin-top:6px;}
@@ -947,17 +946,13 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="journey-rail">
 <article class="leg" data-tab="Hotel">
 <div class="leg-body">
-<div class="callout">
 <a class="snapshot-link" href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener" aria-label="Book at Andaz Mexico City Condesa"><img class="snapshot" src="img/andaz.webp" width="1024" height="683" alt="Lounge at Andaz Mexico City Condesa" loading="lazy" decoding="async"></a>
-<div class="callout-body">
+<div class="callout">
 <p><strong class="lead">Room Block:</strong> We’ve arranged a hotel block at Andaz Mexico City Condesa, a Hyatt hotel. The rate is available Tuesday, Feb. 16 – Wednesday, Feb. 24.</p>
 <div class="ctas"><a class="book primary" href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener">Booking Link</a><a class="book" href="https://maps.app.goo.gl/VpuFjPGXvN67A7yP8" target="_blank" rel="noopener">Directions</a></div>
 </div>
-<div class="callout-foot">
 <p><strong class="lead">Breakfast:</strong> Provided at Andaz for hotel guests on Saturday, Sunday, and Monday mornings.</p>
 <p><strong class="lead">Transportation:</strong> All wedding shuttles leave from Andaz Condesa. If you stay elsewhere, please be within a short walk.</p>
-</div>
-</div>
 </div>
 </article>
 <article class="leg" data-tab="Flying">
