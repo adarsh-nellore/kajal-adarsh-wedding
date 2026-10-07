@@ -485,8 +485,6 @@ a:focus-visible{outline:none;}
 .frame-cliff{--w:min(38.75rem,88vw);--r:-.25deg;--d:-5.2s;}
 /* a tabbed section always keeps room for its tallest card, so most cards already leave space at its foot:
    the frame after it hangs closer to make up for that */
-.journey:not([data-fit]) + .interlude .frame{margin-top:calc(var(--gap) * .5);}
-.journey:not([data-fit]) + .interlude .frame-dance{margin-top:calc(var(--gap) * .5 + clamp(56px,7vw,112px));}
 /* index mode: one card at a time, all stacked in a single cell, so the rail always holds its tallest card and nothing
    below a section moves when its cards swap; each card sits at the top of the cell */
 .journey.index .journey-rail{display:grid;overflow:hidden;}
