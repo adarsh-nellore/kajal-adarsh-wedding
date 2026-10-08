@@ -815,7 +815,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 /* the last group waits until name, email and a reply are in */
 .rsvp-form:not(:has(#rsvp-name:not(:placeholder-shown)):has(#rsvp-email:not(:placeholder-shown)):has(input[name="attending"]:checked)) .group-else{display:none;}
 .group-else{animation:else-in .5s cubic-bezier(.2,.7,.3,1);}
-@keyframes else-in{from{opacity:0;transform:translateX(16px);}}
+@keyframes else-in{from{opacity:0;}}
 /* floated so the legend lays out like a normal block heading inside its fieldset */
 .rsvp .group-h{float:left;width:100%;display:flex;align-items:baseline;gap:14px;margin-bottom:clamp(14px,1.8vw,18px);font-family:var(--body);font-weight:500;font-size:clamp(22px,2.6vw,27px);line-height:1.3;color:var(--gold);}
 .group-h + *{clear:both;}
@@ -926,14 +926,16 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .rsvp-done h3{margin-top:0;}
 .rsvp-done h3:focus{outline:none;}
 .rsvp-done,.rsvp-yes:not([hidden]){animation:rsvp-in .7s cubic-bezier(.2,.7,.3,1);}
-@keyframes rsvp-in{from{opacity:0;transform:translateX(-20px);}}
+@keyframes rsvp-in{from{opacity:0;}}
 @media (prefers-reduced-motion:reduce){
   .rsvp-done,.rsvp-yes:not([hidden]){animation:none;}
   .rsvp input,.rsvp textarea,.check > span::before,.rsvp-send{transition:none;}
 }
 
-.rv{opacity:0;transform:translateX(-28px);transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1);}
+.rv{opacity:0;transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1);}
 .rv.in{opacity:1;transform:none;}
+.frame.rv{transform:translateX(-12px);}
+.frame.rv.in{transform:none;}
 @media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none;}}
 </style>
 </head>
