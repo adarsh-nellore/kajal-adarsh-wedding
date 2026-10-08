@@ -495,6 +495,10 @@ a:focus-visible{outline:none;}
 
 /* a salon-style gallery wall before Events: inner edges line up with an even gap, each frame hung slightly off true */
 .wall{position:relative;width:min(66rem,100%);aspect-ratio:100/55;margin:var(--gap) auto 0;}
+/* sign-off under the wall */
+.contact{margin-top:var(--gap);text-align:center;}
+.contact .contact-h{font-family:var(--head);font-size:clamp(36px,4.4vw,56px);line-height:1.1;color:var(--gold);}
+.contact .contact-h + p{margin-top:8px;}
 .wall figure{position:absolute;margin:0;left:var(--x);top:var(--y);width:var(--w);rotate:var(--r,0deg);}
 .wall picture{display:block;margin:0;}
 .wall img{display:block;width:100%;height:auto;filter:drop-shadow(0 14px 22px rgba(0,0,0,.6));}
@@ -1322,6 +1326,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <figure class="wall-agave" data-px="0.015"><picture><source type="image/webp" srcset="img/wall-agave-sm.webp 400w, img/wall-agave.webp 720w" sizes="(max-width:640px) 45vw, 22rem"><img src="img/wall-agave.png" width="720" height="888" alt="Bougainvillea over a pink wall above agave plants" loading="lazy" decoding="async"></picture></figure>
 <figure class="wall-umbrellas" data-px="0.024"><picture><source type="image/webp" srcset="img/wall-umbrellas-sm.webp 400w, img/wall-umbrellas.webp 720w" sizes="(max-width:640px) 45vw, 22rem"><img src="img/wall-umbrellas.png" width="720" height="800" alt="Paper umbrellas and lanterns strung above a street" loading="lazy" decoding="async"></picture></figure>
 </div>
+<footer class="contact"><p class="contact-h">Questions?</p><p>Message Kajal or Adarsh</p></footer>
 
 <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
 <script>
