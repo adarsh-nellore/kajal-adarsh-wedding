@@ -900,13 +900,13 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .rsvp-done h3{margin-top:0;}
 .rsvp-done h3:focus{outline:none;}
 .rsvp-done,.rsvp-yes:not([hidden]){animation:rsvp-in .7s cubic-bezier(.2,.7,.3,1);}
-@keyframes rsvp-in{from{opacity:0;transform:translateY(10px);}}
+@keyframes rsvp-in{from{opacity:0;transform:translateX(20px);}}
 @media (prefers-reduced-motion:reduce){
   .rsvp-done,.rsvp-yes:not([hidden]){animation:none;}
   .rsvp input,.rsvp textarea,.check > span::before,.rsvp-send{transition:none;}
 }
 
-.rv{opacity:0;transform:translateY(14px);transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1);}
+.rv{opacity:0;transform:translateX(28px);transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1);}
 .rv.in{opacity:1;transform:none;}
 @media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none;}}
 </style>
@@ -1911,14 +1911,15 @@ picture{margin-block:clamp(52px,8vw,104px);}
   }, {passive:true});
   markCurrent();
 
-  /* arrival: as a section's heading nears its resting line in the direction of the scroll, the section runs a little
-     ahead and then eases into place, so it lands with a soft snap. Purely visual and keyed to the scroll position
-     (weighted by a direction that turns over gently), so it never moves the page and holds still once scrolling stops.
-     Rects read elsewhere subtract the section's offset (magOff) to stay on its resting layout */
+  /* arrival: as a section's heading nears its resting line in the direction of the scroll, the heading slides a little
+     sideways and then eases into place, so it lands with a soft snap. Sideways only — headings never move up and down.
+     Purely visual and keyed to the scroll position (weighted by a direction that turns over gently), so it never moves
+     the page and holds still once scrolling stops. Sections themselves stay put, so magOff is always 0 */
   var mags = reduce ? [] : Array.prototype.slice.call(document.querySelectorAll('.journey, .rsvp')).map(function(s){
     s._mag = 0;
-    s.style.willChange = 'translate';
-    return {el: s, h: s.querySelector('h2'), rest: 0};
+    var h = s.querySelector('h2');
+    h.style.willChange = 'translate';
+    return {el: s, h: h, rest: 0, off: 0};
   });
   function magOff(el){
     var s = el.closest && el.closest('.journey, .rsvp');
@@ -1949,9 +1950,9 @@ picture{margin-block:clamp(52px,8vw,104px);}
         var d = m.rest - y, off = 0;
         if(d > 0){ off = -magMax * magShape(d / magZone) * down; }
         else if(d < 0){ off = magMax * magShape(-d / magZone) * up; }
-        if(Math.abs(off - m.el._mag) < 0.01) return;
-        m.el._mag = off;
-        m.el.style.translate = '0 ' + off.toFixed(2) + 'px';
+        if(Math.abs(off - m.off) < 0.01) return;
+        m.off = off;
+        m.h.style.translate = off.toFixed(2) + 'px 0';
       });
     };
     var magRefresh = function(){ magMeasure(); magnet(); };
