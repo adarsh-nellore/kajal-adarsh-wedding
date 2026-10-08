@@ -133,7 +133,7 @@ h1{
 }
 
 h2{
-  font-size:clamp(31px,5vw,46px);
+  font-size:clamp(40px,5.6vw,56px);
   line-height:1.2;
   margin-top:var(--gap);
   margin-bottom:clamp(24px,3vw,36px);
@@ -1954,7 +1954,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
         else if(d < 0){ off = magMax * magShape(-d / magZone) * up; }
         if(Math.abs(off - m.off) < 0.01) return;
         m.off = off;
-        m.h.style.translate = off.toFixed(2) + 'px 0';
+        m.h.style.translate = '';
       });
     };
     var magRefresh = function(){ magMeasure(); magnet(); };
