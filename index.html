@@ -300,7 +300,7 @@ a:focus-visible{outline:none;}
   .journey[data-pin] .leg:has(.stk){grid-template-columns:1fr auto;grid-template-rows:1fr auto;gap:0 14px;}
   .journey[data-pin] .leg:has(.stk) :is(.leg-body,.event){display:contents;}
   .journey[data-pin] .leg:has(.stk) .day{grid-area:1/1;align-self:start;}
-  .journey[data-pin] .leg:has(.stk) .event>*{grid-column:1/-1;}
+  .journey[data-pin] .leg:has(.stk) .event>*{grid-column:1/-1;justify-self:stretch;margin-inline:0;max-width:none;}
   .journey[data-pin] .leg:has(.stk) .event>h3{grid-area:2/1;align-self:end;margin-top:4px;}
   .stk-mendhi,.stk-haldi,.stk-ganesh,.stk-martini{
     --h:96px;
