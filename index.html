@@ -313,6 +313,12 @@ a:focus-visible{outline:none;}
   .journey.index .leg.on:has(.stk) .event>*{opacity:1;transform:none;transition:opacity .6s cubic-bezier(.2,.7,.3,1),transform .6s cubic-bezier(.2,.7,.3,1);}
 }
 @media (max-width:560px) and (prefers-reduced-motion:reduce){ .journey.index .leg .event>*{transition:none !important;} }
+/* phones, Saturday: the long title keeps the full width; the turmeric sits beside the shuttle times instead */
+@media (max-width:560px){
+  .journey[data-pin] .leg:has(.stk-haldi) .event>h3{grid-column:1/-1;}
+  .journey[data-pin] .leg:has(.stk-haldi) .event>p:last-child{grid-area:5/1/6/2;align-self:center;}
+  .journey[data-pin] .leg .stk-haldi{grid-area:5/2/6/3;align-self:center;margin:0;}
+}
 
 /* hangs below the dates out of the flow, so the name, dates and stickers keep their places */
 .cover-rsvp{position:absolute;top:calc(100% + clamp(24px,3vw,40px));left:50%;transform:translateX(-50%);text-decoration:none;white-space:nowrap;}
