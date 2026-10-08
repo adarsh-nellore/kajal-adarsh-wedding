@@ -293,19 +293,26 @@ a:focus-visible{outline:none;}
   .journey[data-pin] .leg .stk img{translate:-50% 0;}
   .stk-haldi{--h:76px;}
 }
-/* phones: the date at the top of the card with its sticker just beside it, the text straight below */
+/* phones: the date at the top of the card, the sticker at the right end of the title, its foot just above the time line.
+   The card's text joins the card's grid so the title can wrap short of the sticker while the rest runs full width;
+   the first row takes whatever extra height the sticker needs, so the title stays snug on the time line */
 @media (max-width:560px){
-  .journey[data-pin] .leg:has(.stk){grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:0;}
-  .journey[data-pin] .leg:has(.stk) .day{align-self:center;}
-  .journey[data-pin] .leg:has(.stk) .leg-body{grid-area:2/1/3/3;}
+  .journey[data-pin] .leg:has(.stk){grid-template-columns:1fr auto;grid-template-rows:1fr auto;gap:0 14px;}
+  .journey[data-pin] .leg:has(.stk) :is(.leg-body,.event){display:contents;}
+  .journey[data-pin] .leg:has(.stk) .day{grid-area:1/1;align-self:start;}
+  .journey[data-pin] .leg:has(.stk) .event>*{grid-column:1/-1;}
+  .journey[data-pin] .leg:has(.stk) .event>h3{grid-area:2/1;align-self:end;margin-top:4px;}
   .stk-mendhi,.stk-haldi,.stk-ganesh,.stk-martini{
     --h:96px;
-    grid-area:1/2;justify-self:start;width:auto;
-    margin:calc(.14 * var(--h)) 0 6px calc(1.2 * var(--stk-gap));
+    grid-area:1/2/3/3;align-self:end;justify-self:end;width:auto;
+    margin:calc(.14 * var(--h)) 0 4px;
   }
   .journey[data-pin] .leg .stk img{translate:none;}
   .stk-haldi{--h:74px;}
+  .journey.index .leg:has(.stk) .event>*{opacity:0;transform:translateX(28px);}
+  .journey.index .leg.on:has(.stk) .event>*{opacity:1;transform:none;transition:opacity .6s cubic-bezier(.2,.7,.3,1),transform .6s cubic-bezier(.2,.7,.3,1);}
 }
+@media (max-width:560px) and (prefers-reduced-motion:reduce){ .journey.index .leg .event>*{transition:none !important;} }
 
 /* hangs below the dates out of the flow, so the name, dates and stickers keep their places */
 .cover-rsvp{position:absolute;top:calc(100% + clamp(24px,3vw,40px));left:50%;transform:translateX(-50%);text-decoration:none;white-space:nowrap;}
@@ -321,7 +328,7 @@ a:focus-visible{outline:none;}
 /* short phones: smaller, so it clears the scroll cue */
 @media (max-width:900px) and (min-height:560px) and (max-height:719px){ .stk-selfie{--h:calc(var(--k) * var(--stk));} }
 /* phones: the selfie is the only thing below the button, so it can take the room down to the scroll cue */
-@media (max-width:700px) and (min-height:720px){ .stk-selfie{--h:calc(1.65 * var(--k) * var(--stk-lg));} }
+@media (max-width:700px) and (min-height:720px){ .stk-selfie{--h:calc(1.35 * var(--k) * var(--stk-lg));} }
 @media (max-width:700px) and (min-height:560px) and (max-height:719px){ .stk-selfie{--h:calc(1.35 * var(--k) * var(--stk));} }
 /* phones: the name as large as the width allows — two lines when there's the height for it, otherwise one full-width line.
    --hf is its size, --lift raises the centred block so the selfie clears the scroll cue; the pair above keeps its spread from --f */
