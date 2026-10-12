@@ -214,6 +214,10 @@ a:focus-visible{outline:none;}
 .teaser.full video{width:100%;height:100%;aspect-ratio:auto;object-fit:contain;background:#000;}
 .teaser.full .teaser-sound{right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));}
 .teaser.full .teaser-full{right:max(14px,env(safe-area-inset-right));top:max(14px,env(safe-area-inset-top));}
+/* while the screen is lifted out to full screen, the frame keeps its shape, so there's a place to come back to */
+.teaser.full::after{content:"";display:block;aspect-ratio:4/3;}
+/* coming back: the film shrinks from the full screen into the frame as the black around it fades */
+.teaser-screen.shrink{z-index:3;box-shadow:0 0 0 100vmax rgba(0,0,0,0);transition:transform .55s cubic-bezier(.2,.7,.3,1),box-shadow .55s cubic-bezier(.2,.7,.3,1);}
 /* the play button, in the RSVP button's manner: Jaini in a gold rule, over a dark veil so it reads on bright frames.
    Before it starts it says what it does; once started, only the triangle */
 .teaser .teaser-play{
@@ -1539,14 +1543,47 @@ picture{margin-block:clamp(52px,8vw,104px);}
     }catch(e){}
   }
   /* the page keeps its place (and its smooth scroll rests) while the film has the screen */
+  var fullW = 0, fullH = 0;
   function fullChanged(full){
+    var wasLifted = fig.classList.contains('full');
+    if(full){ fullW = window.innerWidth; fullH = window.innerHeight; }
     fig.classList.toggle('full', full && fullEl() === screen);
     fullBtn.setAttribute('aria-label', full ? 'Exit full screen' : 'Full screen');
     document.dispatchEvent(new CustomEvent('teaser-fullscreen', {detail: {full: full}}));
-    if(!full && afterFull){
-      var then = afterFull; afterFull = null;
-      window.requestAnimationFrame(function(){ window.requestAnimationFrame(then); });
-    }
+    if(!full && wasLifted){ shrink(); }
+    if(!full && afterFull){ var then = afterFull; afterFull = null; settle(then, wasLifted ? 0 : 450); }
+  }
+  window.addEventListener('resize', function(){
+    if(fig.classList.contains('full')){ fullW = window.innerWidth; fullH = window.innerHeight; }
+  }, {passive: true});
+  /* runs in the same frame the screen drops back into the frame (and after the page's scroll is put back), so the
+     film is never seen at its small size first */
+  function shrink(){
+    if(!fullW || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var r = screen.getBoundingClientRect();
+    if(!r.width) return;
+    var s = Math.min(fullW / r.width, fullH / r.height);
+    var dx = fullW / 2 - (r.left + r.width / 2), dy = fullH / 2 - (r.top + r.height / 2);
+    screen.classList.remove('shrink');
+    screen.style.transition = 'none';
+    screen.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')';
+    screen.style.boxShadow = '0 0 0 100vmax #000';
+    screen.classList.add('shrink');
+    screen.getBoundingClientRect();
+    screen.style.transition = screen.style.transform = screen.style.boxShadow = '';
+    setTimeout(function(){ if(!fig.classList.contains('full')){ screen.classList.remove('shrink'); } }, 700);
+  }
+  /* waits until the film is at rest in its frame (no movement, no viewport change for a few frames), then lets it sit
+     there a moment before going on */
+  function settle(then, minMs){
+    var t0 = performance.now(), last = '', still = 0;
+    (function check(){
+      var r = screen.getBoundingClientRect(), now = performance.now();
+      var key = [Math.round(r.top), Math.round(r.width), window.innerWidth, window.innerHeight, Math.round(window.scrollY)].join();
+      still = key === last ? still + 1 : 0; last = key;
+      if((now - t0 >= minMs && still >= 3) || now - t0 > 2500){ setTimeout(then, 400); }
+      else { window.requestAnimationFrame(check); }
+    })();
   }
   function onFullChange(){ fullChanged(fullEl() === screen); }
   document.addEventListener('fullscreenchange', onFullChange);
@@ -1562,13 +1599,15 @@ picture{margin-block:clamp(52px,8vw,104px);}
   v.addEventListener('pause', function(){ if(onScreen){ play.hidden = false; } });
   v.addEventListener('ended', function(){
     userPaused = true; play.hidden = false;
-    function done(){ document.dispatchEvent(new CustomEvent('teaser-ended')); }
-    if(!isFull()){ done(); return; }
+    function done(fromFull){ document.dispatchEvent(new CustomEvent('teaser-ended', {detail: {fromFull: fromFull}})); }
+    if(!isFull()){ done(false); return; }
     var once = false;
-    afterFull = function(){ if(!once){ once = true; done(); } };
+    afterFull = function(){ if(!once){ once = true; done(true); } };
     exitFull();
-    /* in case the browser never says it has left */
-    setTimeout(function(){ if(afterFull){ afterFull(); afterFull = null; } }, 1200);
+    /* in case the browser has left full screen without saying so */
+    setTimeout(function(){
+      if(afterFull && !isFull()){ var then = afterFull; afterFull = null; settle(then, 0); }
+    }, 2500);
   });
   v.addEventListener('volumechange', function(){
     sound.setAttribute('aria-pressed', String(!v.muted));
@@ -1941,7 +1980,12 @@ picture{margin-block:clamp(52px,8vw,104px);}
     }, {passive:false});
     window.addEventListener('touchend', function(){ reelTouch = null; }, {passive:true});
     /* when the teaser has played through, carry on to the welcome, unless you've already moved on */
-    document.addEventListener('teaser-ended', function(){
+    document.addEventListener('teaser-ended', function(e){
+      /* back from full screen: start from exactly where the page was (a returning toolbar may have nudged it) */
+      if(e.detail && e.detail.fromFull && Math.abs(window.scrollY - teaserY) > 1){
+        window.scrollTo(0, teaserY);
+        if(lenis){ lenis.scrollTo(teaserY, {immediate: true, force: true}); }
+      }
       if(menuOpen() || window.scrollY > 10 || (lenis && lenis.targetScroll > 10)) return;
       glide(stopOf(document.querySelector('.hero')), 1800);
     });
