@@ -30,16 +30,16 @@ export const EVENTS: Record<string, string> = {
   "after-party": "After Party · Sunday 21st",
 };
 
-const GROUND = "#121212";
-const GOLD = "#CDA45E";
-const WHITE = "#EAE3D6";
-const MUTED = "#98948C";   // the off-white at 62% on the ground
-const RULE = "#3B3223";    // the gold at 22%, the site's card border
-const CARD = "#161615";
-const HEAD = "'Jaini','EB Garamond',Georgia,serif";
-const BODY = "'EB Garamond',Georgia,'Times New Roman',serif";
+export const GROUND = "#121212";
+export const GOLD = "#CDA45E";
+export const WHITE = "#EAE3D6";
+export const MUTED = "#98948C";   // the off-white at 62% on the ground
+export const RULE = "#3B3223";    // the gold at 22%, the site's card border
+export const CARD = "#161615";
+export const HEAD = "'Jaini','EB Garamond',Georgia,serif";
+export const BODY = "'EB Garamond',Georgia,'Times New Roman',serif";
 
-function esc(s: unknown): string {
+export function esc(s: unknown): string {
   return String(s ?? "").replace(/[&<>"']/g, (c) => (
     { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!
   ));
@@ -100,10 +100,38 @@ function details(rs: Rsvp[]): string {
   return out;
 }
 
-const link = (href: string, text: string) =>
+export const link = (href: string, text: string) =>
   `<a href="${esc(href)}" style="color:${GOLD};text-decoration:underline;text-decoration-color:${RULE};text-underline-offset:3px;">${esc(text)}</a>`;
 
-function page(o: { title: string; preheader: string; body: string; footer: string }): string {
+export const QUESTIONS = `
+        <tr>
+          <td class="col" align="center" style="padding:56px 20px 0;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-top:1px solid ${RULE};font-size:0;line-height:0;">&nbsp;</td></tr></table>
+            <div style="padding-top:40px;font-family:${HEAD};font-size:30px;line-height:34px;color:${GOLD};">Questions?</div>
+            <div style="padding-top:6px;font-family:${BODY};font-size:17px;line-height:27px;color:${WHITE};">Message ${link("https://wa.me/19492931051", "Kajal")} or ${link("https://wa.me/14087521100", "Adarsh")}</div>
+          </td>
+        </tr>`;
+
+// The 560px column: names, dates and place, then the body rows and the footer.
+export function frame(o: { body: string; footer: string; home?: string; names?: number }): string {
+  const size = o.names ?? 52;
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
+        <tr>
+          <td class="col" align="center" style="padding:0 20px;">
+            <a href="${esc(o.home ?? SITE)}" class="names" style="font-family:${HEAD};font-size:${size}px;line-height:${size + 6}px;color:${GOLD};text-decoration:none;letter-spacing:.01em;">Kajal y Adarsh</a>
+            <div style="padding-top:18px;font-family:${BODY};font-size:17px;line-height:26px;color:${WHITE};"><span style="white-space:nowrap;">Friday, February 19 –</span> <span style="white-space:nowrap;">Sunday, February 21, 2027</span><br>Mexico City, Mexico</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="col" style="padding:56px 20px 0;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${o.body}
+            </table>
+          </td>
+        </tr>${o.footer}
+      </table>`;
+}
+
+export function page(o: { title: string; preheader: string; body: string; footer: string; home?: string }): string {
   return `<!doctype html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -136,20 +164,7 @@ a{color:${GOLD};}
   <tr>
     <td class="shell" align="center" style="padding:64px 16px 72px;">
       <!--[if mso]><table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
-        <tr>
-          <td class="col" align="center" style="padding:0 20px;">
-            <a href="${SITE}" class="names" style="font-family:${HEAD};font-size:52px;line-height:58px;color:${GOLD};text-decoration:none;letter-spacing:.01em;">Kajal y Adarsh</a>
-            <div style="padding-top:18px;font-family:${BODY};font-size:17px;line-height:26px;color:${WHITE};"><span style="white-space:nowrap;">Friday, February 19 –</span> <span style="white-space:nowrap;">Sunday, February 21, 2027</span><br>Mexico City, Mexico</div>
-          </td>
-        </tr>
-        <tr>
-          <td class="col" style="padding:56px 20px 0;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${o.body}
-            </table>
-          </td>
-        </tr>${o.footer}
-      </table>
+      ${frame(o)}
       <!--[if mso]></td></tr></table><![endif]-->
     </td>
   </tr>
@@ -183,17 +198,9 @@ export function guestEmail(rs: Rsvp[]) {
         <tr>
           <td style="padding:24px 0 0;font-family:${BODY};font-size:17px;line-height:27px;color:${WHITE};">${link(SITE + "#rsvp", "Change your reply")}</td>
         </tr>`;
-  const footer = `
-        <tr>
-          <td class="col" align="center" style="padding:56px 20px 0;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-top:1px solid ${RULE};font-size:0;line-height:0;">&nbsp;</td></tr></table>
-            <div style="padding-top:40px;font-family:${HEAD};font-size:30px;line-height:34px;color:${GOLD};">Questions?</div>
-            <div style="padding-top:6px;font-family:${BODY};font-size:17px;line-height:27px;color:${WHITE};">Message ${link("https://wa.me/19492931051", "Kajal")} or ${link("https://wa.me/14087521100", "Adarsh")}</div>
-          </td>
-        </tr>`;
   return {
     subject: "Your RSVP for Kajal & Adarsh’s wedding",
-    html: page({ title: "Kajal y Adarsh", preheader: line, body, footer }),
+    html: page({ title: "Kajal y Adarsh", preheader: line, body, footer: QUESTIONS }),
     text: [
       "Kajal y Adarsh",
       "Friday, February 19 – Sunday, February 21, 2027",
