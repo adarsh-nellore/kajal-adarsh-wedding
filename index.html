@@ -887,8 +887,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .rsvp legend{padding:0;}
 /* three steps, each under a small Jaini heading; groups sit further apart than the fields inside them */
 .group + .group,.send{margin-top:clamp(48px,6vw,68px);}
-/* the last group waits until name, email and a reply are in */
-.rsvp-form:not(:has(#rsvp-name:not(:placeholder-shown)):has(#rsvp-email:not(:placeholder-shown)):has(input[name="attending"]:checked)) .group-else{display:none;}
+/* the last group waits until a party is found, the email is in and someone has replied */
+.rsvp-form:not(:has(#rsvp-email:not(:placeholder-shown)):has(.guest .choice input:checked)) .group-else{display:none;}
 .group-else{animation:else-in .5s cubic-bezier(.2,.7,.3,1);}
 @keyframes else-in{from{opacity:0;}}
 /* floated so the legend lays out like a normal block heading inside its fieldset */
@@ -996,14 +996,55 @@ picture{margin-block:clamp(52px,8vw,104px);}
 }
 .rsvp-again:focus-visible{outline:1px solid var(--gold);outline-offset:4px;}
 
+/* name search: matches drop in under the field, a few at a time; picking one brings in the party */
+.find .box > input[readonly]{cursor:default;}
+.find .box > input[readonly]:hover{border-color:rgba(var(--gold-rgb),.35);}
+.matches{list-style:none;margin:6px 0 0;padding:4px 0;border:1px solid rgba(var(--gold-rgb),.35);border-radius:4px;background:#161615;}
+.matches li{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:10px;min-height:48px;padding:10px 15px;font-size:18px;line-height:26px;cursor:pointer;}
+.matches li + li{border-top:1px solid rgba(var(--gold-rgb),.12);}
+.matches li:hover,.matches li[aria-selected="true"]{background:rgba(var(--gold-rgb),.12);color:var(--gold);}
+.matches .with{font-size:16px;color:rgba(234,227,214,.6);}
+.find-note{margin-top:8px;font-size:16px;line-height:1.5;color:rgba(234,227,214,.74);}
+.find-note:empty{display:none;}
+.find-note a{color:var(--gold);}
+.find-note .rsvp-again{color:var(--gold);}
+/* the party: one quiet card per guest, the person replying first */
+.bulk{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 18px;margin-bottom:16px;font-size:17px;line-height:28px;color:rgba(234,227,214,.74);}
+.bulk .rsvp-again,.same-events .rsvp-again{color:var(--gold);}
+.party{display:grid;gap:12px;}
+.rsvp .guest{padding:16px 20px 18px;border:1px solid rgba(var(--gold-rgb),.22);border-radius:4px;background:rgba(234,227,214,.02);}
+.rsvp .guest.missing{border-color:var(--gold);}
+.guest-name{float:left;width:100%;font-size:20px;line-height:1.4;font-weight:500;color:var(--white);}
+.guest > :not(legend){clear:both;}
+.guest .guest-plus{margin-top:12px;}
+.guest .choices{margin-top:6px;}
+.guest .tab{font-size:clamp(20px,2.2vw,24px);}
+.guest-yes{margin-top:12px;}
+.guest-events-h{font-size:16px;line-height:26px;color:rgba(234,227,214,.74);}
+.guest .check[hidden]{display:none;}
+.same-events{margin-top:8px;font-size:16px;}
+.guest .err{margin-top:8px;}
+/* fingers: every choice, event and link in the party is at least 44px tall */
+@media (pointer:coarse){
+  .guest .choices{row-gap:0;}
+  .guest .choice{display:flex;align-items:center;min-height:44px;}
+  .guest .tab::after{content:none;}
+  .guest .check > span{min-height:44px;padding-block:9px;}
+  .bulk .rsvp-again,.same-events .rsvp-again,.find-note .rsvp-again{position:relative;}
+  .bulk .rsvp-again::after,.same-events .rsvp-again::after,.find-note .rsvp-again::after{content:"";position:absolute;inset:-12px -6px;}
+}
+@media (max-width:480px){
+  .rsvp .guest{padding:14px 16px 16px;}
+  .bulk > span{flex-basis:100%;}
+}
 .rsvp-done{margin-top:clamp(36px,5vw,60px);}
 .rsvp-done:empty{display:none;}
 .rsvp-done h3{margin-top:0;}
 .rsvp-done h3:focus{outline:none;}
-.rsvp-done,.rsvp-yes:not([hidden]){animation:rsvp-in .7s cubic-bezier(.2,.7,.3,1);}
+.rsvp-done,.rsvp-yes:not([hidden]),.group-party:not([hidden]),.guest-yes:not([hidden]),.matches:not([hidden]){animation:rsvp-in .7s cubic-bezier(.2,.7,.3,1);}
 @keyframes rsvp-in{from{opacity:0;}}
 @media (prefers-reduced-motion:reduce){
-  .rsvp-done,.rsvp-yes:not([hidden]){animation:none;}
+  .rsvp-done,.rsvp-yes:not([hidden]),.group-party:not([hidden]),.guest-yes:not([hidden]),.matches:not([hidden]){animation:none;}
   .rsvp input,.rsvp textarea,.check > span::before,.rsvp-send{transition:none;}
 }
 
@@ -1355,11 +1396,13 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <fieldset class="group">
 <legend class="group-h">Your details</legend>
 <div class="pair">
-<div class="field">
+<div class="field find">
 <div class="box">
-<input id="rsvp-name" name="name" type="text" autocomplete="name" aria-describedby="rsvp-name-err" placeholder=" " required>
-<label for="rsvp-name">Full name(s)</label>
+<input id="rsvp-name" name="name" type="text" role="combobox" autocomplete="off" autocapitalize="words" spellcheck="false" aria-autocomplete="list" aria-expanded="false" aria-controls="rsvp-matches" aria-describedby="rsvp-name-err rsvp-find-note" placeholder=" " required>
+<label for="rsvp-name">Your name</label>
 </div>
+<ul class="matches" id="rsvp-matches" role="listbox" aria-label="Guests" hidden></ul>
+<p class="find-note" id="rsvp-find-note" aria-live="polite"></p>
 <p class="err" id="rsvp-name-err"></p>
 </div>
 <div class="field">
@@ -1371,33 +1414,41 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </div>
 </fieldset>
-<div class="group">
+<div class="group group-party" hidden>
 <fieldset aria-describedby="rsvp-attending-err">
 <legend class="group-h">Will you be joining us?</legend>
-<div class="choices">
-<label class="choice"><input type="radio" name="attending" value="yes" required><span class="tab">Joyfully accept</span></label>
-<label class="choice"><input type="radio" name="attending" value="no"><span class="tab">Regretfully decline</span></label>
-</div>
+<div class="bulk" hidden><span>For everyone:</span> <button type="button" class="rsvp-again" data-all="yes">Joyfully accept</button> <button type="button" class="rsvp-again" data-all="no">Regretfully decline</button></div>
+<div class="party"></div>
 <p class="err" id="rsvp-attending-err"></p>
 </fieldset>
-<div class="rsvp-yes" hidden>
-<div class="field">
-<div class="box box-num">
-<input id="rsvp-guests" name="guests" type="number" inputmode="numeric" min="1" max="10" value="1" aria-describedby="rsvp-guests-err" placeholder=" ">
-<label for="rsvp-guests">Number of guests, including you</label>
+<!-- one card per guest, filled in from guests.json; events are the ones that guest is invited to -->
+<template id="rsvp-guest">
+<fieldset class="guest">
+<legend class="guest-name"></legend>
+<div class="field guest-plus" hidden>
+<div class="box">
+<input type="text" autocomplete="off" autocapitalize="words" maxlength="200" placeholder=" ">
+<label>Guest’s name</label>
 </div>
-<p class="err" id="rsvp-guests-err"></p>
 </div>
-<fieldset class="field" aria-describedby="rsvp-events-err">
-<legend>Which events will you join?</legend>
+<div class="choices">
+<label class="choice"><input type="radio" value="yes"><span class="tab">Joyfully accept</span></label>
+<label class="choice"><input type="radio" value="no"><span class="tab">Regretfully decline</span></label>
+</div>
+<div class="guest-yes" hidden>
+<p class="guest-events-h">Which events will they join?</p>
 <div class="checks">
-<label class="check"><input type="checkbox" name="events" value="welcome-party" checked><span>Welcome Party · Friday 19th</span></label>
-<label class="check"><input type="checkbox" name="events" value="saatak-haldi" checked><span>Ganesh Pooja, Grah Shanti &amp; Haldi · Saturday 20th</span></label>
-<label class="check"><input type="checkbox" name="events" value="baarat-wedding" checked><span>Baarat &amp; Wedding · Sunday 21st</span></label>
-<label class="check"><input type="checkbox" name="events" value="after-party" checked><span>After Party · Sunday 21st</span></label>
+<label class="check" data-event="welcome-party"><input type="checkbox" value="welcome-party" checked><span>Welcome Party · Friday 19th</span></label>
+<label class="check" data-event="saatak-haldi"><input type="checkbox" value="saatak-haldi" checked><span>Ganesh Pooja, Grah Shanti &amp; Haldi · Saturday 20th</span></label>
+<label class="check" data-event="baarat-wedding"><input type="checkbox" value="baarat-wedding" checked><span>Baarat &amp; Wedding · Sunday 21st</span></label>
+<label class="check" data-event="after-party"><input type="checkbox" value="after-party" checked><span>After Party · Sunday 21st</span></label>
 </div>
-<p class="err" id="rsvp-events-err"></p>
+<p class="same-events" hidden><button type="button" class="rsvp-again">Same events for everyone</button></p>
+</div>
+<p class="err guest-err"></p>
 </fieldset>
+</template>
+<div class="rsvp-yes" hidden>
 <div class="field">
 <div class="box">
 <input id="rsvp-dietary" name="dietary" type="text" autocomplete="off" maxlength="1000" placeholder=" ">
@@ -1921,46 +1972,38 @@ picture{margin-block:clamp(52px,8vw,104px);}
         return (c === 'x' ? r : (r & 3 | 8)).toString(16);
       });
     }
-    function submit(data){
-      var row = {
-        id: uuid(),
-        name: data.name,
-        email: data.email,
-        attending: data.attending,
-        guests: data.guests,
-        events: data.events,
-        dietary: data.dietary || null,
-        note: data.note || null,
-        send_copy: data.copy,
-        user_agent: (navigator.userAgent || '').slice(0, 1000)
-      };
+    function submit(rows){
       var headers = {'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json'};
       return fetch(SUPABASE_URL + '/rest/v1/wedding_rsvps', {
         method: 'POST',
         headers: Object.assign({'Prefer': 'return=minimal'}, headers),
-        body: JSON.stringify(row)
+        body: JSON.stringify(rows)
       }).then(function(res){
         if(!res.ok) return res.text().then(function(t){ throw new Error('RSVP insert failed: ' + res.status + ' ' + t.slice(0, 200)); });
         fetch(SUPABASE_URL + '/functions/v1/notify-wedding-rsvp', {
-          method: 'POST', headers: headers, body: JSON.stringify({id: row.id}), keepalive: true
+          method: 'POST', headers: headers, body: JSON.stringify({id: rows[0].id}), keepalive: true
         }).catch(function(){});
       });
     }
 
+    var EVENTS = ['welcome-party', 'saatak-haldi', 'baarat-wedding', 'after-party'];
     var done = document.querySelector('.rsvp-done');
     var yes = form.querySelector('.rsvp-yes');
     var send = form.querySelector('.rsvp-send');
     var sendErr = document.getElementById('rsvp-send-err');
+    var groupParty = form.querySelector('.group-party');
+    var partyEl = form.querySelector('.party');
+    var bulk = form.querySelector('.bulk');
+    var tpl = document.getElementById('rsvp-guest');
     var f = {
       name: document.getElementById('rsvp-name'),
       email: document.getElementById('rsvp-email'),
-      guests: document.getElementById('rsvp-guests'),
       dietary: document.getElementById('rsvp-dietary'),
       note: document.getElementById('rsvp-note'),
-      copy: document.getElementById('rsvp-copy')
+      copy: document.getElementById('rsvp-copy'),
+      matches: document.getElementById('rsvp-matches'),
+      findNote: document.getElementById('rsvp-find-note')
     };
-    var radios = Array.prototype.slice.call(form.querySelectorAll('input[name="attending"]'));
-    var boxes = Array.prototype.slice.call(form.querySelectorAll('input[name="events"]'));
     if (!CSS.supports('field-sizing', 'content')) {
       f.note.addEventListener('input', function () {
         f.note.style.height = 'auto';
@@ -1968,39 +2011,267 @@ picture{margin-block:clamp(52px,8vw,104px);}
       });
     }
     var tried = false;
+    var picked = null, party = [], shown = [], active = -1;
 
-    function attending(){
-      for(var i=0;i<radios.length;i++){ if(radios[i].checked) return radios[i].value; }
-      return '';
+    /* the guest list: names, party numbers and invited events only (scripts/sync_guests.py builds it from the sheet).
+       Nothing is shown until three letters are typed, and a party only once someone picks their own name */
+    var guests = null, loading = null;
+    function norm(s){
+      return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
     }
+    function load(){
+      if(!loading){
+        loading = fetch('guests.json', {cache: 'no-cache'}).then(function(r){
+          if(!r.ok) throw new Error('guest list ' + r.status);
+          return r.json();
+        }).then(function(d){
+          guests = d.guests.map(function(g, i){ g.i = i; g.words = norm(g.name).split(' '); return g; });
+          return guests;
+        });
+        loading.catch(function(){ loading = null; });
+      }
+      return loading;
+    }
+    /* within one typo: "Shradda" still finds Shradha */
+    function near(a, b){
+      if(Math.abs(a.length - b.length) > 1) return false;
+      var i = 0, j = 0, edits = 0;
+      while(i < a.length && j < b.length){
+        if(a[i] === b[j]){ i++; j++; continue; }
+        if(++edits > 1) return false;
+        if(a.length > b.length) i++; else if(b.length > a.length) j++; else { i++; j++; }
+      }
+      return edits + (a.length - i) + (b.length - j) <= 1;
+    }
+    function score(g, words){
+      var total = 0;
+      for(var k = 0; k < words.length; k++){
+        var w = words[k], best = 0;
+        g.words.forEach(function(x){
+          var s = x === w ? 3 : x.indexOf(w) === 0 ? 2 : w.length >= 4 && (near(w, x) || near(w, x.slice(0, w.length))) ? 1 : 0;
+          if(s > best) best = s;
+        });
+        if(!best) return 0;
+        total += best;
+      }
+      return total;
+    }
+    function members(p){ return guests.filter(function(g){ return g.party === p; }); }
+    function firstName(g){ return g.name.split(' ')[0]; }
+
+    function closeList(){
+      f.matches.hidden = true;
+      f.matches.textContent = '';
+      f.name.setAttribute('aria-expanded', 'false');
+      f.name.removeAttribute('aria-activedescendant');
+      shown = []; active = -1;
+    }
+    function note(nodes){
+      f.findNote.textContent = '';
+      nodes.forEach(function(n){ f.findNote.appendChild(typeof n === 'string' ? document.createTextNode(n) : n); });
+    }
+    function link(text, href){
+      var a = document.createElement('a');
+      a.href = href; a.target = '_blank'; a.rel = 'noopener'; a.textContent = text;
+      return a;
+    }
+    function search(){
+      if(picked) return;
+      var q = norm(f.name.value);
+      if(q.replace(/ /g, '').length < 3){ closeList(); note([]); return; }
+      load().then(function(){
+        if(picked || norm(f.name.value) !== q) return;
+        var words = q.split(' ');
+        shown = guests.filter(function(g){ return !g.plus; })
+          .map(function(g){ return {g: g, s: score(g, words)}; })
+          .filter(function(m){ return m.s; })
+          .sort(function(a, b){ return b.s - a.s || a.g.i - b.g.i; })
+          .slice(0, 6)
+          .map(function(m){ return m.g; });
+        f.matches.textContent = '';
+        active = -1;
+        f.name.removeAttribute('aria-activedescendant');
+        if(!shown.length){
+          closeList();
+          note(['We can’t find that name on our list. Try your first or last name as it’s written on your invitation, or message ', link('Kajal', 'https://wa.me/19492931051'), ' or ', link('Adarsh', 'https://wa.me/14087521100'), ' and we’ll sort it out.']);
+          return;
+        }
+        note([]);
+        shown.forEach(function(g, k){
+          var li = document.createElement('li');
+          li.id = 'rsvp-opt-' + k;
+          li.setAttribute('role', 'option');
+          li.setAttribute('aria-selected', 'false');
+          var n = document.createElement('span');
+          n.textContent = g.name;
+          li.appendChild(n);
+          /* the same name in two parties: say who they're with, so each picks their own */
+          var twin = guests.some(function(o){ return o !== g && o.name.toLowerCase() === g.name.toLowerCase(); });
+          if(twin){
+            var others = members(g.party).filter(function(o){ return o !== g && !o.plus; }).map(firstName);
+            if(others.length){
+              var w = document.createElement('span');
+              w.className = 'with';
+              w.textContent = 'with ' + (others.length > 2 ? others.slice(0, 2).join(', ') + ' and others' : others.join(' and '));
+              li.appendChild(w);
+            }
+          }
+          li.addEventListener('mousedown', function(e){ e.preventDefault(); });
+          li.addEventListener('click', function(){ pick(g); });
+          f.matches.appendChild(li);
+        });
+        f.matches.hidden = false;
+        f.name.setAttribute('aria-expanded', 'true');
+      }, function(){
+        closeList();
+        note(['We couldn’t load the guest list. Please refresh the page, or message ', link('Kajal', 'https://wa.me/19492931051'), ' or ', link('Adarsh', 'https://wa.me/14087521100'), '.']);
+      });
+    }
+    function move(d){
+      if(!shown.length) return;
+      active = (active + d + shown.length) % shown.length;
+      Array.prototype.forEach.call(f.matches.children, function(li, k){ li.setAttribute('aria-selected', k === active ? 'true' : 'false'); });
+      f.name.setAttribute('aria-activedescendant', 'rsvp-opt-' + active);
+    }
+    f.name.addEventListener('focus', function(){ load().catch(function(){}); });
+    f.name.addEventListener('input', search);
+    f.name.addEventListener('keydown', function(e){
+      if(picked || f.matches.hidden) return;
+      if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){ e.preventDefault(); move(e.key === 'ArrowDown' ? 1 : -1); }
+      else if(e.key === 'Enter'){ e.preventDefault(); pick(shown[active < 0 ? 0 : active]); }
+      else if(e.key === 'Escape'){ closeList(); }
+    });
+    f.name.addEventListener('blur', function(){ setTimeout(function(){ if(document.activeElement !== f.name) closeList(); }, 150); });
+
+    function cards(){ return Array.prototype.slice.call(partyEl.querySelectorAll('.guest')); }
+    function answer(c){
+      var r = c.querySelector('.choice input:checked');
+      return r ? r.value : '';
+    }
+    function card(g, k, me){
+      var c = tpl.content.firstElementChild.cloneNode(true);
+      c.querySelector('.guest-name').textContent = g.plus ? 'Plus one' : g.name;
+      c.setAttribute('aria-describedby', 'rsvp-guest-' + k + '-err');
+      c.querySelector('.guest-err').id = 'rsvp-guest-' + k + '-err';
+      c.querySelectorAll('.choice input').forEach(function(r){ r.name = 'attending-' + k; });
+      if(g.plus){
+        var plus = c.querySelector('.guest-plus');
+        plus.hidden = false;
+        plus.querySelector('input').id = 'rsvp-plus-' + k;
+        plus.querySelector('label').htmlFor = 'rsvp-plus-' + k;
+      }
+      var invited = g.events && g.events.length ? g.events : EVENTS;
+      c.querySelectorAll('.check').forEach(function(l){
+        var on = invited.indexOf(l.dataset.event) > -1;
+        l.hidden = !on;
+        l.querySelector('input').checked = on;
+      });
+      c.querySelector('.guest-events-h').textContent = me ? 'Which events will you join?' : g.plus ? 'Which events will they join?' : 'Which events will ' + firstName(g) + ' join?';
+      return c;
+    }
+    function pick(g){
+      if(!g) return;
+      picked = g;
+      closeList();
+      f.name.value = g.name;
+      f.name.readOnly = true;
+      f.name.removeAttribute('aria-invalid');
+      document.getElementById('rsvp-name-err').textContent = '';
+      var again = document.createElement('button');
+      again.type = 'button';
+      again.className = 'rsvp-again';
+      again.textContent = 'Not you? Search again';
+      again.addEventListener('click', reset);
+      note([again]);
+      party = [g].concat(members(g.party).filter(function(o){ return o !== g; }));
+      partyEl.textContent = '';
+      party.forEach(function(m, k){ partyEl.appendChild(card(m, k, k === 0)); });
+      bulk.hidden = party.length < 2;
+      groupParty.hidden = false;
+      update();
+      var top = groupParty.getBoundingClientRect().top;
+      if(top > window.innerHeight * 0.8){
+        window.scrollTo({top: top + window.scrollY - magOff(groupParty) - window.innerHeight * 0.3, behavior: reduce ? 'auto' : 'smooth'});
+      }
+    }
+    function reset(){
+      picked = null; party = [];
+      partyEl.textContent = '';
+      groupParty.hidden = true;
+      yes.hidden = true;
+      document.getElementById('rsvp-attending-err').textContent = '';
+      f.name.readOnly = false;
+      f.name.value = '';
+      note([]);
+      f.name.focus();
+    }
+    function update(){
+      var cs = cards(), going = cs.filter(function(c){ return answer(c) === 'yes'; });
+      cs.forEach(function(c){
+        c.querySelector('.guest-yes').hidden = answer(c) !== 'yes';
+        c.querySelector('.same-events').hidden = going.length < 2 || c !== going[0];
+      });
+      yes.hidden = !going.length;
+    }
+    bulk.addEventListener('click', function(e){
+      var b = e.target.closest('button');
+      if(!b) return;
+      cards().forEach(function(c){ c.querySelector('.choice input[value="' + b.dataset.all + '"]').checked = true; });
+      update();
+      if(tried) rules.attending();
+    });
+    partyEl.addEventListener('click', function(e){
+      var b = e.target.closest('.same-events button');
+      if(!b) return;
+      var from = b.closest('.guest');
+      var on = Array.prototype.filter.call(from.querySelectorAll('.check input'), function(i){ return i.checked; }).map(function(i){ return i.value; });
+      cards().forEach(function(c){
+        if(c === from || answer(c) !== 'yes') return;
+        c.querySelectorAll('.check:not([hidden]) input').forEach(function(i){ i.checked = on.indexOf(i.value) > -1; });
+      });
+      if(tried) rules.attending();
+    });
+
     function flag(key, msg, els){
       document.getElementById('rsvp-' + key + '-err').textContent = msg;
       els.forEach(function(el){ if(msg){ el.setAttribute('aria-invalid', 'true'); } else { el.removeAttribute('aria-invalid'); } });
       return !msg;
     }
     var rules = {
-      name: function(){ return flag('name', f.name.value.trim() ? '' : 'Please enter your name.', [f.name]); },
+      name: function(){
+        return flag('name', picked ? '' : f.name.value.trim() ? 'Please choose your name from the list.' : 'Please enter your name.', [f.name]);
+      },
       email: function(){
         var v = f.email.value.trim();
         return flag('email', !v ? 'Please enter your email.' : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'Please check your email address.', [f.email]);
       },
-      attending: function(){ return flag('attending', attending() ? '' : 'Please let us know whether you can join us.', radios); },
-      guests: function(){
-        var n = Number(f.guests.value);
-        return flag('guests', attending() !== 'yes' || (n % 1 === 0 && n >= 1 && n <= 10) ? '' : 'Please enter a number from 1 to 10.', [f.guests]);
-      },
-      events: function(){
-        return flag('events', attending() !== 'yes' || boxes.some(function(b){ return b.checked; }) ? '' : 'Please choose at least one event.', boxes);
+      attending: function(){
+        var ok = true;
+        cards().forEach(function(c, k){
+          var a = answer(c), plus = c.querySelector('.guest-plus:not([hidden]) input'), msg = '';
+          if(!a) msg = party.length > 1 ? 'Please let us know whether ' + (k === 0 ? 'you' : party[k].plus ? 'your guest' : firstName(party[k])) + ' can join us.' : 'Please let us know whether you can join us.';
+          else if(a === 'yes' && plus && !plus.value.trim()) msg = 'Please tell us your guest’s name.';
+          else if(a === 'yes' && !c.querySelector('.check input:checked')) msg = 'Please choose at least one event.';
+          c.querySelector('.guest-err').textContent = msg;
+          c.classList.toggle('missing', !!msg);
+          c.querySelectorAll('.choice input').forEach(function(r){ if(!a){ r.setAttribute('aria-invalid', 'true'); } else { r.removeAttribute('aria-invalid'); } });
+          if(plus){ if(msg && a === 'yes' && !plus.value.trim()){ plus.setAttribute('aria-invalid', 'true'); } else { plus.removeAttribute('aria-invalid'); } }
+          if(msg) ok = false;
+        });
+        return ok;
       }
     };
-    var firstOf = {name: f.name, email: f.email, attending: radios[0], guests: f.guests, events: boxes[0]};
+    function firstOf(k){
+      if(k !== 'attending') return f[k];
+      var c = partyEl.querySelector('.guest.missing');
+      return c && (c.querySelector('[aria-invalid="true"]') || c.querySelector('.check:not([hidden]) input'));
+    }
 
     function onEdit(e){
-      var k = e.target.name;
-      if(k === 'attending'){ yes.hidden = attending() !== 'yes'; }
-      if(!tried || !rules[k]) return;
-      rules[k]();
-      if(k === 'attending'){ rules.guests(); rules.events(); }
+      var t = e.target;
+      if(t === f.name) return;
+      if(t.closest('.guest')){ update(); if(tried) rules.attending(); return; }
+      if(tried && t === f.email) rules.email();
     }
     form.addEventListener('change', onEdit);
     form.addEventListener('input', onEdit);
@@ -2012,28 +2283,38 @@ picture{margin-block:clamp(52px,8vw,104px);}
       sendErr.textContent = '';
       var first = null;
       Object.keys(rules).forEach(function(k){ if(!rules[k]() && !first){ first = k; } });
-      if(first){ firstOf[first].focus(); return; }
+      if(first){ var el = firstOf(first); if(el) el.focus(); return; }
 
-      var going = attending() === 'yes';
-      var data = {
-        name: f.name.value.trim(),
-        email: f.email.value.trim(),
-        attending: going,
-        guests: going ? Number(f.guests.value) : 0,
-        events: going ? boxes.filter(function(b){ return b.checked; }).map(function(b){ return b.value; }) : [],
-        dietary: going ? f.dietary.value.trim() : '',
-        note: f.note.value.trim(),
-        copy: f.copy.checked
-      };
+      var by = picked.name, sid = uuid(), cs = cards();
+      var going = cs.some(function(c){ return answer(c) === 'yes'; });
+      var email = f.email.value.trim(), dietary = going ? f.dietary.value.trim() : '', note = f.note.value.trim();
+      var rows = cs.map(function(c, k){
+        var g = party[k], on = answer(c) === 'yes', plus = c.querySelector('.guest-plus:not([hidden]) input');
+        return {
+          id: uuid(),
+          name: g.plus ? (plus.value.trim() || 'Guest of ' + by) : g.name,
+          email: email,
+          attending: on,
+          guests: on ? 1 : 0,
+          events: on ? Array.prototype.filter.call(c.querySelectorAll('.check:not([hidden]) input'), function(i){ return i.checked; }).map(function(i){ return i.value; }) : [],
+          dietary: dietary || null,
+          note: note || null,
+          send_copy: f.copy.checked,
+          user_agent: (navigator.userAgent || '').slice(0, 1000),
+          party: g.party,
+          submission_id: sid,
+          submitted_by: by
+        };
+      });
 
       send.disabled = true;
       send.textContent = 'Sending…';
-      submit(data).then(function(){
+      submit(rows).then(function(){
         form.hidden = true;
         done.textContent = '';
         var h = document.createElement('h3');
         h.tabIndex = -1;
-        h.textContent = 'Thank you, ' + data.name + '.';
+        h.textContent = 'Thank you, ' + by + '.';
         var p = document.createElement('p');
         p.textContent = going
           ? 'Your reply is in. We can’t wait to celebrate with you in Mexico City.'
@@ -2046,7 +2327,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
         b.addEventListener('click', function(){
           done.textContent = '';
           form.hidden = false;
-          f.name.focus();
+          var r = partyEl.querySelector('.choice input');
+          (r || f.name).focus();
         });
         again.appendChild(b);
         done.appendChild(h);

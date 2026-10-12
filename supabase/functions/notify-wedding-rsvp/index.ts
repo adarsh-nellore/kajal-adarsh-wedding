@@ -9,6 +9,9 @@
 // claimed via notified_at, so each RSVP is emailed once and the function can't
 // be used to send arbitrary mail.
 //
+// Party replies are one row per guest sharing a submission_id; whichever row
+// is claimed first claims its siblings too, so a party gets one email.
+//
 // Deploy with: supabase functions deploy notify-wedding-rsvp --no-verify-jwt
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
@@ -22,7 +25,7 @@ const TO = ["adarsh.nellore@gmail.com", "949kjp@gmail.com"];
 
 const EVENTS: Record<string, string> = {
   "welcome-party": "Welcome Party · Friday 19th",
-  "saatak-haldi": "Ganesh Puja & Haldi · Saturday 20th",
+  "saatak-haldi": "Ganesh Pooja, Grah Shanti & Haldi · Saturday 20th",
   "baarat-wedding": "Baarat & Wedding · Sunday 21st",
   "after-party": "After Party · Sunday 21st",
 };
@@ -44,6 +47,9 @@ type Rsvp = {
   dietary: string | null;
   note: string | null;
   send_copy: boolean;
+  party: string | null;
+  submission_id: string | null;
+  submitted_by: string | null;
 };
 
 function esc(s: unknown): string {
@@ -67,8 +73,25 @@ function rows(r: Rsvp): [string, string][] {
   return out;
 }
 
-function render(title: string, intro: string, r: Rsvp) {
-  const list = rows(r);
+function partyRows(rs: Rsvp[]): [string, string][] {
+  const r = rs[0];
+  const out: [string, string][] = [
+    ["Sent by", r.submitted_by || r.name],
+    ["Email", r.email],
+    ["Party", r.party || ""],
+  ];
+  for (const g of rs) {
+    out.push([g.name, g.attending
+      ? ["Joyfully accepts", ...(g.events || []).map((e) => EVENTS[e] || e)].join("\n")
+      : "Regretfully declines"]);
+  }
+  if (rs.some((g) => g.attending)) out.push(["Dietary", r.dietary || "None"]);
+  out.push(["Note", r.note || ""]);
+  return out;
+}
+
+function render(title: string, intro: string, rs: Rsvp[]) {
+  const list = rs[0].submission_id ? partyRows(rs) : rows(rs[0]);
   const text = [intro, "", ...list.map(([k, v]) => `${k}: ${v.replace(/\n/g, ", ")}`)].join("\n");
   const html = `
     <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#222">
@@ -105,39 +128,52 @@ Deno.serve(async (req: Request) => {
   if (!/^[0-9a-f-]{36}$/i.test(id)) return json({ error: "missing id" }, 400);
 
   const since = new Date(Date.now() - 15 * 60 * 1000).toISOString();
-  const claim = await fetch(
-    `${SUPABASE_URL}/rest/v1/wedding_rsvps?id=eq.${id}&notified_at=is.null&created_at=gt.${since}`,
-    {
-      method: "PATCH",
-      headers: {
-        "apikey": SERVICE_KEY,
-        "Authorization": `Bearer ${SERVICE_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "return=representation",
+  const headers = {
+    "apikey": SERVICE_KEY,
+    "Authorization": `Bearer ${SERVICE_KEY}`,
+    "Content-Type": "application/json",
+  };
+  const claimWhere = async (filter: string) => {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/wedding_rsvps?${filter}&notified_at=is.null&created_at=gt.${since}`,
+      {
+        method: "PATCH",
+        headers: { ...headers, "Prefer": "return=representation" },
+        body: JSON.stringify({ notified_at: new Date().toISOString() }),
       },
-      body: JSON.stringify({ notified_at: new Date().toISOString() }),
-    },
-  );
-  if (!claim.ok) return json({ error: "lookup failed", detail: (await claim.text()).slice(0, 300) }, 502);
-  const [r] = (await claim.json()) as Rsvp[];
+    );
+    if (!res.ok) throw new Error((await res.text()).slice(0, 300));
+    return (await res.json()) as Rsvp[];
+  };
+
+  let rs: Rsvp[];
+  try {
+    rs = await claimWhere(`id=eq.${id}`);
+    const sid = rs[0]?.submission_id;
+    if (sid && /^[0-9a-f-]{36}$/i.test(sid)) rs = rs.concat(await claimWhere(`submission_id=eq.${sid}`));
+  } catch (e) {
+    return json({ error: "lookup failed", detail: String(e) }, 502);
+  }
+  const r = rs[0];
   if (!r) return json({ ok: true, skipped: "not found, too old, or already notified" });
+  const by = r.submitted_by || r.name;
+  rs.sort((a, b) => Number(b.name === by) - Number(a.name === by));
+  const anyAttending = rs.some((g) => g.attending);
 
   // One message per address, so a rejected recipient (e.g. while sending from
   // onboarding@resend.dev) doesn't block the other.
-  const subject = `RSVP: ${r.name} ${r.attending ? "accepts" : "declines"}`;
-  const body = render("New RSVP", `${r.name} replied on ${new Date(r.created_at).toUTCString()}.`, r);
+  const subject = r.submission_id
+    ? `RSVP: ${by}${r.party ? ` (party ${r.party})` : ""}, ${rs.filter((g) => g.attending).length} of ${rs.length} coming`
+    : `RSVP: ${r.name} ${r.attending ? "accepts" : "declines"}`;
+  const body = render("New RSVP", `${by} replied on ${new Date(r.created_at).toUTCString()}.`, rs);
   const couple: Record<string, Awaited<ReturnType<typeof send>>> = {};
   for (const to of TO) couple[to] = await send([to], subject, body, r.email);
   const anyOk = Object.values(couple).some((c) => c.ok);
 
   if (!anyOk) {
-    await fetch(`${SUPABASE_URL}/rest/v1/wedding_rsvps?id=eq.${id}`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/wedding_rsvps?id=in.(${rs.map((g) => g.id).join(",")})`, {
       method: "PATCH",
-      headers: {
-        "apikey": SERVICE_KEY,
-        "Authorization": `Bearer ${SERVICE_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({ notified_at: null }),
     });
   }
@@ -148,11 +184,11 @@ Deno.serve(async (req: Request) => {
       [r.email],
       "Your RSVP for Kajal & Adarsh's wedding",
       render(
-        `Thank you, ${r.name}.`,
-        r.attending
+        `Thank you, ${by}.`,
+        anyAttending
           ? "Here's a copy of your reply. We can't wait to celebrate with you in Mexico City."
           : "Here's a copy of your reply. We'll miss you, and we'll be thinking of you from Mexico City.",
-        r,
+        rs,
       ),
       TO[0],
     );
