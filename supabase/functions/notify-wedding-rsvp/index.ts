@@ -82,10 +82,10 @@ function partyRows(rs: Rsvp[]): [string, string][] {
   ];
   for (const g of rs) {
     out.push([g.name, g.attending
-      ? ["Joyfully accepts", ...(g.events || []).map((e) => EVENTS[e] || e)].join("\n")
+      ? ["Joyfully accepts", ...(g.events || []).map((e) => EVENTS[e] || e),
+        ...(g.dietary?.trim() ? [`Dietary: ${g.dietary.trim()}`] : [])].join("\n")
       : "Regretfully declines"]);
   }
-  if (rs.some((g) => g.attending)) out.push(["Dietary", r.dietary || "None"]);
   out.push(["Note", r.note || ""]);
   return out;
 }

@@ -8,7 +8,7 @@ const base = {
   created_at: "2026-10-12T16:40:00Z",
   email: "priya.shah@gmail.com",
   guests: 1,
-  dietary: "Rohan is vegetarian and allergic to tree nuts.",
+  dietary: null,
   note: "Meera has exams that week and is so sad to miss it.\nCan’t wait to see you both!",
   send_copy: true,
   party: "12",
@@ -18,7 +18,7 @@ const base = {
 
 const party: Rsvp[] = [
   { ...base, id: "1", name: "Priya Shah", attending: true, events: ["welcome-party", "saatak-haldi", "baarat-wedding", "after-party"] },
-  { ...base, id: "2", name: "Rohan Shah", attending: true, events: ["baarat-wedding", "welcome-party"] },
+  { ...base, id: "2", name: "Rohan Shah", attending: true, events: ["baarat-wedding", "welcome-party"], dietary: "Vegetarian, allergic to tree nuts" },
   { ...base, id: "3", name: "Meera Shah", attending: false, guests: 0, events: [] },
 ];
 

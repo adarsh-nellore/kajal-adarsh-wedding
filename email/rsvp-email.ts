@@ -74,7 +74,9 @@ function guestCard(g: Rsvp): string {
                   <div style="font-family:${BODY};font-size:18px;line-height:26px;font-weight:500;color:${WHITE};">${esc(g.name)}</div>
                   ${reply}${events ? `
                   <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:8px;">${events}
-                  </table>` : ""}
+                  </table>` : ""}${g.attending && g.dietary?.trim() ? `
+                  <div style="padding-top:12px;font-family:${BODY};font-size:15px;line-height:22px;color:${MUTED};">Dietary restrictions or allergies</div>
+                  <div style="font-family:${BODY};font-size:16px;line-height:26px;color:${WHITE};">${lines(g.dietary)}</div>` : ""}
                 </td>
               </tr>
             </table>
@@ -95,7 +97,6 @@ function detail(label: string, value: string): string {
 function details(rs: Rsvp[]): string {
   const r = rs[0];
   let out = "";
-  if (rs.some((g) => g.attending) && r.dietary?.trim()) out += detail("Dietary restrictions or allergies", r.dietary);
   if (r.note?.trim()) out += detail("A note to us", r.note);
   return out;
 }
@@ -175,9 +176,9 @@ a{color:${GOLD};}
 
 const plain = (rs: Rsvp[]) => [
   ...rs.flatMap((g) => g.attending
-    ? [g.name, "Joyfully accepts", ...eventsOf(g).map((e) => `  ${e}`), ""]
+    ? [g.name, "Joyfully accepts", ...eventsOf(g).map((e) => `  ${e}`),
+      ...(g.dietary?.trim() ? [`  Dietary restrictions or allergies: ${g.dietary.trim()}`] : []), ""]
     : [g.name, "Regretfully declines", ""]),
-  ...(rs.some((g) => g.attending) && rs[0].dietary?.trim() ? ["Dietary restrictions or allergies", rs[0].dietary.trim(), ""] : []),
   ...(rs[0].note?.trim() ? ["A note to us", rs[0].note.trim(), ""] : []),
 ];
 

@@ -910,7 +910,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .field + .field{margin-top:clamp(24px,2.8vw,32px);}
 .pair{display:grid;gap:clamp(24px,2.8vw,32px) clamp(28px,3.4vw,44px);}
 .pair > .field + .field{margin-top:0;}
-.rsvp-yes{margin-top:clamp(28px,3.4vw,38px);}
 .field > label,.field > legend{display:block;font-size:17px;line-height:28px;color:rgba(234,227,214,.74);}
 .field > label.check{font-size:inherit;line-height:inherit;color:inherit;}
 .opt{opacity:.6;}
@@ -1043,6 +1042,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .guest-yes{margin-top:12px;}
 .guest .check[hidden]{display:none;}
 .same-events{margin-top:10px;font-size:16px;line-height:26px;}
+.guest .guest-diet{margin-top:16px;}
 .guest .err{margin-top:8px;}
 /* fingers: every choice, event and link in the party is at least 44px tall */
 @media (pointer:coarse){
@@ -1061,10 +1061,10 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .rsvp-done:empty{display:none;}
 .rsvp-done h3{margin-top:0;}
 .rsvp-done h3:focus{outline:none;}
-.rsvp-done,.rsvp-yes:not([hidden]),.group-party:not([hidden]),.guest-yes:not([hidden]),.matches:not([hidden]){animation:rsvp-in .7s cubic-bezier(.2,.7,.3,1);}
+.rsvp-done,.group-party:not([hidden]),.guest-yes:not([hidden]),.matches:not([hidden]){animation:rsvp-in .7s cubic-bezier(.2,.7,.3,1);}
 @keyframes rsvp-in{from{opacity:0;}}
 @media (prefers-reduced-motion:reduce){
-  .rsvp-done,.rsvp-yes:not([hidden]),.group-party:not([hidden]),.guest-yes:not([hidden]),.matches:not([hidden]){animation:none;}
+  .rsvp-done,.group-party:not([hidden]),.guest-yes:not([hidden]),.matches:not([hidden]){animation:none;}
   .rsvp input,.rsvp textarea,.check > span::before,.rsvp-send{transition:none;}
 }
 
@@ -1496,18 +1496,16 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <label class="check" data-event="after-party"><input type="checkbox" value="after-party" checked><span>After Party · Sunday 21st</span></label>
 </div>
 <p class="same-events" hidden><button type="button" class="rsvp-again">Same events for everyone</button></p>
+<div class="field guest-diet">
+<div class="box">
+<input type="text" autocomplete="off" maxlength="1000" placeholder=" ">
+<label>Dietary restrictions or allergies <span class="opt">(optional)</span></label>
+</div>
+</div>
 </div>
 <p class="err guest-err"></p>
 </fieldset>
 </template>
-<div class="rsvp-yes" hidden>
-<div class="field">
-<div class="box">
-<input id="rsvp-dietary" name="dietary" type="text" autocomplete="off" maxlength="1000" placeholder=" ">
-<label for="rsvp-dietary">Dietary restrictions or allergies <span class="opt">(optional)</span></label>
-</div>
-</div>
-</div>
 </div>
 <fieldset class="group group-else">
 <legend class="group-h">Anything else?</legend>
@@ -2177,7 +2175,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
     var EVENTS = ['welcome-party', 'saatak-haldi', 'baarat-wedding', 'after-party'];
     var done = document.querySelector('.rsvp-done');
-    var yes = form.querySelector('.rsvp-yes');
     var send = form.querySelector('.rsvp-send');
     var sendErr = document.getElementById('rsvp-send-err');
     var groupParty = form.querySelector('.group-party');
@@ -2187,7 +2184,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
     var f = {
       name: document.getElementById('rsvp-name'),
       email: document.getElementById('rsvp-email'),
-      dietary: document.getElementById('rsvp-dietary'),
       note: document.getElementById('rsvp-note'),
       copy: document.getElementById('rsvp-copy'),
       matches: document.getElementById('rsvp-matches'),
@@ -2349,6 +2345,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
         plus.querySelector('input').id = 'rsvp-plus-' + k;
         plus.querySelector('label').htmlFor = 'rsvp-plus-' + k;
       }
+      c.querySelector('.guest-diet input').id = 'rsvp-diet-' + k;
+      c.querySelector('.guest-diet label').htmlFor = 'rsvp-diet-' + k;
       var invited = g.events && g.events.length ? g.events : EVENTS;
       c.querySelectorAll('.check').forEach(function(l){
         var on = invited.indexOf(l.dataset.event) > -1;
@@ -2386,7 +2384,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
       picked = null; party = [];
       partyEl.textContent = '';
       groupParty.hidden = true;
-      yes.hidden = true;
       document.getElementById('rsvp-attending-err').textContent = '';
       f.name.readOnly = false;
       f.name.value = '';
@@ -2399,7 +2396,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
         c.querySelector('.guest-yes').hidden = answer(c) !== 'yes';
         c.querySelector('.same-events').hidden = going.length < 2 || c !== going[0];
       });
-      yes.hidden = !going.length;
       var all = cs.length && cs.every(function(c){ return answer(c) === answer(cs[0]); }) ? answer(cs[0]) : '';
       bulk.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.all === all ? 'true' : 'false'); });
     }
@@ -2477,7 +2473,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
       var by = picked.name, sid = uuid(), cs = cards();
       var going = cs.some(function(c){ return answer(c) === 'yes'; });
-      var email = f.email.value.trim(), dietary = going ? f.dietary.value.trim() : '', note = f.note.value.trim();
+      var email = f.email.value.trim(), note = f.note.value.trim();
       var rows = cs.map(function(c, k){
         var g = party[k], on = answer(c) === 'yes', plus = c.querySelector('.guest-plus:not([hidden]) input');
         return {
@@ -2487,7 +2483,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
           attending: on,
           guests: on ? 1 : 0,
           events: on ? Array.prototype.filter.call(c.querySelectorAll('.check:not([hidden]) input'), function(i){ return i.checked; }).map(function(i){ return i.value; }) : [],
-          dietary: dietary || null,
+          dietary: on ? c.querySelector('.guest-diet input').value.trim() || null : null,
           note: note || null,
           send_copy: f.copy.checked,
           user_agent: (navigator.userAgent || '').slice(0, 1000),
