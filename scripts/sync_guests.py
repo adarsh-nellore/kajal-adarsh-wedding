@@ -28,8 +28,9 @@ EVENTS = [  # same values as the RSVP form's checkboxes
     ("baarat-wedding", r"baarat|wedding|ceremony"),
     ("after-party", r"after"),
 ]
-NOTE = re.compile(r"\+ ?1|plus|kid|baby|hubby|husband|wife|daughter|son\b|partner", re.I)
-PLACEHOLDER = re.compile(r"^(plus ?(1|one)|\+ ?1|guest|.*\b(hubby|husband|wife|partner))$", re.I)
+# a first name that's a note rather than a name ("Babli kid 1 (Adithi)", "Victor +1 (Julia)",
+# "Bhavani hubby", "Plus 1") becomes an unnamed plus one; whoever replies types the name
+NOTE = re.compile(r"[()+]|\b(plus|kid|kids|baby|hubby|husband|wife|daughter|son|partner|guest)\b", re.I)
 
 warnings = []
 
@@ -41,23 +42,11 @@ def col(header, *names):
     return None
 
 
-def clean_first(first, row_no):
-    """Turn sheet shorthand into a name a guest would recognise as theirs."""
-    raw = first
-    m = re.match(r"^(.*?)\s*\((.*)\)\s*$", first)
-    if m:
-        outside, inside = m.group(1).strip(), m.group(2).strip()
-        # "Moe (Jasper +1)" keeps Moe; "Victor +1 (Julia)" and "Babli kid 1 (Adithi)" become Julia / Adithi
-        first = outside if NOTE.search(inside) else inside
-    elif NOTE.search(first) and not PLACEHOLDER.match(first):
-        # "Bhavani 1st daughter Sharanya" -> Sharanya
-        last_word = first.split()[-1]
-        if not NOTE.search(last_word):
-            first = last_word
-    first = re.sub(r"\s*\+ ?1\s*$", "", first).strip()
-    if first != raw.strip():
-        warnings.append(f"row {row_no}: read “{raw.strip()}” as “{first}”")
-    return first
+def is_note(first, row_no):
+    if NOTE.search(first):
+        warnings.append(f"row {row_no}: “{first}” shown as Plus one")
+        return True
+    return False
 
 
 def parse_events(cell, row_no):
@@ -109,9 +98,8 @@ def main():
         if len(firsts) > 1:
             warnings.append(f"row {i}: split “{first}” into {', '.join(firsts)}")
         for f in firsts:
-            f = clean_first(f, i)
             g = {"party": party}
-            if PLACEHOLDER.match(f):
+            if is_note(f, i):
                 g["name"] = "Guest"
                 g["plus"] = True
             else:
