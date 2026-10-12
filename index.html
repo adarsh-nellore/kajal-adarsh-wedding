@@ -21,14 +21,14 @@
   --head:'Jaini','EB Garamond',Georgia,serif;
   --body:'EB Garamond',Georgia,'Times New Roman',serif;
   /* the one gap between the end of a section and the next heading */
-  --gap:clamp(80px,9vw,150px);
+  --gap:clamp(100px,10.5vw,172px);
   /* stickers: one height, one larger size (hero pair, full-length figure), one distance from their text, one tilt */
   --stk:clamp(68px,8vw,116px);
   --stk-lg:calc(1.35 * var(--stk));
   --stk-gap:clamp(16px,2vw,28px);
   --stk-tilt:5deg;
   /* between a section's index (or intro line) and its content */
-  --inner:clamp(24px,3vw,40px);
+  --inner:clamp(32px,3.6vw,52px);
   /* the riso grain, shared by the page and the phone menu */
   --riso-fine:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='s' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='1' seed='11' stitchTiles='stitch' result='n'/%3E%3CfeColorMatrix in='n' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0' result='a'/%3E%3CfeComponentTransfer in='a' result='t'%3E%3CfeFuncA type='discrete' tableValues='0 1'/%3E%3C/feComponentTransfer%3E%3CfeFlood flood-color='%230C0C0C' result='ink'/%3E%3CfeComposite in='ink' in2='t' operator='in'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
   --riso-coarse:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='340'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' seed='4' stitchTiles='stitch' result='n'/%3E%3CfeColorMatrix in='n' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0' result='a'/%3E%3CfeComponentTransfer in='a' result='t'%3E%3CfeFuncA type='discrete' tableValues='0 0 0 1'/%3E%3C/feComponentTransfer%3E%3CfeFlood flood-color='%23161616' result='ink'/%3E%3CfeComposite in='ink' in2='t' operator='in'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
@@ -452,7 +452,7 @@ a:focus-visible{outline:none;}
 .journey h2,.journey .lede,.journey .tabs{width:var(--col);max-width:none;margin-inline:auto;}
 /* the index runs as wide as a card, hanging past the text column on the right */
 .journey .tabs{width:min(52rem, var(--col));margin-left:var(--edge);}
-.journey h2{margin-bottom:clamp(14px,1.8vw,22px);}
+.journey h2{margin-bottom:clamp(20px,2.2vw,30px);}
 .lede{margin-bottom:clamp(18px,2.4vw,28px);}
 
 /* ---------- a faint light behind each section, different in each. Pseudo-elements behind the content (each section isolated),
@@ -649,7 +649,7 @@ a:focus-visible{outline:none;}
 .interlude:has(.frame-tacos){--below:.9;}
 /* more under the cliff: RSVP's sticker rides above its heading, and on wide screens it should clear the frame too */
 .interlude:has(.frame-cliff){--below:1.02;}
-@media (min-width:1000px){ .interlude:has(.frame-cliff){--below:1.36;} }
+@media (min-width:1000px){ .interlude:has(.frame-cliff){--below:1.18;} }
 /* index mode: one card at a time, all stacked in a single cell, each at the top of it. The script sizes the cell to the
    chosen card, but only ever shrinks it while its foot is off screen, so nothing in view below a section moves */
 .journey.index .journey-rail{display:grid;overflow:hidden;}
@@ -885,7 +885,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 /* ---------- RSVP: a plain form on the page — quiet outlined fields ---------- */
 /* same text column as the index sections; not a .journey, so the tab script leaves it alone */
 .rsvp{width:100vw;margin-left:calc(50% - 50vw);padding-inline:max(22px, calc(50vw - 19.375rem));}
-.rsvp h2{margin-bottom:clamp(14px,1.8vw,22px);}
+.rsvp h2{margin-bottom:clamp(20px,2.2vw,30px);}
 /* beside the heading and lede, its right edge on the text column's (and the cliff frame's) right edge;
    lifted a little so it clears the form below */
 .rsvp{position:relative;}
@@ -1070,9 +1070,41 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
 .rv{opacity:0;transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1);}
 .rv.in{opacity:1;transform:none;}
-.frame.rv{transform:translateX(-12px);}
-.frame.rv.in{transform:none;}
-@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none;}}
+/* frames come in a touch small and off to the left, then settle onto the nail */
+.frame.rv{transform:translateX(-12px);scale:.965;transition:opacity 1.1s cubic-bezier(.2,.7,.3,1),transform 1.3s cubic-bezier(.2,.7,.3,1),scale 1.5s cubic-bezier(.2,.7,.3,1);}
+.frame.rv.in{transform:none;scale:1;}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;scale:none;transition:none;}}
+
+/* arrival: each section comes in once as it's reached. The heading inks in from the left, then its index name by name,
+   then the card. Opacity and masks only, so no type moves and nothing changes size (the rails' heights stay put).
+   The script adds .arrive only when motion is allowed, so otherwise everything simply shows */
+@keyframes arrive-fade{from{opacity:0;}}
+@keyframes arrive-ink{
+  from{opacity:0;-webkit-mask-position:100% 0;mask-position:100% 0;}
+  25%{opacity:1;}
+  to{opacity:1;-webkit-mask-position:0 0;mask-position:0 0;}
+}
+@keyframes arrive-hang{from{opacity:0;scale:.96;}}
+.arrive:not(.in) :is(h2,.tab,.journey-rail,.lede,.rsvp-form,.stk-hats,.contact-h,.contact-h + p),.wall.arrive:not(.in) figure{opacity:0;}
+.arrive.in :is(h2,.contact-h,.day b){
+  -webkit-mask-image:linear-gradient(90deg,#000 33.3%,transparent 66.7%);mask-image:linear-gradient(90deg,#000 33.3%,transparent 66.7%);
+  -webkit-mask-size:300% 100%;mask-size:300% 100%;
+  animation:arrive-ink 1.4s cubic-bezier(.35,.55,.2,1) both;
+}
+.arrive.settled :is(h2,.contact-h,.day b){-webkit-mask-image:none;mask-image:none;}
+.arrive.in .tab{animation:arrive-fade .8s cubic-bezier(.2,.7,.3,1) calc(.35s + var(--n,0) * 70ms) both;}
+.arrive.in :is(.journey-rail,.lede){animation:arrive-fade 1s cubic-bezier(.2,.7,.3,1) .55s both;}
+.arrive.in .day b{animation-delay:.75s;}
+.rsvp.arrive.in .lede{animation-delay:.4s;}
+.arrive.in :is(.rsvp-form,.stk-hats,.contact-h + p){animation:arrive-fade 1s cubic-bezier(.2,.7,.3,1) .8s both;}
+/* reached by a menu link: all at once, during the glide */
+.arrive.in.jump :is(h2,.tab,.journey-rail,.lede,.rsvp-form,.stk-hats,.day b){animation-delay:0s;animation-duration:.8s;}
+/* the gallery wall fills in picture by picture, the big one first */
+.wall.arrive.in figure{animation:arrive-hang 1.2s cubic-bezier(.2,.7,.3,1) calc(var(--n,0) * 140ms) both;}
+.wall-lotus{--n:1;}
+.wall-agave{--n:2;}
+.wall-marigold{--n:3;}
+.wall-umbrellas{--n:4;}
 </style>
 </head>
 <body>
@@ -1411,9 +1443,9 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
 <section class="rsvp" aria-label="RSVP">
 <h2 id="rsvp">RSVP</h2>
-<p class="lede rv">Kindly reply by December 1.</p>
+<p class="lede">Kindly reply by December 1.</p>
 <picture class="stk stk-hats" data-px="-0.04" aria-hidden="true"><source type="image/webp" srcset="img/sticker-hats-sm.webp 220w, img/sticker-hats.webp 340w" sizes="190px"><img src="img/sticker-hats.png" width="340" height="329" alt="" loading="lazy" decoding="async"></picture>
-<form class="rsvp-form rv" novalidate>
+<form class="rsvp-form" novalidate>
 <fieldset class="group">
 <legend class="group-h">Your details</legend>
 <div class="pair">
@@ -2086,6 +2118,32 @@ picture{margin-block:clamp(52px,8vw,104px);}
       });
     }, {rootMargin:'0px 0px -6% 0px', threshold:0.05});
     items.forEach(function(el){ io.observe(el); });
+  }
+
+  /* arrival: each section, the gallery wall and the sign-off come in once as they're reached */
+  if(!reduce && 'IntersectionObserver' in window){
+    var arrive = function(s){
+      if(!s || s.classList.contains('in')) return;
+      s.classList.add('in');
+      setTimeout(function(){ s.classList.add('settled'); }, 2600);
+    };
+    var arriveIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ arrive(e.target); arriveIO.unobserve(e.target); }
+      });
+    }, {rootMargin:'0px 0px -6% 0px'});
+    document.querySelectorAll('.journey, .rsvp, .wall, .contact').forEach(function(s){
+      s.querySelectorAll('.tab').forEach(function(t, i){ t.style.setProperty('--n', Math.min(i, 6)); });
+      s.classList.add('arrive');
+      arriveIO.observe(s);
+    });
+    /* a menu link starts its section straight away, so it has filled in by the time the glide lands */
+    document.addEventListener('click', function(e){
+      var a = e.target.closest && e.target.closest('a[href^="#"]');
+      var el = a && a.getAttribute('href').length > 1 && document.getElementById(a.getAttribute('href').slice(1));
+      var s = el && el.closest('.arrive');
+      if(s && !s.classList.contains('in')){ s.classList.add('jump'); arrive(s); }
+    }, true);
   }
 
   /* RSVP */
