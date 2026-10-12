@@ -1020,7 +1020,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .guest .choices{margin-top:6px;}
 .guest .tab{font-size:clamp(20px,2.2vw,24px);}
 .guest-yes{margin-top:12px;}
-.guest-events-h{font-size:16px;line-height:26px;color:rgba(234,227,214,.74);}
 .guest .check[hidden]{display:none;}
 .same-events{margin-top:8px;font-size:16px;}
 .guest .err{margin-top:8px;}
@@ -1436,7 +1435,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <label class="choice"><input type="radio" value="no"><span class="tab">Regretfully decline</span></label>
 </div>
 <div class="guest-yes" hidden>
-<p class="guest-events-h">Which events will they join?</p>
 <div class="checks">
 <label class="check" data-event="welcome-party"><input type="checkbox" value="welcome-party" checked><span>Welcome Party · Friday 19th</span></label>
 <label class="check" data-event="saatak-haldi"><input type="checkbox" value="saatak-haldi" checked><span>Ganesh Pooja, Grah Shanti &amp; Haldi · Saturday 20th</span></label>
@@ -2166,7 +2164,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
         l.hidden = !on;
         l.querySelector('input').checked = on;
       });
-      c.querySelector('.guest-events-h').textContent = me ? 'Which events will you join?' : g.plus ? 'Which events will they join?' : 'Which events will ' + firstName(g) + ' join?';
       return c;
     }
     function pick(g){
