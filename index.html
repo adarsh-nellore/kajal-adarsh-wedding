@@ -166,11 +166,66 @@ a:focus-visible{outline:none;}
 .leg a{color:var(--gold);background-size:100% 1px;}
 @media (prefers-reduced-motion:reduce){a{transition:none;}}
 
-/* opening screen: the teaser as a polaroid with the name and dates written on its foot, then the RSVP, all on the first screen.
-   --rest is everything on the screen that isn't the polaroid; --tall is the polaroid's height per unit of width */
+/* screen one: the teaser alone, as large as the screen allows, in a thin cream border. Full-bleed, so only the
+   screen's edges limit it; --m is the margin around it (a little more below, for the scroll cue) */
+.reel{
+  --m:clamp(12px,3.5vmin,40px);
+  --b:clamp(5px,.6vw,9px);
+  position:relative;
+  width:100vw;
+  margin-left:calc(50% - 50vw);
+  height:100vh;
+  height:100svh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:var(--m) var(--m) calc(var(--m) + 26px);
+}
+.teaser{
+  width:calc(min(100vw - 2 * var(--m) - 2 * var(--b), (100svh - 2 * var(--m) - 26px - 2 * var(--b)) * 4 / 3) + 2 * var(--b));
+  flex:none;
+  margin:0;
+  padding:var(--b);
+  background:#EAE3D6;
+  border-radius:2px;
+  box-shadow:0 14px 30px rgba(0,0,0,.5);
+  animation:fade-in 1s cubic-bezier(.2,.7,.3,1) both;
+}
+.teaser-screen{position:relative;}
+.teaser video{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#121212;cursor:pointer;}
+.teaser button{appearance:none;border:0;margin:0;padding:0;background:none;cursor:pointer;}
+.teaser button:focus-visible{outline:1px solid var(--gold);outline-offset:2px;}
+/* sound: a small speaker in the video's corner, muted until tapped. 44px to tap, 36px to see */
+.teaser-sound{
+  position:absolute;right:8px;bottom:8px;width:44px;height:44px;display:grid;place-items:center;
+  opacity:.72;transition:opacity .35s cubic-bezier(.2,.7,.3,1);
+}
+.teaser-sound::before{content:"";position:absolute;inset:4px;border-radius:50%;background:rgba(18,18,18,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.teaser-sound svg{position:relative;width:18px;height:18px;fill:none;stroke:#EAE3D6;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.teaser-sound:hover,.teaser-sound:focus-visible{opacity:1;}
+.teaser-sound[aria-pressed="true"] .ico-off,.teaser-sound[aria-pressed="false"] .ico-on{display:none;}
+/* before it starts: one quiet pill that says what it does; once started, a plain round play button when paused */
+.teaser-play{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  height:clamp(52px,4.6vw,64px);display:flex;align-items:center;gap:12px;padding:0 1.4em 0 1.15em;border-radius:999px;
+  background:rgba(18,18,18,.5) !important;border:1px solid rgba(234,227,214,.35) !important;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  color:#EAE3D6;font-family:var(--body);font-size:clamp(18px,1.6vw,22px);line-height:1;white-space:nowrap;
+  transition:background-color .35s cubic-bezier(.2,.7,.3,1),border-color .35s cubic-bezier(.2,.7,.3,1);
+}
+.teaser-play[hidden]{display:none;}
+.teaser-play:hover,.teaser-play:focus-visible{background:rgba(18,18,18,.7) !important;border-color:rgba(234,227,214,.6) !important;}
+.teaser-play svg{width:18px;height:18px;fill:#EAE3D6;flex:none;}
+.teaser-play .label{padding-bottom:2px;}
+.teaser.started .teaser-play{width:64px;height:64px;padding:0 0 0 4px;justify-content:center;}
+.teaser.started .teaser-play .label{display:none;}
+.teaser:not(.started) .teaser-sound{display:none;}
+/* the cue arrives once the teaser has had the screen to itself for a few seconds */
+.reel .cue{bottom:calc(.5 * var(--m));}
+.reel .cue span{animation:fade-in 1.2s ease 4s both;}
+
+/* screen two: the welcome, the names, the dates and the RSVP, centred; they fade in as the screen arrives */
 .hero{
-  --rest:calc(clamp(20px,3svh,40px) + clamp(18px,2.6svh,32px) + 49px + clamp(64px,9svh,92px));
-  --tall:1.05;
   position:relative;
   min-height:100vh;
   min-height:100svh;
@@ -179,59 +234,20 @@ a:focus-visible{outline:none;}
   justify-content:center;
   align-items:center;
   text-align:center;
-  padding-block:clamp(20px,3svh,40px) clamp(64px,9svh,92px);
+  padding-block:clamp(48px,8vh,96px);
 }
-@media (max-width:700px){ .hero{--tall:1.08;} }
-
-/* a thin cream border on three sides and a deeper foot. Sized by its width, so the writing on the foot (in cqw) scales with it;
-   on phones it may run into the page gutters */
-.teaser{
-  --b:clamp(6px,.8vw,11px);
-  width:max(260px, min(100vw - 20px, 760px, (100svh - var(--rest)) / var(--tall)));
-  flex:none;
-  margin:0;
-  padding:var(--b) var(--b) 0;
-  background:#EAE3D6;
-  border-radius:2px;
-  box-shadow:0 14px 30px rgba(0,0,0,.5);
-  container-type:inline-size;
-  animation:fade-in 1s cubic-bezier(.2,.7,.3,1) both;
-}
-.teaser-screen{position:relative;}
-.teaser video{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#121212;cursor:pointer;}
-.teaser figcaption{padding:3.2cqw 4cqw 4.4cqw;color:#1E1712;}
-.hero h1{font-size:11.5cqw;line-height:1;color:#1E1712;will-change:auto;}
-.hero .stamp{margin-top:1.4cqw;font-size:max(14px, 3cqw);line-height:1.4;}
-@media (max-width:700px){
-  .hero h1{font-size:13.6cqw;}
-  .hero .stamp{font-size:max(14px, 3.9cqw);}
-}
-.teaser button{appearance:none;border:0;margin:0;padding:0;background:none;cursor:pointer;}
-.teaser button:focus-visible{outline:1px solid var(--gold);outline-offset:2px;}
-/* sound: a small speaker in the video's corner, muted until tapped. 44px to tap, 36px to see */
-.teaser-sound{
-  position:absolute;right:6px;bottom:6px;width:44px;height:44px;display:grid;place-items:center;
-  opacity:.72;transition:opacity .35s cubic-bezier(.2,.7,.3,1);
-}
-.teaser-sound::before{content:"";position:absolute;inset:4px;border-radius:50%;background:rgba(18,18,18,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
-.teaser-sound svg{position:relative;width:18px;height:18px;fill:none;stroke:#EAE3D6;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
-.teaser-sound:hover,.teaser-sound:focus-visible{opacity:1;}
-.teaser-sound[aria-pressed="true"] .ico-off,.teaser-sound[aria-pressed="false"] .ico-on{display:none;}
-.teaser-play{
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  width:64px;height:64px;display:grid;place-items:center;border-radius:50%;
-  background:rgba(18,18,18,.55) !important;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-  transition:background-color .35s cubic-bezier(.2,.7,.3,1);
-}
-.teaser-play[hidden]{display:none;}
-.teaser-play:hover{background:rgba(18,18,18,.75) !important;}
-.teaser-play svg{width:22px;height:22px;margin-left:4px;fill:#EAE3D6;}
-/* the writing on the polaroid develops once the teaser is under way */
-.develop{transition:opacity 1.4s cubic-bezier(.2,.7,.3,1);}
+.welcome{font-size:clamp(22px,2.6vw,30px);line-height:1.35;margin-bottom:clamp(8px,1.4vw,18px);}
+@media (max-width:700px){ .hero h1{font-size:min(17vw,96px);} }
+.develop{transition:opacity 1.6s cubic-bezier(.2,.7,.3,1);}
 .develop.wait{opacity:0;}
+.hero h1.develop{transition-delay:.25s;}
+.hero .stamp.develop{transition-delay:.55s;}
+.hero .cover-cta.develop{transition-delay:.8s;}
 @media (scripting:none){ .develop.wait{opacity:1;} }
 @keyframes fade-in{from{opacity:0;}}
-@media (prefers-reduced-motion:reduce){ .teaser{animation:none;} .develop{transition:none;} }
+@media (prefers-reduced-motion:reduce){ .teaser,.reel .cue span{animation:none;} .develop{transition:none;} }
+/* the top bar keeps off the teaser */
+.mbar.reel-on{transform:translateY(-100%);pointer-events:none;}
 .cue{
   position:absolute;
   left:50%;
@@ -375,7 +391,7 @@ a:focus-visible{outline:none;}
   .journey[data-pin] .leg .stk-haldi{grid-area:5/2/6/3;align-self:center;margin:0;}
 }
 
-.cover-cta{margin-top:clamp(18px,2.6svh,32px);}
+.cover-cta{margin-top:clamp(28px,3.4vw,44px);}
 .cover-rsvp{display:inline-block;text-decoration:none;white-space:nowrap;}
 .stk-selfie{top:50%;margin-top:calc(-.23 * var(--h));}
 /* just outside the left end of the date line, but never nearer the screen edge than --swing past the edge margin;
@@ -1018,18 +1034,19 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </div>
 
-<header class="hero" id="top">
+<header class="reel" id="top">
 <figure class="teaser">
 <div class="teaser-screen">
-<video src="video/teaser.mp4" poster="img/teaser-poster.jpg" width="768" height="576" muted loop playsinline preload="metadata" aria-label="Teaser: Kajal and Adarsh in Mexico City"></video>
-<button class="teaser-play" type="button" aria-label="Play the teaser with sound" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg></button>
-<button class="teaser-sound" type="button" aria-pressed="false" aria-label="Turn sound on"><svg class="ico-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg><svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.5a8 8 0 0 1 0 11"/></svg></button>
+<video src="video/teaser.mp4" poster="img/teaser-poster.jpg" width="768" height="576" playsinline preload="metadata" aria-label="Teaser: Kajal and Adarsh in Mexico City"></video>
+<button class="teaser-play" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg><span class="label">Play with sound</span></button>
+<button class="teaser-sound" type="button" aria-pressed="true" aria-label="Turn sound off"><svg class="ico-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg><svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.5a8 8 0 0 1 0 11"/></svg></button>
 </div>
-<figcaption class="develop wait">
-<h1>Kajal y Adarsh</h1>
-<p class="stamp">Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico</p>
-</figcaption>
 </figure>
+<a class="cue" href="#welcome" aria-label="Skip to the welcome"><span aria-hidden="true">↓</span></a></header>
+<section class="hero" id="welcome" aria-label="Welcome">
+<p class="welcome develop wait">Welcome to our wedding weekend</p>
+<h1 class="develop wait">Kajal y Adarsh</h1>
+<p class="stamp develop wait">Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico</p>
 <p class="cover-cta develop wait"><a class="rsvp-send cover-rsvp" href="#rsvp">RSVP</a></p>
 <!-- HERO STICKERS (retired for the teaser; kept for reuse elsewhere, e.g. with a frame). The selfie sat inside .stamp, after the RSVP link.
 <picture class="stk stk-hero stk-selfie" aria-hidden="true">
@@ -1042,7 +1059,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <img src="img/sticker-couple.png" width="340" height="355" alt="Kajal and Adarsh" decoding="async">
 </picture>
 -->
-<a class="cue" href="#weekend" aria-label="Skip to the details"><span aria-hidden="true">↓</span></a></header>
+</section>
 <section class="journey light-events" data-pin aria-label="Events">
 <div class="journey-pin">
 <h2 id="weekend">Events</h2>
@@ -1406,45 +1423,42 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <footer class="contact"><p class="contact-h">Questions?</p><p>Message <a href="https://wa.me/19492931051" target="_blank" rel="noopener">Kajal</a> or <a href="https://wa.me/14087521100" target="_blank" rel="noopener">Adarsh</a></p></footer>
 
 <script>
-/* the teaser: plays muted and looped while it's on screen; with reduced motion it waits on its poster for a tap.
-   A tap on a muted video turns the sound on; after that a tap pauses and plays. The writing on the polaroid
-   develops once the video is under way (or after a moment, if it can't start) */
+/* the teaser waits on its poster until it's asked to play, and then plays with sound. After that a tap pauses and
+   plays, and the corner speaker mutes. When it ends it rests on its last frame with the play button, and tells the
+   page (which carries you on to the welcome) */
 (function(){
   var fig = document.querySelector('.teaser');
   if(!fig) return;
   var v = fig.querySelector('video'), play = fig.querySelector('.teaser-play'), sound = fig.querySelector('.teaser-sound');
-  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var userPaused = still, onScreen = true;
-  function show(){ document.querySelectorAll('.develop.wait').forEach(function(el){ el.classList.remove('wait'); }); }
-  if(still){ show(); play.hidden = false; }
-  else {
-    v.addEventListener('playing', function(){ setTimeout(show, 1200); }, {once:true});
-    setTimeout(show, 2600);
-  }
+  var userPaused = true, onScreen = true;
   function start(){
     var p = v.play();
     if(p && p.catch){ p.catch(function(){ if(v.paused){ play.hidden = false; } }); }
   }
-  function listen(){ v.muted = false; userPaused = false; if(v.paused){ start(); } }
+  function listen(){ v.muted = false; userPaused = false; fig.classList.add('started'); if(v.paused){ start(); } }
   v.addEventListener('play', function(){ play.hidden = true; });
   v.addEventListener('pause', function(){ if(onScreen){ play.hidden = false; } });
+  v.addEventListener('ended', function(){
+    userPaused = true; play.hidden = false;
+    document.dispatchEvent(new CustomEvent('teaser-ended'));
+  });
   v.addEventListener('volumechange', function(){
     sound.setAttribute('aria-pressed', String(!v.muted));
     sound.setAttribute('aria-label', v.muted ? 'Turn sound on' : 'Turn sound off');
   });
   v.addEventListener('click', function(){
-    if(v.muted || v.paused){ listen(); } else { userPaused = true; v.pause(); }
+    if(v.paused){ listen(); } else { userPaused = true; v.pause(); }
   });
   play.addEventListener('click', listen);
-  sound.addEventListener('click', function(){ if(v.muted){ listen(); } else { v.muted = true; } });
-  /* off screen it rests, to spare the battery */
+  sound.addEventListener('click', function(){ v.muted = !v.muted; });
+  /* off screen it rests, to spare the battery, and picks up again on the way back */
   if('IntersectionObserver' in window){
     new IntersectionObserver(function(entries){
       onScreen = entries[entries.length - 1].isIntersecting;
       if(!onScreen){ if(!v.paused){ v.pause(); } }
       else if(!userPaused){ start(); }
     }, {threshold: 0.25}).observe(v);
-  } else if(!userPaused){ start(); }
+  }
 })();
 </script>
 <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
@@ -1685,7 +1699,9 @@ picture{margin-block:clamp(52px,8vw,104px);}
   var anim = null;
   function pad(){ return Math.min(64, Math.max(24, window.innerHeight * 0.06)); }
   function stopOf(el){
-    if(el.classList.contains('hero')) return 0;
+    if(el.classList.contains('reel')) return 0;
+    /* the welcome is a screen of its own: it stops flush with the top */
+    if(el.classList.contains('hero')) return el.getBoundingClientRect().top + window.scrollY;
     return el.getBoundingClientRect().top - magOff(el) + window.scrollY - (barClear() || pad());
   }
   /* where the top bar shows, headings stop this far down so it never covers them (matches their scroll-margin-top) */
@@ -1717,13 +1733,17 @@ picture{margin-block:clamp(52px,8vw,104px);}
   var lenis = !reduce && window.Lenis ? new window.Lenis({
     lerp: 0.07, wheelMultiplier: 0.85, autoRaf: true,
     /* sideways swipes step through a section's cards, so they're left alone */
-    virtualScroll: function(d){ return Math.abs(d.deltaY) >= Math.abs(d.deltaX) && !heroHandoff(d); }
+    virtualScroll: function(d){
+      /* Lenis halts any glide on a touch; the swipe glide off the teaser has to run on */
+      if(d.event.type.indexOf('touch') === 0 && performance.now() < reelGlideEnd) return false;
+      return Math.abs(d.deltaY) >= Math.abs(d.deltaX) && !heroHandoff(d);
+    }
   }) : null;
   if(lenis){ lenis.on('scroll', onScrollSettle); }
   window.addEventListener('scroll', onScrollSettle, {passive:true});
-  /* from the top of the opening screen, the first downward wheel or trackpad gesture carries you to Events (as the
-     cue does) and its leftover momentum is absorbed, so a single flick lands on the first section instead of sailing
-     past it. Decided when the gesture starts, never as a correction afterwards; touch keeps its native momentum */
+  /* from the teaser, the first downward wheel or trackpad gesture carries you to the welcome; from the welcome, the next
+     one carries you to Events. Each glide absorbs its gesture's leftover momentum, so a single flick lands on the next
+     screen instead of sailing past it. Decided when the gesture starts, never as a correction afterwards */
   var handing = false, handQuiet = 0, handT0 = 0, handLast = 0, handRise = 0;
   function heroHandoff(d){
     if(d.event.type !== 'wheel') return false;
@@ -1739,21 +1759,44 @@ picture{margin-block:clamp(52px,8vw,104px);}
       return false;
     }
     if(d.deltaY <= 0 || menuOpen()) return false;
-    var hero = document.querySelector('.hero'), first = document.getElementById('weekend');
-    if(!hero || !first || lenis.targetScroll > hero.offsetHeight * 0.4) return false;
-    var to = stopOf(first);
-    if(to <= lenis.targetScroll + 8) return false;
+    var reel = document.querySelector('.reel'), hero = document.querySelector('.hero'), first = document.getElementById('weekend');
+    if(!reel || !hero || !first) return false;
+    var y = lenis.targetScroll, to = null, dur = 1.1;
+    if(y < reel.offsetHeight * 0.4){ to = stopOf(hero); dur = 1.4; }
+    else if(Math.abs(y - stopOf(hero)) < hero.offsetHeight * 0.4){ to = stopOf(first); }
+    if(to === null || to <= y + 8) return false;
     var t0 = performance.now();
     handing = true; handQuiet = handT0 = t0; handLast = Math.abs(d.deltaY); handRise = 0;
     d.event.preventDefault();
-    lenis.scrollTo(to, {duration: 1.1, easing: inOut});
+    lenis.scrollTo(to, {duration: dur, easing: inOut});
     /* hand control back once the glide is over and the wheel has gone quiet (capped, in case the glide is cut short) */
     (function release(){
       var now = performance.now();
       if(!handing) return;
-      if((now - t0 > 1150 && now - handQuiet > 140) || now - t0 > 2600){ handing = false; } else { setTimeout(release, 60); }
+      if((now - t0 > dur * 1000 + 50 && now - handQuiet > 140) || now - t0 > 2600){ handing = false; } else { setTimeout(release, 60); }
     })();
     return true;
+  }
+  /* on a phone, the first swipe up from the teaser glides to the welcome; the rest of that swipe is held so it can't
+     fight the glide. Only from the very top: anywhere else, touch keeps its native momentum */
+  var reelTouch = null, reelGlideEnd = 0;
+  if(!reduce){
+    window.addEventListener('touchstart', function(e){
+      reelTouch = window.scrollY < 4 && e.touches.length === 1 && !menuOpen() ? {y: e.touches[0].clientY, held: false} : null;
+    }, {passive:true});
+    window.addEventListener('touchmove', function(e){
+      if(!reelTouch) return;
+      if(reelTouch.held){ e.preventDefault(); return; }
+      var dy = reelTouch.y - e.touches[0].clientY;
+      if(dy > 8){ e.preventDefault(); reelTouch.held = true; reelGlideEnd = performance.now() + 1500; glide(stopOf(document.querySelector('.hero')), 1400); }
+      else if(dy < -8){ reelTouch = null; }
+    }, {passive:false});
+    window.addEventListener('touchend', function(){ reelTouch = null; }, {passive:true});
+    /* when the teaser has played through, carry on to the welcome, unless you've already moved on */
+    document.addEventListener('teaser-ended', function(){
+      if(menuOpen() || window.scrollY > 10 || (lenis && lenis.targetScroll > 10)) return;
+      glide(stopOf(document.querySelector('.hero')), 1800);
+    });
   }
   var mnav = document.querySelector('.mnav');
   var mbar = mnav.querySelector('.mbar');
@@ -1820,6 +1863,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
     if(menuOpen()) return;
     var y = window.scrollY, dy = y - barY;
     mbar.classList.toggle('solid', y > 24);
+    mbar.classList.toggle('reel-on', y < window.innerHeight * 0.5);
     if(reduce || y < 120 || Date.now() < barHold){ mbar.classList.remove('away'); barY = y; }
     else if(Math.abs(dy) > 8){ mbar.classList.toggle('away', dy > 0); barY = y; }
   }
@@ -1827,6 +1871,17 @@ picture{margin-block:clamp(52px,8vw,104px);}
     if(!barTicking){ barTicking = true; window.requestAnimationFrame(placeBar); }
   }, {passive:true});
   placeBar();
+
+  /* the welcome fades in as its screen arrives */
+  var welcome = document.querySelector('.hero');
+  function developed(){ document.querySelectorAll('.develop.wait').forEach(function(el){ el.classList.remove('wait'); }); }
+  if(reduce || !welcome || !('IntersectionObserver' in window)){ developed(); }
+  else {
+    var devIO = new IntersectionObserver(function(entries){
+      if(entries[entries.length - 1].isIntersecting){ developed(); devIO.disconnect(); }
+    }, {threshold: 0.35});
+    devIO.observe(welcome);
+  }
 
   /* reveal: body text fades up once as it enters */
   var items = document.querySelectorAll('.rv');
@@ -2005,7 +2060,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
   var marks = railLinks.map(function(a){
     return document.getElementById(a.getAttribute('href').slice(1));
   });
-  var cueDown = document.querySelector('.hero .cue');
+  var cueDown = document.querySelector('.reel .cue');
   function markCurrent(){
     var line = window.innerHeight * 0.42, current = -1;
     cueDown.classList.toggle('gone', window.scrollY > 40);
