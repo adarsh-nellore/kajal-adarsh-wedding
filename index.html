@@ -166,12 +166,11 @@ a:focus-visible{outline:none;}
 .leg a{color:var(--gold);background-size:100% 1px;}
 @media (prefers-reduced-motion:reduce){a{transition:none;}}
 
-/* opening screen: the teaser in its frame, then the name, dates and RSVP, all on the first screen.
-   --hf is the name's size; --rest is everything on the screen that isn't the frame, so the frame takes the height left over */
+/* opening screen: the teaser as a polaroid with the name and dates written on its foot, then the RSVP, all on the first screen.
+   --rest is everything on the screen that isn't the polaroid; --tall is the polaroid's height per unit of width */
 .hero{
-  --hf:min(clamp(54px,12vw,148px), 10.5svh);
-  --below:clamp(30px,4svh,44px);
-  --rest:calc(clamp(24px,4svh,48px) + var(--below) + 1.04 * var(--hf) + clamp(8px,1.4svh,16px) + 3 * clamp(19px,2.4vw,26px) + clamp(18px,2.6svh,32px) + 49px + clamp(64px,9svh,92px));
+  --rest:calc(clamp(20px,3svh,40px) + clamp(18px,2.6svh,32px) + 49px + clamp(64px,9svh,92px));
+  --tall:1.05;
   position:relative;
   min-height:100vh;
   min-height:100svh;
@@ -180,49 +179,59 @@ a:focus-visible{outline:none;}
   justify-content:center;
   align-items:center;
   text-align:center;
-  padding-block:clamp(24px,4svh,48px) clamp(64px,9svh,92px);
+  padding-block:clamp(20px,3svh,40px) clamp(64px,9svh,92px);
 }
-.hero h1{font-size:var(--hf);}
-.hero .stamp{margin-top:clamp(8px,1.4svh,16px);}
-/* phones: the name on one line across the width */
-@media (max-width:700px){ .hero{--hf:min(16.5vw, 10.5svh);--rest:calc(clamp(24px,4svh,48px) + var(--below) + 1.04 * var(--hf) + clamp(8px,1.4svh,16px) + 4.5 * clamp(19px,2.4vw,26px) + clamp(18px,2.6svh,32px) + 49px + clamp(64px,9svh,92px));} }
+@media (max-width:700px){ .hero{--tall:1.08;} }
 
-/* the teaser in the copper frame from the cliff interlude, its picture cut out (img/frame-ornate-window, 1400×1108).
-   The video sits under the frame, running 4px (at 1400 wide) past the window on each side so the frame hides its edges.
-   On phones the frame may run into the page gutters */
+/* a thin cream border on three sides and a deeper foot. Sized by its width, so the writing on the foot (in cqw) scales with it;
+   on phones it may run into the page gutters */
 .teaser{
-  position:relative;
-  width:max(260px, min(100vw - 12px, 980px, (100svh - var(--rest) - 12px) * 1400 / 1108));
-  aspect-ratio:1400/1108;
+  --b:clamp(6px,.8vw,11px);
+  width:max(260px, min(100vw - 20px, 760px, (100svh - var(--rest)) / var(--tall)));
   flex:none;
-  margin:0 0 var(--below);
+  margin:0;
+  padding:var(--b) var(--b) 0;
+  background:#EAE3D6;
+  border-radius:2px;
+  box-shadow:0 14px 30px rgba(0,0,0,.5);
+  container-type:inline-size;
   animation:fade-in 1s cubic-bezier(.2,.7,.3,1) both;
 }
-.teaser video{
-  position:absolute;
-  left:calc(182 / 1400 * 100%);top:calc(190 / 1108 * 100%);
-  width:calc(1036 / 1400 * 100%);height:calc(730 / 1108 * 100%);
-  object-fit:cover;background:#121212;cursor:pointer;
+.teaser-screen{position:relative;}
+.teaser video{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#121212;cursor:pointer;}
+.teaser figcaption{padding:3.2cqw 4cqw 4.4cqw;color:#1E1712;}
+.hero h1{font-size:11.5cqw;line-height:1;color:#1E1712;will-change:auto;}
+.hero .stamp{margin-top:1.4cqw;font-size:max(14px, 3cqw);line-height:1.4;}
+@media (max-width:700px){
+  .hero h1{font-size:13.6cqw;}
+  .hero .stamp{font-size:max(14px, 3.9cqw);}
 }
-.teaser picture{position:absolute;inset:0;margin:0;pointer-events:none;}
-.teaser picture img{display:block;width:100%;height:100%;filter:drop-shadow(0 16px 26px rgba(0,0,0,.55));}
-/* the sound switch hangs just under the frame, level with the window's right edge */
-.teaser figcaption{position:absolute;top:calc(100% + 2px);right:calc(186 / 1400 * 100%);}
-.teaser button{appearance:none;border:0;margin:0;font-family:var(--body);font-size:15px;line-height:1.2;cursor:pointer;}
-.teaser-sound{background:none;padding:4px 2px;color:var(--camel);opacity:.8;transition:opacity .35s cubic-bezier(.2,.7,.3,1);}
+.teaser button{appearance:none;border:0;margin:0;padding:0;background:none;cursor:pointer;}
+.teaser button:focus-visible{outline:1px solid var(--gold);outline-offset:2px;}
+/* sound: a small speaker in the video's corner, muted until tapped. 44px to tap, 36px to see */
+.teaser-sound{
+  position:absolute;right:6px;bottom:6px;width:44px;height:44px;display:grid;place-items:center;
+  opacity:.72;transition:opacity .35s cubic-bezier(.2,.7,.3,1);
+}
+.teaser-sound::before{content:"";position:absolute;inset:4px;border-radius:50%;background:rgba(18,18,18,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.teaser-sound svg{position:relative;width:18px;height:18px;fill:none;stroke:#EAE3D6;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
 .teaser-sound:hover,.teaser-sound:focus-visible{opacity:1;}
-.teaser button:focus-visible{outline:1px solid var(--gold);outline-offset:3px;}
+.teaser-sound[aria-pressed="true"] .ico-off,.teaser-sound[aria-pressed="false"] .ico-on{display:none;}
 .teaser-play{
-  position:absolute;left:50%;top:calc((190 + 365) / 1108 * 100%);transform:translate(-50%,-50%);z-index:1;
-  padding:.3em 1.1em .4em;background:rgba(18,18,18,.62);color:#EAE3D6;border:1px solid rgba(234,227,214,.5) !important;font-size:19px !important;
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:64px;height:64px;display:grid;place-items:center;border-radius:50%;
+  background:rgba(18,18,18,.55) !important;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  transition:background-color .35s cubic-bezier(.2,.7,.3,1);
 }
-.teaser-play:hover{background:rgba(18,18,18,.8);}
-/* the name fades in once the teaser is under way */
-.hero-names{transition:opacity 1.4s cubic-bezier(.2,.7,.3,1);}
-.hero-names.wait{opacity:0;}
-@media (scripting:none){ .hero-names.wait{opacity:1;} }
+.teaser-play[hidden]{display:none;}
+.teaser-play:hover{background:rgba(18,18,18,.75) !important;}
+.teaser-play svg{width:22px;height:22px;margin-left:4px;fill:#EAE3D6;}
+/* the writing on the polaroid develops once the teaser is under way */
+.develop{transition:opacity 1.4s cubic-bezier(.2,.7,.3,1);}
+.develop.wait{opacity:0;}
+@media (scripting:none){ .develop.wait{opacity:1;} }
 @keyframes fade-in{from{opacity:0;}}
-@media (prefers-reduced-motion:reduce){ .teaser{animation:none;} .hero-names{transition:none;} }
+@media (prefers-reduced-motion:reduce){ .teaser{animation:none;} .develop{transition:none;} }
 .cue{
   position:absolute;
   left:50%;
@@ -1011,16 +1020,17 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
 <header class="hero" id="top">
 <figure class="teaser">
+<div class="teaser-screen">
 <video src="video/teaser.mp4" poster="img/teaser-poster.jpg" width="768" height="576" muted loop playsinline preload="metadata" aria-label="Teaser: Kajal and Adarsh in Mexico City"></video>
-<picture aria-hidden="true"><source type="image/webp" srcset="img/frame-ornate-window-sm.webp 700w, img/frame-ornate-window.webp 1400w" sizes="(max-width:700px) 100vw, 980px"><img src="img/frame-ornate-window.png" width="700" height="554" alt="" decoding="async"></picture>
-<button class="teaser-play" type="button" hidden>Play</button>
-<figcaption><button class="teaser-sound" type="button" aria-pressed="false">Sound on</button></figcaption>
-</figure>
-<div class="hero-names wait">
-<h1 data-px="0.07" data-px-hero>Kajal y Adarsh</h1>
-<p class="stamp" data-px="0.035" data-px-hero>Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico</p>
-<p class="cover-cta" data-px="0.035" data-px-hero><a class="rsvp-send cover-rsvp" href="#rsvp">RSVP</a></p>
+<button class="teaser-play" type="button" aria-label="Play the teaser with sound" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg></button>
+<button class="teaser-sound" type="button" aria-pressed="false" aria-label="Turn sound on"><svg class="ico-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg><svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.5a8 8 0 0 1 0 11"/></svg></button>
 </div>
+<figcaption class="develop wait">
+<h1>Kajal y Adarsh</h1>
+<p class="stamp">Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico</p>
+</figcaption>
+</figure>
+<p class="cover-cta develop wait"><a class="rsvp-send cover-rsvp" href="#rsvp">RSVP</a></p>
 <!-- HERO STICKERS (retired for the teaser; kept for reuse elsewhere, e.g. with a frame). The selfie sat inside .stamp, after the RSVP link.
 <picture class="stk stk-hero stk-selfie" aria-hidden="true">
 <source type="image/webp" srcset="img/sticker-selfie-sm.webp 220w, img/sticker-selfie.webp 340w" sizes="(max-width:700px) 180px, (max-width:900px) 130px, 210px">
@@ -1397,15 +1407,15 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
 <script>
 /* the teaser: plays muted and looped while it's on screen; with reduced motion it waits on its poster for a tap.
-   The name fades in once the video is under way (or after a moment, if it can't start) */
+   A tap on a muted video turns the sound on; after that a tap pauses and plays. The writing on the polaroid
+   develops once the video is under way (or after a moment, if it can't start) */
 (function(){
   var fig = document.querySelector('.teaser');
   if(!fig) return;
   var v = fig.querySelector('video'), play = fig.querySelector('.teaser-play'), sound = fig.querySelector('.teaser-sound');
-  var names = document.querySelector('.hero-names');
   var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var userPaused = still, onScreen = true;
-  function show(){ names.classList.remove('wait'); }
+  function show(){ document.querySelectorAll('.develop.wait').forEach(function(el){ el.classList.remove('wait'); }); }
   if(still){ show(); play.hidden = false; }
   else {
     v.addEventListener('playing', function(){ setTimeout(show, 1200); }, {once:true});
@@ -1415,19 +1425,18 @@ picture{margin-block:clamp(52px,8vw,104px);}
     var p = v.play();
     if(p && p.catch){ p.catch(function(){ if(v.paused){ play.hidden = false; } }); }
   }
+  function listen(){ v.muted = false; userPaused = false; if(v.paused){ start(); } }
   v.addEventListener('play', function(){ play.hidden = true; });
   v.addEventListener('pause', function(){ if(onScreen){ play.hidden = false; } });
-  function toggle(){
-    if(v.paused){ userPaused = false; start(); } else { userPaused = true; v.pause(); }
-  }
-  v.addEventListener('click', toggle);
-  play.addEventListener('click', toggle);
-  sound.addEventListener('click', function(){
-    v.muted = !v.muted;
-    sound.textContent = v.muted ? 'Sound on' : 'Sound off';
+  v.addEventListener('volumechange', function(){
     sound.setAttribute('aria-pressed', String(!v.muted));
-    if(!v.muted && v.paused){ userPaused = false; start(); }
+    sound.setAttribute('aria-label', v.muted ? 'Turn sound on' : 'Turn sound off');
   });
+  v.addEventListener('click', function(){
+    if(v.muted || v.paused){ listen(); } else { userPaused = true; v.pause(); }
+  });
+  play.addEventListener('click', listen);
+  sound.addEventListener('click', function(){ if(v.muted){ listen(); } else { v.muted = true; } });
   /* off screen it rests, to spare the battery */
   if('IntersectionObserver' in window){
     new IntersectionObserver(function(entries){
