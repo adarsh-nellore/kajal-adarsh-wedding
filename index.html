@@ -1007,10 +1007,18 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .find-note{margin-top:8px;font-size:16px;line-height:1.5;color:rgba(234,227,214,.74);}
 .find-note:empty{display:none;}
 .find-note a{color:var(--gold);}
-.find-note .rsvp-again{color:var(--gold);}
 /* the party: one quiet card per guest, the person replying first */
-.bulk{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 18px;margin-bottom:16px;font-size:17px;line-height:28px;color:rgba(234,227,214,.74);}
-.bulk .rsvp-again,.same-events .rsvp-again{color:var(--gold);}
+.bulk{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 16px;margin-bottom:14px;font-size:17px;line-height:28px;color:rgba(234,227,214,.74);}
+/* small text actions, in the links' manner: inline, a hairline just under the letters, solid once hovered or applied */
+.bulk .rsvp-again,.same-events .rsvp-again,.find-note .rsvp-again{
+  display:inline;padding:0 0 1px;line-height:inherit;color:var(--gold);
+  background:linear-gradient(rgba(var(--gold-rgb),.4),rgba(var(--gold-rgb),.4)) no-repeat 0 100% / 100% 1px;
+  transition:color .35s cubic-bezier(.2,.7,.3,1);
+}
+.bulk .rsvp-again{color:rgba(var(--gold-rgb),.78);}
+.bulk .rsvp-again:hover,.same-events .rsvp-again:hover,.find-note .rsvp-again:hover,.bulk .rsvp-again[aria-pressed="true"]{color:var(--gold);background-image:linear-gradient(var(--gold),var(--gold));}
+.bulk .rsvp-again:active,.same-events .rsvp-again:active,.find-note .rsvp-again:active{opacity:.7;}
+.bulk .rsvp-again:focus-visible,.same-events .rsvp-again:focus-visible,.find-note .rsvp-again:focus-visible{outline:1px solid var(--gold);outline-offset:3px;border-radius:2px;}
 .party{display:grid;gap:12px;}
 .rsvp .guest{padding:16px 20px 18px;border:1px solid rgba(var(--gold-rgb),.22);border-radius:4px;background:rgba(234,227,214,.02);}
 .rsvp .guest.missing{border-color:var(--gold);}
@@ -1021,7 +1029,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .guest .tab{font-size:clamp(20px,2.2vw,24px);}
 .guest-yes{margin-top:12px;}
 .guest .check[hidden]{display:none;}
-.same-events{margin-top:8px;font-size:16px;}
+.same-events{margin-top:10px;font-size:16px;line-height:26px;}
 .guest .err{margin-top:8px;}
 /* fingers: every choice, event and link in the party is at least 44px tall */
 @media (pointer:coarse){
@@ -2209,6 +2217,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
         c.querySelector('.same-events').hidden = going.length < 2 || c !== going[0];
       });
       yes.hidden = !going.length;
+      var all = cs.length && cs.every(function(c){ return answer(c) === answer(cs[0]); }) ? answer(cs[0]) : '';
+      bulk.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.all === all ? 'true' : 'false'); });
     }
     bulk.addEventListener('click', function(e){
       var b = e.target.closest('button');
