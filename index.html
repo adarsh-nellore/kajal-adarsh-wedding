@@ -407,11 +407,11 @@ a:focus-visible{outline:none;}
   .journey.index .leg.on:has(.stk) .event>*{opacity:1;transform:none;transition:opacity .6s cubic-bezier(.2,.7,.3,1),transform .6s cubic-bezier(.2,.7,.3,1);}
 }
 @media (max-width:560px) and (prefers-reduced-motion:reduce){ .journey.index .leg .event>*{transition:none !important;} }
-/* phones, Saturday: the long title keeps the full width; the turmeric sits beside the shuttle times instead */
+/* phones, Saturday: the long title keeps the full width, so the turmeric sits top right beside the date alone, its foot
+   just above the title. Its negative bottom margin keeps the date's row (and so the date-to-title gap) as on the other days */
 @media (max-width:560px){
   .journey[data-pin] .leg:has(.stk-haldi) .event>h3{grid-column:1/-1;margin-top:24px;}
-  .journey[data-pin] .leg:has(.stk-haldi) .event>p:last-child{grid-area:5/1/6/2;align-self:center;}
-  .journey[data-pin] .leg .stk-haldi{grid-area:5/2/6/3;align-self:center;margin:0;}
+  .journey[data-pin] .leg .stk-haldi{--h:72px;grid-area:1/2/2/3;align-self:start;margin:calc(.14 * var(--h)) 0 -28px;}
 }
 
 .cover-cta{margin-top:clamp(28px,3.4vw,44px);}
@@ -502,10 +502,15 @@ a:focus-visible{outline:none;}
   margin-left:calc(var(--edge) - 8px);
   margin-bottom:calc(var(--inner) - 8px);
   overflow-x:auto;
-  overscroll-behavior-x:contain;
+  overscroll-behavior-x:none;
   scrollbar-width:none;
 }
 .journey[data-pin] .tabs::-webkit-scrollbar{display:none;}
+/* the one-line rows slide sideways only: overflow-x alone makes them scroll up and down too (the fingertip hit areas
+   reach a pixel past the padding), so a drag could shift or bounce the names; nor are they selectable or draggable */
+.journey[data-pin] .tabs{overflow-y:hidden;touch-action:manipulation;}
+@media (max-width:700px){ .light-faq .tabs{overflow-y:hidden;touch-action:manipulation;} }
+.tabs .tab{-webkit-user-select:none;user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none;}
 .journey[data-pin] .tabs.more{
   -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 96px),transparent);
           mask-image:linear-gradient(to right,#000 calc(100% - 96px),transparent);
@@ -527,7 +532,7 @@ a:focus-visible{outline:none;}
     margin-left:calc(var(--edge) - 8px);
     margin-bottom:calc(var(--inner) - 8px);
     overflow-x:auto;
-    overscroll-behavior-x:contain;
+    overscroll-behavior-x:none;
     scrollbar-width:none;
   }
   .light-faq .tabs::-webkit-scrollbar{display:none;}
@@ -1068,11 +1073,10 @@ picture{margin-block:clamp(52px,8vw,104px);}
   .rsvp input,.rsvp textarea,.check > span::before,.rsvp-send{transition:none;}
 }
 
-.rv{opacity:0;transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1);}
+.rv{opacity:0;transition:opacity 1.2s cubic-bezier(.3,.15,.25,1),transform 1.2s cubic-bezier(.3,.15,.25,1);}
 .rv.in{opacity:1;transform:none;}
 /* frames come in a touch small and off to the left, then settle onto the nail */
-.frame.rv{transform:translateX(-12px);scale:.965;transition:opacity 1.1s cubic-bezier(.2,.7,.3,1),transform 1.3s cubic-bezier(.2,.7,.3,1),scale 1.5s cubic-bezier(.2,.7,.3,1);}
-.frame.rv.in{transform:none;scale:1;}
+.frame.rv{transform:translateX(-12px);scale:.965;transition:opacity 1.4s cubic-bezier(.3,.15,.25,1),transform 1.7s cubic-bezier(.3,.15,.25,1),scale 1.9s cubic-bezier(.3,.15,.25,1);}.frame.rv.in{transform:none;scale:1;}
 @media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;scale:none;transition:none;}}
 
 /* arrival: each section comes in once as it's reached. The heading inks in from the left, then its index name by name,
@@ -1081,7 +1085,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 @keyframes arrive-fade{from{opacity:0;}}
 @keyframes arrive-ink{
   from{opacity:0;-webkit-mask-position:100% 0;mask-position:100% 0;}
-  25%{opacity:1;}
+  35%{opacity:1;}
   to{opacity:1;-webkit-mask-position:0 0;mask-position:0 0;}
 }
 @keyframes arrive-hang{from{opacity:0;scale:.96;}}
@@ -1089,18 +1093,18 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .arrive.in :is(h2,.contact-h,.day b){
   -webkit-mask-image:linear-gradient(90deg,#000 33.3%,transparent 66.7%);mask-image:linear-gradient(90deg,#000 33.3%,transparent 66.7%);
   -webkit-mask-size:300% 100%;mask-size:300% 100%;
-  animation:arrive-ink 1.4s cubic-bezier(.35,.55,.2,1) both;
+  animation:arrive-ink 1.9s cubic-bezier(.33,.3,.2,1) both;
 }
 .arrive.settled :is(h2,.contact-h,.day b){-webkit-mask-image:none;mask-image:none;}
-.arrive.in .tab{animation:arrive-fade .8s cubic-bezier(.2,.7,.3,1) calc(.35s + var(--n,0) * 70ms) both;}
-.arrive.in :is(.journey-rail,.lede){animation:arrive-fade 1s cubic-bezier(.2,.7,.3,1) .55s both;}
-.arrive.in .day b{animation-delay:.75s;}
-.rsvp.arrive.in .lede{animation-delay:.4s;}
-.arrive.in :is(.rsvp-form,.stk-hats,.contact-h + p){animation:arrive-fade 1s cubic-bezier(.2,.7,.3,1) .8s both;}
+.arrive.in .tab{animation:arrive-fade 1.2s cubic-bezier(.3,.15,.25,1) calc(.45s + var(--n,0) * 110ms) both;}
+.arrive.in :is(.journey-rail,.lede){animation:arrive-fade 1.4s cubic-bezier(.3,.15,.25,1) .7s both;}
+.arrive.in .day b{animation-delay:.9s;}
+.rsvp.arrive.in .lede{animation-delay:.5s;}
+.arrive.in :is(.rsvp-form,.stk-hats,.contact-h + p){animation:arrive-fade 1.4s cubic-bezier(.3,.15,.25,1) .95s both;}
 /* reached by a menu link: all at once, during the glide */
-.arrive.in.jump :is(h2,.tab,.journey-rail,.lede,.rsvp-form,.stk-hats,.day b){animation-delay:0s;animation-duration:.8s;}
+.arrive.in.jump :is(h2,.tab,.journey-rail,.lede,.rsvp-form,.stk-hats,.day b){animation-delay:0s;animation-duration:1s;}
 /* the gallery wall fills in picture by picture, the big one first */
-.wall.arrive.in figure{animation:arrive-hang 1.2s cubic-bezier(.2,.7,.3,1) calc(var(--n,0) * 140ms) both;}
+.wall.arrive.in figure{animation:arrive-hang 1.6s cubic-bezier(.3,.15,.25,1) calc(var(--n,0) * 180ms) both;}
 .wall-lotus{--n:1;}
 .wall-agave{--n:2;}
 .wall-marigold{--n:3;}
@@ -1933,7 +1937,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
   /* weighted scrolling (Lenis): a mouse or trackpad scroll eases out slowly; touch keeps the phone's own momentum.
      The scroll position is never corrected afterwards */
   var lenis = !reduce && window.Lenis ? new window.Lenis({
-    lerp: 0.07, wheelMultiplier: 0.85, autoRaf: true,
+    lerp: 0.08, wheelMultiplier: 0.85, autoRaf: true,
     /* sideways swipes step through a section's cards, so they're left alone */
     virtualScroll: function(d){
       /* Lenis halts any glide on a touch; the swipe glide off the teaser has to run on */
@@ -2019,6 +2023,59 @@ picture{margin-block:clamp(52px,8vw,104px);}
       if(menuOpen() || window.scrollY > 10 || (lenis && lenis.targetScroll > 10)) return;
       glide(stopOf(document.querySelector('.hero')), 1800);
     });
+  }
+  /* between sections, a softer echo of the glide off the teaser: once a wheel or swipe has come to rest (a phone's own
+     momentum included) with the next heading just short of its resting line, the page glides the rest of the way. Only
+     when it's that close, so long sections scroll freely, and only towards where you were going (or back a hair if you
+     just overshot). It picks up the scroll's own speed, so a still-coasting wheel flows on into it; any input takes over */
+  if(lenis){
+    var nearHeads = Array.prototype.slice.call(document.querySelectorAll('.journey h2, .rsvp h2'));
+    var nearTimer = 0, nearDir = 1, nearTouch = false, nearMoved = false, nearPrevY = window.scrollY, nearPrevT = 0, nearV = 0, nearLeft = false, nearGliding = false;
+    var nearLater = function(ms){ clearTimeout(nearTimer); nearTimer = setTimeout(nearCheck, ms); };
+    var nearCheck = function(){
+      if(nearTouch || handing || teaserFull || menuOpen() || performance.now() < reelGlideEnd) return;
+      /* a swipe that ended on a menu link or the like: let that glide run (its scroll will ask again) */
+      if(nearLeft && lenis.isScrolling === 'smooth') return;
+      var vh = window.innerHeight, from = nearLeft ? window.scrollY : lenis.animatedScroll, y = nearLeft ? window.scrollY : lenis.targetScroll;
+      var maxY = document.documentElement.scrollHeight - vh, to = null, best = Infinity;
+      nearLeft = false;
+      if(y < vh * 1.2) return;
+      nearHeads.forEach(function(h){
+        var stop = Math.max(0, Math.min(maxY, Math.round(stopOf(h)))), ahead = (stop - y) * nearDir;
+        if(((ahead > 2 && ahead <= vh * 0.2) || (ahead < -2 && ahead >= -vh * 0.04)) && Math.abs(stop - y) < best){ to = stop; best = Math.abs(stop - y); }
+      });
+      if(to === null || Math.abs(to - from) < 2) return;
+      var dist = to - from, ms = 900 + Math.min(300, Math.abs(dist) / vh * 1000);
+      /* a curve that leaves at the scroll's current speed and comes to rest, so nothing lurches */
+      var s = Math.max(0, Math.min(2.4, nearV * ms / dist));
+      nearGliding = true;
+      lenis.scrollTo(to, {duration: ms / 1000, easing: function(t){ return (s - 2) * t * t * t + (3 - 2 * s) * t * t + s * t; },
+        onComplete: function(){ nearGliding = false; }});
+    };
+    var nearCancel = function(){
+      clearTimeout(nearTimer);
+      if(nearGliding){ nearGliding = false; lenis.scrollTo(window.scrollY, {immediate: true, force: true}); }
+    };
+    window.addEventListener('wheel', function(e){
+      if(Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      nearGliding = false;
+      nearDir = e.deltaY > 0 ? 1 : -1;
+      nearLater(220);
+    }, {passive:true});
+    window.addEventListener('touchstart', function(){ nearTouch = true; nearMoved = false; nearLeft = false; nearCancel(); }, {passive:true});
+    /* a tap that didn't scroll leaves the page where it is */
+    window.addEventListener('touchend', function(){ nearTouch = false; if(nearMoved){ nearLeft = true; nearLater(240); } }, {passive:true});
+    window.addEventListener('touchcancel', function(){ nearTouch = false; }, {passive:true});
+    window.addEventListener('keydown', function(){ nearCancel(); });
+    window.addEventListener('scroll', function(){
+      var now = performance.now(), y = window.scrollY, dy = y - nearPrevY;
+      if(now - nearPrevT < 120 && Math.abs(dy) > 0.2){ nearV = nearV * 0.6 + (dy / Math.max(1, now - nearPrevT)) * 0.4; } else { nearV = 0; }
+      nearPrevY = y; nearPrevT = now;
+      if(nearTouch || nearLeft){
+        if(Math.abs(dy) > 0.5){ nearDir = dy > 0 ? 1 : -1; nearMoved = true; }
+        if(nearLeft){ nearLater(240); }
+      }
+    }, {passive:true});
   }
   var mnav = document.querySelector('.mnav');
   var mbar = mnav.querySelector('.mbar');
@@ -2114,7 +2171,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
       entries.forEach(function(e){
         if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
       });
-    }, {rootMargin:'0px 0px -6% 0px', threshold:0.05});
+    }, {rootMargin:'0px 0px 2% 0px', threshold:0});
     items.forEach(function(el){ io.observe(el); });
   }
 
@@ -2123,13 +2180,13 @@ picture{margin-block:clamp(52px,8vw,104px);}
     var arrive = function(s){
       if(!s || s.classList.contains('in')) return;
       s.classList.add('in');
-      setTimeout(function(){ s.classList.add('settled'); }, 2600);
+      setTimeout(function(){ s.classList.add('settled'); }, 4200);
     };
     var arriveIO = new IntersectionObserver(function(entries){
       entries.forEach(function(e){
         if(e.isIntersecting){ arrive(e.target); arriveIO.unobserve(e.target); }
       });
-    }, {rootMargin:'0px 0px -6% 0px'});
+    }, {rootMargin:'0px 0px 2% 0px'});
     document.querySelectorAll('.journey, .rsvp, .wall, .contact').forEach(function(s){
       s.querySelectorAll('.tab').forEach(function(t, i){ t.style.setProperty('--n', Math.min(i, 6)); });
       s.classList.add('arrive');
