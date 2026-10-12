@@ -167,7 +167,7 @@ a:focus-visible{outline:none;}
 @media (prefers-reduced-motion:reduce){a{transition:none;}}
 
 /* screen one: the teaser alone, as large as the screen allows, in a thin cream border. Full-bleed, so only the
-   screen's edges limit it; --m is the margin around it (a little more below, for the scroll cue) */
+   screen's edges limit it; --m is the margin around it */
 .reel{
   --m:clamp(12px,3.5vmin,40px);
   --b:clamp(5px,.6vw,9px);
@@ -179,10 +179,10 @@ a:focus-visible{outline:none;}
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:var(--m) var(--m) calc(var(--m) + 26px);
+  padding:var(--m);
 }
 .teaser{
-  width:calc(min(100vw - 2 * var(--m) - 2 * var(--b), (100svh - 2 * var(--m) - 26px - 2 * var(--b)) * 4 / 3) + 2 * var(--b));
+  width:calc(min(100vw - 2 * var(--m) - 2 * var(--b), (100svh - 2 * var(--m) - 2 * var(--b)) * 4 / 3) + 2 * var(--b));
   flex:none;
   margin:0;
   padding:var(--b);
@@ -204,27 +204,31 @@ a:focus-visible{outline:none;}
 .teaser-sound svg{position:relative;width:18px;height:18px;fill:none;stroke:#EAE3D6;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
 .teaser-sound:hover,.teaser-sound:focus-visible{opacity:1;}
 .teaser-sound[aria-pressed="true"] .ico-off,.teaser-sound[aria-pressed="false"] .ico-on{display:none;}
-/* before it starts: one quiet pill that says what it does; once started, a plain round play button when paused */
-.teaser-play{
+/* the play button, in the RSVP button's manner: Jaini in a gold rule, over a dark veil so it reads on bright frames.
+   Before it starts it says what it does; once started, only the triangle */
+.teaser .teaser-play{
   position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  height:clamp(52px,4.6vw,64px);display:flex;align-items:center;gap:12px;padding:0 1.4em 0 1.15em;border-radius:999px;
-  background:rgba(18,18,18,.5) !important;border:1px solid rgba(234,227,214,.35) !important;
+  display:inline-flex;align-items:center;gap:.42em;
+  padding:.2em 28px .32em 24px;
+  border:1px solid var(--gold);border-radius:0;
+  background:linear-gradient(rgba(var(--gold-rgb),.1),rgba(var(--gold-rgb),.1)),rgba(18,18,18,.74);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  color:#EAE3D6;font-family:var(--body);font-size:clamp(18px,1.6vw,22px);line-height:1;white-space:nowrap;
-  transition:background-color .35s cubic-bezier(.2,.7,.3,1),border-color .35s cubic-bezier(.2,.7,.3,1);
+  font-family:var(--head);font-size:clamp(24px,2.6vw,30px);line-height:1.2;letter-spacing:.01em;color:#EAE3D6;white-space:nowrap;
+  transition:background-color .35s cubic-bezier(.2,.7,.3,1);
 }
-.teaser-play[hidden]{display:none;}
-.teaser-play:hover,.teaser-play:focus-visible{background:rgba(18,18,18,.7) !important;border-color:rgba(234,227,214,.6) !important;}
-.teaser-play svg{width:18px;height:18px;fill:#EAE3D6;flex:none;}
-.teaser-play .label{padding-bottom:2px;}
-.teaser.started .teaser-play{width:64px;height:64px;padding:0 0 0 4px;justify-content:center;}
+.teaser .teaser-play:hover{background:linear-gradient(rgba(var(--gold-rgb),.26),rgba(var(--gold-rgb),.26)),rgba(18,18,18,.74);}
+.teaser .teaser-play:focus-visible{outline:1px solid var(--gold);outline-offset:4px;}
+.teaser-play[hidden]{display:none !important;}
+.teaser-play svg{width:.56em;height:.56em;fill:currentColor;flex:none;margin-top:.1em;}
+.teaser.started .teaser-play{padding:.42em .62em .42em .72em;}
 .teaser.started .teaser-play .label{display:none;}
 .teaser:not(.started) .teaser-sound{display:none;}
 /* the cue arrives once the teaser has had the screen to itself for a few seconds */
-.reel .cue{bottom:calc(.5 * var(--m));}
-.reel .cue span{animation:fade-in 1.2s ease 4s both;}
+/* the scroll cue bobs gently, so it reads as a way on */
+.cue span{display:block;font-size:24px;line-height:1;animation:cue-float 2.4s ease-in-out infinite;}
+@keyframes cue-float{0%,100%{transform:translateY(0);opacity:1;}50%{transform:translateY(6px);opacity:.55;}}
 
-/* screen two: the welcome, the names, the dates and the RSVP, centred; they fade in as the screen arrives */
+/* screen two: the names, the dates and the RSVP, centred; they fade in as the screen arrives */
 .hero{
   position:relative;
   min-height:100vh;
@@ -236,16 +240,15 @@ a:focus-visible{outline:none;}
   text-align:center;
   padding-block:clamp(48px,8vh,96px);
 }
-.welcome{font-size:clamp(22px,2.6vw,30px);line-height:1.35;margin-bottom:clamp(8px,1.4vw,18px);}
 @media (max-width:700px){ .hero h1{font-size:min(17vw,96px);} }
 .develop{transition:opacity 1.6s cubic-bezier(.2,.7,.3,1);}
 .develop.wait{opacity:0;}
-.hero h1.develop{transition-delay:.25s;}
-.hero .stamp.develop{transition-delay:.55s;}
-.hero .cover-cta.develop{transition-delay:.8s;}
+.hero h1.develop{transition-delay:0s;}
+.hero .stamp.develop{transition-delay:.3s;}
+.hero .cover-cta.develop{transition-delay:.55s;}
 @media (scripting:none){ .develop.wait{opacity:1;} }
 @keyframes fade-in{from{opacity:0;}}
-@media (prefers-reduced-motion:reduce){ .teaser,.reel .cue span{animation:none;} .develop{transition:none;} }
+@media (prefers-reduced-motion:reduce){ .teaser,.cue span{animation:none;} .develop{transition:none;} }
 /* the top bar keeps off the teaser */
 .mbar.reel-on{transform:translateY(-100%);pointer-events:none;}
 .cue{
@@ -1042,12 +1045,12 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <button class="teaser-sound" type="button" aria-pressed="true" aria-label="Turn sound off"><svg class="ico-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg><svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.5a8 8 0 0 1 0 11"/></svg></button>
 </div>
 </figure>
-<a class="cue" href="#welcome" aria-label="Skip to the welcome"><span aria-hidden="true">↓</span></a></header>
+</header>
 <section class="hero" id="welcome" aria-label="Welcome">
-<p class="welcome develop wait">Welcome to our wedding weekend</p>
 <h1 class="develop wait">Kajal y Adarsh</h1>
 <p class="stamp develop wait">Friday, February 19 – Sunday, February 21, 2027<br>Mexico City, Mexico</p>
 <p class="cover-cta develop wait"><a class="rsvp-send cover-rsvp" href="#rsvp">RSVP</a></p>
+<a class="cue" href="#weekend" aria-label="Skip to the events"><span aria-hidden="true">↓</span></a>
 <!-- HERO STICKERS (retired for the teaser; kept for reuse elsewhere, e.g. with a frame). The selfie sat inside .stamp, after the RSVP link.
 <picture class="stk stk-hero stk-selfie" aria-hidden="true">
 <source type="image/webp" srcset="img/sticker-selfie-sm.webp 220w, img/sticker-selfie.webp 340w" sizes="(max-width:700px) 180px, (max-width:900px) 130px, 210px">
@@ -2060,10 +2063,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
   var marks = railLinks.map(function(a){
     return document.getElementById(a.getAttribute('href').slice(1));
   });
-  var cueDown = document.querySelector('.reel .cue');
   function markCurrent(){
     var line = window.innerHeight * 0.42, current = -1;
-    cueDown.classList.toggle('gone', window.scrollY > 40);
     rail.classList.toggle('show', stamp.getBoundingClientRect().bottom < 0);
     for(var i=0;i<marks.length;i++){
       if(marks[i] && marks[i].getBoundingClientRect().top - magOff(marks[i]) <= line){ current = i; }
