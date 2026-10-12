@@ -166,13 +166,12 @@ a:focus-visible{outline:none;}
 .leg a{color:var(--gold);background-size:100% 1px;}
 @media (prefers-reduced-motion:reduce){a{transition:none;}}
 
-/* opening screen: the teaser in its mat, then the name, dates and RSVP, all on the first screen.
-   --hf is the name's size; --rest is everything on the screen that isn't the video, so the video takes the height left over */
+/* opening screen: the teaser in its frame, then the name, dates and RSVP, all on the first screen.
+   --hf is the name's size; --rest is everything on the screen that isn't the frame, so the frame takes the height left over */
 .hero{
   --hf:min(clamp(54px,12vw,148px), 10.5svh);
-  --mat:clamp(7px,.8vw,12px);
-  --strip:30px;
-  --rest:calc(clamp(24px,4svh,48px) + 2 * var(--mat) + var(--strip) + clamp(24px,3.4svh,40px) + 1.04 * var(--hf) + clamp(8px,1.4svh,16px) + 3 * clamp(19px,2.4vw,26px) + clamp(18px,2.6svh,32px) + 49px + clamp(64px,9svh,92px));
+  --below:clamp(30px,4svh,44px);
+  --rest:calc(clamp(24px,4svh,48px) + var(--below) + 1.04 * var(--hf) + clamp(8px,1.4svh,16px) + 3 * clamp(19px,2.4vw,26px) + clamp(18px,2.6svh,32px) + 49px + clamp(64px,9svh,92px));
   position:relative;
   min-height:100vh;
   min-height:100svh;
@@ -186,30 +185,35 @@ a:focus-visible{outline:none;}
 .hero h1{font-size:var(--hf);}
 .hero .stamp{margin-top:clamp(8px,1.4svh,16px);}
 /* phones: the name on one line across the width */
-@media (max-width:700px){ .hero{--hf:min(16.5vw, 10.5svh);--rest:calc(clamp(24px,4svh,48px) + 2 * var(--mat) + var(--strip) + clamp(24px,3.4svh,40px) + 1.04 * var(--hf) + clamp(8px,1.4svh,16px) + 4.5 * clamp(19px,2.4vw,26px) + clamp(18px,2.6svh,32px) + 49px + clamp(64px,9svh,92px));} }
+@media (max-width:700px){ .hero{--hf:min(16.5vw, 10.5svh);--rest:calc(clamp(24px,4svh,48px) + var(--below) + 1.04 * var(--hf) + clamp(8px,1.4svh,16px) + 4.5 * clamp(19px,2.4vw,26px) + clamp(18px,2.6svh,32px) + 49px + clamp(64px,9svh,92px));} }
 
-/* the teaser, matted like the snapshots down the page, with a deeper foot that holds the sound switch */
+/* the teaser in the copper frame from the cliff interlude, its picture cut out (img/frame-ornate-window, 1400×1108).
+   The video sits under the frame, running 4px (at 1400 wide) past the window on each side so the frame hides its edges.
+   On phones the frame may run into the page gutters */
 .teaser{
-  --vid:max(240px, min(100% - 2 * var(--mat), 880px, (100svh - var(--rest)) * 4 / 3));
   position:relative;
-  width:calc(var(--vid) + 2 * var(--mat));
-  max-width:100%;
-  margin:0 0 clamp(24px,3.4svh,40px);
-  padding:var(--mat) var(--mat) 0;
-  background:#EAE3D6;
-  border-radius:4px;
-  rotate:-1deg;
-  box-shadow:0 14px 30px rgba(0,0,0,.55);
+  width:max(260px, min(100vw - 12px, 980px, (100svh - var(--rest) - 12px) * 1400 / 1108));
+  aspect-ratio:1400/1108;
+  flex:none;
+  margin:0 0 var(--below);
   animation:fade-in 1s cubic-bezier(.2,.7,.3,1) both;
 }
-.teaser video{display:block;width:100%;height:auto;aspect-ratio:4/3;background:#121212;border-radius:1px;cursor:pointer;}
-.teaser figcaption{display:flex;justify-content:flex-end;align-items:center;height:var(--strip);}
+.teaser video{
+  position:absolute;
+  left:calc(182 / 1400 * 100%);top:calc(190 / 1108 * 100%);
+  width:calc(1036 / 1400 * 100%);height:calc(730 / 1108 * 100%);
+  object-fit:cover;background:#121212;cursor:pointer;
+}
+.teaser picture{position:absolute;inset:0;margin:0;pointer-events:none;}
+.teaser picture img{display:block;width:100%;height:100%;filter:drop-shadow(0 16px 26px rgba(0,0,0,.55));}
+/* the sound switch hangs just under the frame, level with the window's right edge */
+.teaser figcaption{position:absolute;top:calc(100% + 2px);right:calc(186 / 1400 * 100%);}
 .teaser button{appearance:none;border:0;margin:0;font-family:var(--body);font-size:15px;line-height:1.2;cursor:pointer;}
-.teaser-sound{background:none;padding:4px 2px;color:#121212;opacity:.7;transition:opacity .35s cubic-bezier(.2,.7,.3,1);}
+.teaser-sound{background:none;padding:4px 2px;color:var(--camel);opacity:.8;transition:opacity .35s cubic-bezier(.2,.7,.3,1);}
 .teaser-sound:hover,.teaser-sound:focus-visible{opacity:1;}
 .teaser button:focus-visible{outline:1px solid var(--gold);outline-offset:3px;}
 .teaser-play{
-  position:absolute;left:50%;top:calc(var(--mat) + .5 * var(--vid) * 3 / 4);transform:translate(-50%,-50%);
+  position:absolute;left:50%;top:calc((190 + 365) / 1108 * 100%);transform:translate(-50%,-50%);z-index:1;
   padding:.3em 1.1em .4em;background:rgba(18,18,18,.62);color:#EAE3D6;border:1px solid rgba(234,227,214,.5) !important;font-size:19px !important;
 }
 .teaser-play:hover{background:rgba(18,18,18,.8);}
@@ -1008,6 +1012,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <header class="hero" id="top">
 <figure class="teaser">
 <video src="video/teaser.mp4" poster="img/teaser-poster.jpg" width="768" height="576" muted loop playsinline preload="metadata" aria-label="Teaser: Kajal and Adarsh in Mexico City"></video>
+<picture aria-hidden="true"><source type="image/webp" srcset="img/frame-ornate-window-sm.webp 700w, img/frame-ornate-window.webp 1400w" sizes="(max-width:700px) 100vw, 980px"><img src="img/frame-ornate-window.png" width="700" height="554" alt="" decoding="async"></picture>
 <button class="teaser-play" type="button" hidden>Play</button>
 <figcaption><button class="teaser-sound" type="button" aria-pressed="false">Sound on</button></figcaption>
 </figure>
