@@ -32,6 +32,14 @@ EVENTS = [  # same values as the RSVP form's checkboxes
 # "Bhavani hubby", "Plus 1") becomes an unnamed plus one; whoever replies types the name
 NOTE = re.compile(r"[()+]|\b(plus|kid|kids|baby|hubby|husband|wife|daughter|son|partner|guest)\b", re.I)
 
+# plus ones the sheet numbers apart from their host: sheet first name -> host's party.
+# Harmless once the sheet itself is fixed.
+PARTY_FIX = {
+    "sandy +1 (linda)": "68",
+    "victor +1 (julia)": "74",
+    "mikey +1 (sara)": "77",
+}
+
 warnings = []
 
 
@@ -92,6 +100,10 @@ def main():
         if not party:
             warnings.append(f"row {i}: “{(first + ' ' + last).strip()}” has no party number, skipped")
             continue
+        fix = PARTY_FIX.get(first.lower())
+        if fix and fix != party:
+            warnings.append(f"row {i}: “{first}” moved from party {party} to {fix}")
+            party = fix
         events = parse_events(row[c_events], i) if c_events is not None else None
         # "Gita & Jayesh and Panda" is three people
         firsts = [p.strip() for p in re.split(r"\s*&\s*|\s+and\s+", first) if p.strip()] if not re.search(r"\(", first) else [first]
