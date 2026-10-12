@@ -271,6 +271,11 @@ a:focus-visible{outline:none;}
   transition:opacity .35s cubic-bezier(.2,.7,.3,1);
 }
 .cue::after{content:"";position:absolute;inset:-13px -20px;}
+/* a phone on its side: the welcome only just fits, so the arrow keeps clear of the RSVP */
+@media (pointer:coarse) and (orientation:landscape) and (max-height:500px){
+  .hero .stamp{margin-top:24px;}
+  .hero .cue{bottom:10px;}
+}
 .cue:hover,.cue:focus-visible{opacity:1;}
 .cue.gone{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .35s cubic-bezier(.2,.7,.3,1),visibility 0s .35s;}
 .hero + h2{margin-top:clamp(64px,10vw,120px);}
