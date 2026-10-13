@@ -196,7 +196,11 @@ a:focus-visible{outline:none;}
   flex:none;
   margin:0;
   padding:var(--b) var(--b) 0;
-  /* off-white paper: a fine grain (drawn, no image to fetch) over a faintly uneven tone; the film covers it */
+  animation:fade-in 1s cubic-bezier(.2,.7,.3,1) both;
+}
+/* off-white paper: a fine grain (drawn, no image to fetch) over a faintly uneven tone; the film covers it. The hotel's
+   postcard in Travel is printed on the same paper */
+.teaser,.leg a.postcard{
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .24 0 0 0 0 .24 0 0 0 0 .23 1.1 0 0 0 -.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E"),
     radial-gradient(ellipse 70% 55% at 22% 18%, rgba(240,240,236,.18), rgba(240,240,236,0) 70%),
@@ -214,7 +218,6 @@ a:focus-visible{outline:none;}
     0 1px 2px rgba(0,0,0,.45),
     0 4px 14px rgba(215,215,210,.05),
     0 10px 30px rgba(215,215,210,.05);
-  animation:fade-in 1s cubic-bezier(.2,.7,.3,1) both;
 }
 @media (min-width:701px) and (min-height:501px){
   .teaser{
@@ -620,8 +623,15 @@ a:focus-visible{outline:none;}
 .leg a.book.primary{border-color:var(--gold);background-color:rgba(var(--gold-rgb),.22);color:#EAE3D6;}
 .leg a.book.primary:hover{border-color:var(--gold);background-color:rgba(var(--gold-rgb),.34);}
 .leg a.book:focus-visible{outline:1px solid var(--gold);outline-offset:4px;}
-.leg a.snapshot-link{display:block;background:none;padding:0;}
-.leg-body .snapshot{display:block;box-sizing:border-box;width:calc(100% - 28px);height:auto;margin:24px auto clamp(32px,3.6vw,44px);padding:clamp(6px,.7vw,9px);background:#EAE3D6;border-radius:4px;rotate:-1.2deg;box-shadow:0 10px 22px rgba(0,0,0,.5);}
+/* the hotel as a polaroid like the teaser's: the same thin border and captioned strip, scaled to the photo's width */
+.leg a.postcard{
+  --s:max(34px, 7.15cqw);
+  --ink:#1d1b19;
+  display:block;box-sizing:border-box;width:calc(100% - 28px);margin:24px auto clamp(32px,3.6vw,44px);padding:2.5% 2.5% 0;
+  container-type:inline-size;
+}
+.leg a.postcard:focus-visible{outline:1px solid var(--gold);outline-offset:4px;}
+.leg a.postcard .snapshot{display:block;width:100%;height:auto;outline:1px solid rgba(0,0,0,.14);outline-offset:-1px;}
 .leg ul.gems{list-style:none;padding:0;margin:10px 0 0;}
 .leg ul.gems li{position:relative;padding-left:1.3em;}
 .leg ul.gems li + li{margin-top:6px;}
@@ -1271,7 +1281,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="journey-rail">
 <article class="leg" data-tab="Hotel">
 <div class="leg-body">
-<a class="snapshot-link" href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener" aria-label="Book at Andaz Mexico City Condesa"><img class="snapshot" src="img/andaz.webp" width="1024" height="683" alt="Lounge at Andaz Mexico City Condesa" loading="lazy" decoding="async"></a>
+<a class="snapshot-link postcard" href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener" aria-label="Book at Andaz Mexico City Condesa"><img class="snapshot" src="img/andaz.webp" width="1024" height="683" alt="Lounge at Andaz Mexico City Condesa" loading="lazy" decoding="async"><div class="teaser-strip"><p>Andaz CDMX</p><p>condesa</p></div></a>
 <div class="callout">
 <p><strong class="lead">Room Block:</strong> We’ve arranged a hotel block at Andaz Mexico City Condesa, a Hyatt hotel. The special rate is available Tuesday, Feb. 16 – Wednesday, Feb. 24.</p>
 <div class="ctas"><a class="book primary" href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener">Booking Link</a><a class="book" href="https://maps.app.goo.gl/VpuFjPGXvN67A7yP8" target="_blank" rel="noopener">Directions</a></div>
