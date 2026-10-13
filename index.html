@@ -941,8 +941,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .rsvp legend{padding:0;}
 /* three steps, each under a small Jaini heading; groups sit further apart than the fields inside them */
 .group + .group,.send{margin-top:clamp(48px,6vw,68px);}
-/* the last group waits until a party is found, the email is in and someone has replied */
-.rsvp-form:not(:has(#rsvp-email:not(:placeholder-shown)):has(.guest .choice input:checked)) .group-else{display:none;}
+/* the last group (note, email, copy) waits until a party is found */
+.rsvp-form:has(.group-party[hidden]) .group-else{display:none;}
 .group-else{animation:else-in .5s cubic-bezier(.2,.7,.3,1);}
 @keyframes else-in{from{opacity:0;}}
 /* floated so the legend lays out like a normal block heading inside its fieldset */
@@ -1050,8 +1050,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .rsvp-again:focus-visible{outline:1px solid var(--gold);outline-offset:4px;}
 
 /* name search: matches drop in under the field, a few at a time; picking one brings in the party */
-.find .box > input[readonly]{cursor:default;}
-.find .box > input[readonly]:hover{border-color:rgba(var(--gold-rgb),.35);}
 .matches{list-style:none;margin:6px 0 0;padding:4px 0;border:1px solid rgba(var(--gold-rgb),.35);border-radius:4px;background:#161615;}
 .matches li{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:10px;min-height:48px;padding:10px 15px;font-size:18px;line-height:26px;cursor:pointer;}
 .matches li + li{border-top:1px solid rgba(var(--gold-rgb),.12);}
@@ -1503,13 +1501,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p class="find-note" id="rsvp-find-note" aria-live="polite"></p>
 <p class="err" id="rsvp-name-err"></p>
 </div>
-<div class="field">
-<div class="box">
-<input id="rsvp-email" name="email" type="email" autocomplete="email" aria-describedby="rsvp-email-err" placeholder=" " required>
-<label for="rsvp-email">Email</label>
-</div>
-<p class="err" id="rsvp-email-err"></p>
-</div>
 </div>
 </fieldset>
 <div class="group group-party" hidden>
@@ -1559,6 +1550,13 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <textarea id="rsvp-note" name="note" rows="1" maxlength="4000" placeholder=" "></textarea>
 <label for="rsvp-note">A note to us <span class="opt">(optional)</span></label>
 </div>
+</div>
+<div class="field">
+<div class="box">
+<input id="rsvp-email" name="email" type="email" autocomplete="email" aria-describedby="rsvp-email-err" placeholder=" " required>
+<label for="rsvp-email">Email</label>
+</div>
+<p class="err" id="rsvp-email-err"></p>
 </div>
 <div class="field">
 <label class="check"><input type="checkbox" name="copy" id="rsvp-copy"><span>Please send me a copy of my RSVP responses</span></label>
@@ -2371,7 +2369,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
       });
     }
     var tried = false;
-    var picked = null, party = [], shown = [], active = -1;
+    var picked = null, party = [], shown = [], active = -1, kept = {};
 
     /* the guest list: names, party numbers and invited events only (scripts/sync_guests.py builds it from the sheet).
        Nothing is shown until three letters are typed, and a party only once someone picks their own name */
@@ -2494,7 +2492,10 @@ picture{margin-block:clamp(52px,8vw,104px);}
       f.name.setAttribute('aria-activedescendant', 'rsvp-opt-' + active);
     }
     f.name.addEventListener('focus', function(){ load().catch(function(){}); });
-    f.name.addEventListener('input', search);
+    f.name.addEventListener('input', function(){
+      if(picked && f.name.value !== picked.name) unpick();
+      search();
+    });
     f.name.addEventListener('keydown', function(e){
       if(picked || f.matches.hidden) return;
       if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){ e.preventDefault(); move(e.key === 'ArrowDown' ? 1 : -1); }
@@ -2535,18 +2536,13 @@ picture{margin-block:clamp(52px,8vw,104px);}
       picked = g;
       closeList();
       f.name.value = g.name;
-      f.name.readOnly = true;
       f.name.removeAttribute('aria-invalid');
       document.getElementById('rsvp-name-err').textContent = '';
-      var again = document.createElement('button');
-      again.type = 'button';
-      again.className = 'rsvp-again';
-      again.textContent = 'Not you? Search again';
-      again.addEventListener('click', reset);
-      note([again]);
+      note([]);
       party = [g].concat(members(g.party).filter(function(o){ return o !== g; }));
       partyEl.textContent = '';
-      party.forEach(function(m, k){ partyEl.appendChild(card(m, k, k === 0)); });
+      (kept[g.i] || party.map(function(m, k){ return card(m, k, k === 0); })).forEach(function(c){ partyEl.appendChild(c); });
+      delete kept[g.i];
       bulk.hidden = party.length < 2;
       groupParty.hidden = false;
       update();
@@ -2555,15 +2551,13 @@ picture{margin-block:clamp(52px,8vw,104px);}
         window.scrollTo({top: top + window.scrollY - magOff(groupParty) - window.innerHeight * 0.3, behavior: reduce ? 'auto' : 'smooth'});
       }
     }
-    function reset(){
+    /* the answers are kept, so picking the same name again brings them back */
+    function unpick(){
+      kept[picked.i] = cards();
       picked = null; party = [];
       partyEl.textContent = '';
       groupParty.hidden = true;
       document.getElementById('rsvp-attending-err').textContent = '';
-      f.name.readOnly = false;
-      f.name.value = '';
-      note([]);
-      f.name.focus();
     }
     function update(){
       var cs = cards(), going = cs.filter(function(c){ return answer(c) === 'yes'; });
@@ -2602,10 +2596,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
       name: function(){
         return flag('name', picked ? '' : f.name.value.trim() ? 'Please choose your name from the list.' : 'Please enter your name.', [f.name]);
       },
-      email: function(){
-        var v = f.email.value.trim();
-        return flag('email', !v ? 'Please enter your email.' : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'Please check your email address.', [f.email]);
-      },
       attending: function(){
         var ok = true;
         cards().forEach(function(c, k){
@@ -2620,6 +2610,10 @@ picture{margin-block:clamp(52px,8vw,104px);}
           if(msg) ok = false;
         });
         return ok;
+      },
+      email: function(){
+        var v = f.email.value.trim();
+        return flag('email', !v ? 'Please enter your email.' : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'Please check your email address.', [f.email]);
       }
     };
     function firstOf(k){
