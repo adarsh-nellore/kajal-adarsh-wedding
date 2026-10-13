@@ -181,7 +181,7 @@ a:focus-visible{outline:none;}
   justify-content:center;
   padding:var(--m);
   /* a faint warm light behind the card, so its shadow has something to fall on */
-  background:radial-gradient(ellipse 58% 62% at 50% 46%, rgba(234,227,214,.085), rgba(234,227,214,.03) 55%, rgba(234,227,214,0) 80%);
+  background:radial-gradient(ellipse 58% 62% at 50% 50%, rgba(234,227,214,.085), rgba(234,227,214,.03) 55%, rgba(234,227,214,0) 80%);
 }
 /* a polaroid: a thin even border (--b, 2.75% of the film's width) on three sides and a shallow strip below (--s, a little
    under three times as much, never less than 34px) for the caption. The card is sized to fit the screen: about nine
@@ -211,11 +211,10 @@ a:focus-visible{outline:none;}
     inset 0 0 0 1px rgba(0,0,0,.06),
     inset 0 -2px 4px rgba(0,0,0,.05),
     inset 0 -10px 22px -16px rgba(120,100,70,.14),
-    0 2px 3px rgba(0,0,0,.6),
-    0 10px 12px -6px rgba(0,0,0,.55),
-    0 18px 40px rgba(0,0,0,.75),
-    0 40px 80px rgba(0,0,0,.6),
-    0 0 60px rgba(234,227,214,.06);
+    0 1px 2px rgba(0,0,0,.45),
+    0 4px 14px rgba(215,215,210,.10),
+    0 10px 36px rgba(215,215,210,.12),
+    0 0 80px rgba(215,215,210,.08);
   animation:fade-in 1s cubic-bezier(.2,.7,.3,1) both;
 }
 @media (min-width:701px) and (min-height:501px){
