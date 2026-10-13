@@ -181,33 +181,53 @@ a:focus-visible{outline:none;}
   justify-content:center;
   padding:var(--m);
 }
+/* a polaroid: the thin cream border all round, and a deeper strip below (--s) that holds the controls. The film is
+   sized so the whole card fits the screen: a little short of the width on a phone, about two thirds of the height on a
+   larger screen */
 .teaser{
-  width:calc(min(100vw - 2 * var(--m) - 2 * var(--b), (100vh - 2 * var(--m) - 2 * var(--b)) * 4 / 3) + 2 * var(--b));
-  width:calc(min(100vw - 2 * var(--m) - 2 * var(--b), (100svh - 2 * var(--m) - 2 * var(--b)) * 4 / 3) + 2 * var(--b));
+  --s:clamp(46px,6vh,58px);
+  --w:min(86vw, 100vw - 2 * var(--m) - 2 * var(--b), (100vh - 2 * var(--m) - var(--b) - var(--s)) * 4 / 3);
+  --w:min(86vw, 100vw - 2 * var(--m) - 2 * var(--b), (100svh - 2 * var(--m) - var(--b) - var(--s)) * 4 / 3);
+  width:calc(var(--w) + 2 * var(--b));
   flex:none;
   margin:0;
-  padding:var(--b);
+  padding:var(--b) var(--b) 0;
   background:#EAE3D6;
   border-radius:2px;
   box-shadow:0 14px 30px rgba(0,0,0,.5);
   animation:fade-in 1s cubic-bezier(.2,.7,.3,1) both;
 }
-@media (min-width:701px){
-  .teaser{max-width:calc(78vh * 4 / 3);max-width:calc(78svh * 4 / 3);}
+@media (min-width:701px) and (min-height:501px){
+  .teaser{max-width:calc(64vh * 4 / 3 + 2 * var(--b));max-width:calc(64svh * 4 / 3 + 2 * var(--b));}
 }
 .teaser-screen{position:relative;}
 .teaser video{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#121212;cursor:pointer;}
 .teaser button{appearance:none;border:0;margin:0;padding:0;background:none;cursor:pointer;}
 .teaser button:focus-visible{outline:1px solid var(--gold);outline-offset:2px;}
-/* sound: a small speaker in the video's corner, muted until tapped. 44px to tap, 36px to see */
-.teaser-sound,.teaser-full{
+/* the strip: play/pause on the left in Jaini, sound and full screen on the right, all dark on the cream */
+.teaser-strip{height:var(--s);display:flex;align-items:center;justify-content:space-between;color:#121212;}
+.teaser .teaser-play{
+  display:inline-flex;align-items:center;gap:.36em;min-width:44px;min-height:44px;padding:0 12px 0 2px;
+  font-family:var(--head);font-size:clamp(20px,2.4vh,24px);line-height:1;color:#121212;
+}
+.teaser-play svg{width:.62em;height:.62em;fill:currentColor;flex:none;}
+.teaser-play .label{padding-bottom:.08em;}
+.teaser.playing .ico-play,.teaser:not(.playing) .ico-pause{display:none;}
+.teaser-tools{display:flex;}
+.teaser:not(.started) .teaser-tools{visibility:hidden;}
+.teaser-tools button{width:44px;height:44px;display:grid;place-items:center;opacity:.72;transition:opacity .35s cubic-bezier(.2,.7,.3,1);}
+.teaser-tools button:hover,.teaser-tools button:focus-visible{opacity:1;}
+.teaser-tools svg{width:19px;height:19px;fill:none;stroke:#121212;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+/* in full screen the strip is left behind, so the screen carries its own speaker and way out */
+.teaser:not(.full) .teaser-screen .teaser-sound,.teaser:not(.full) .teaser-screen .teaser-full{display:none;}
+.teaser-screen .teaser-sound,.teaser-screen .teaser-full{
   position:absolute;right:8px;bottom:8px;width:44px;height:44px;display:grid;place-items:center;
   opacity:.72;transition:opacity .35s cubic-bezier(.2,.7,.3,1);
 }
-.teaser-full{bottom:auto;top:8px;}
-.teaser-sound::before,.teaser-full::before{content:"";position:absolute;inset:4px;border-radius:50%;background:rgba(18,18,18,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
-.teaser-sound svg,.teaser-full svg{position:relative;width:18px;height:18px;fill:none;stroke:#EAE3D6;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
-.teaser-sound:hover,.teaser-sound:focus-visible,.teaser-full:hover,.teaser-full:focus-visible{opacity:1;}
+.teaser-screen .teaser-full{bottom:auto;top:8px;}
+.teaser-screen .teaser-sound::before,.teaser-screen .teaser-full::before{content:"";position:absolute;inset:4px;border-radius:50%;background:rgba(18,18,18,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.teaser-screen .teaser-sound svg,.teaser-screen .teaser-full svg{position:relative;width:18px;height:18px;fill:none;stroke:#EAE3D6;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.teaser-screen .teaser-sound:hover,.teaser-screen .teaser-sound:focus-visible,.teaser-screen .teaser-full:hover,.teaser-screen .teaser-full:focus-visible{opacity:1;}
 .teaser-sound[aria-pressed="true"] .ico-off,.teaser-sound[aria-pressed="false"] .ico-on{display:none;}
 .teaser-full[hidden]{display:none !important;}
 .teaser:not(.full) .ico-shrink,.teaser.full .ico-grow{display:none;}
@@ -218,29 +238,9 @@ a:focus-visible{outline:none;}
 .teaser.full .teaser-sound{right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));}
 .teaser.full .teaser-full{right:max(14px,env(safe-area-inset-right));top:max(14px,env(safe-area-inset-top));}
 /* while the screen is lifted out to full screen, the frame keeps its shape, so there's a place to come back to */
-.teaser.full::after{content:"";display:block;aspect-ratio:4/3;}
+.teaser.full::before{content:"";display:block;aspect-ratio:4/3;}
 /* coming back: the film shrinks from the full screen into the frame as the black around it fades */
 .teaser-screen.shrink{z-index:3;box-shadow:0 0 0 100vmax rgba(0,0,0,0);transition:transform .55s cubic-bezier(.2,.7,.3,1),box-shadow .55s cubic-bezier(.2,.7,.3,1);}
-/* the play button, in the RSVP button's manner: Jaini in a gold rule, over a dark veil so it reads on bright frames.
-   Before it starts it says what it does; once started, only the triangle */
-.teaser .teaser-play{
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  display:inline-flex;align-items:center;justify-content:center;gap:.42em;
-  min-width:44px;min-height:44px;
-  padding:.2em 28px .32em 24px;
-  border:1px solid var(--gold);border-radius:0;
-  background:linear-gradient(rgba(var(--gold-rgb),.1),rgba(var(--gold-rgb),.1)),rgba(18,18,18,.74);
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  font-family:var(--head);font-size:clamp(24px,2.6vw,30px);line-height:1.2;letter-spacing:.01em;color:#EAE3D6;white-space:nowrap;
-  transition:background-color .35s cubic-bezier(.2,.7,.3,1);
-}
-.teaser .teaser-play:hover{background:linear-gradient(rgba(var(--gold-rgb),.26),rgba(var(--gold-rgb),.26)),rgba(18,18,18,.74);}
-.teaser .teaser-play:focus-visible{outline:1px solid var(--gold);outline-offset:4px;}
-.teaser-play[hidden]{display:none !important;}
-.teaser-play svg{width:.56em;height:.56em;fill:currentColor;flex:none;margin-top:.1em;}
-.teaser.started .teaser-play{padding:.42em .62em .42em .72em;}
-.teaser.started .teaser-play .label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
-.teaser:not(.started) .teaser-sound,.teaser:not(.started) .teaser-full{display:none;}
 /* the cue arrives once the teaser has had the screen to itself for a few seconds */
 /* the scroll cue bobs gently, so it reads as a way on */
 .cue span{display:block;font-size:24px;line-height:1;animation:cue-float 2.4s ease-in-out infinite;}
@@ -1148,9 +1148,12 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <figure class="teaser">
 <div class="teaser-screen">
 <video src="video/teaser.mp4" poster="img/teaser-poster.jpg" width="768" height="576" playsinline webkit-playsinline preload="metadata" aria-label="Teaser: Kajal and Adarsh in Mexico City"></video>
-<button class="teaser-play" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg><span class="label">Play with sound</span></button>
 <button class="teaser-sound" type="button" aria-pressed="true" aria-label="Turn sound off"><svg class="ico-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg><svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.5a8 8 0 0 1 0 11"/></svg></button>
 <button class="teaser-full" type="button" aria-label="Full screen"><svg class="ico-grow" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><svg class="ico-shrink" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5"/></svg></button>
+</div>
+<div class="teaser-strip">
+<button class="teaser-play" type="button" aria-label="Play with sound"><svg class="ico-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg><svg class="ico-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg><span class="label">Play</span></button>
+<span class="teaser-tools"><button class="teaser-sound" type="button" aria-pressed="true" aria-label="Turn sound off"><svg class="ico-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg><svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.5a8 8 0 0 1 0 11"/></svg></button><button class="teaser-full" type="button" aria-label="Full screen"><svg class="ico-grow" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><svg class="ico-shrink" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5"/></svg></button></span>
 </div>
 </figure>
 </header>
@@ -1541,21 +1544,22 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <footer class="contact"><p class="contact-h">Questions?</p><p>Message <a href="https://wa.me/19492931051" target="_blank" rel="noopener">Kajal</a> or <a href="https://wa.me/14087521100" target="_blank" rel="noopener">Adarsh</a></p></footer>
 
 <script>
-/* the teaser waits on its poster until it's asked to play, and then plays with sound. After that a tap pauses and
-   plays, and the corner speaker mutes. When it ends it rests on its last frame with the play button, and tells the
-   page (which carries you on to the welcome).
-   Play with sound also takes it full screen: the screen with its own controls where the browser allows it, else (iPhone)
-   the phone's own player. The corner button leaves or re-enters full screen; at the end it leaves full screen first,
-   and only then tells the page */
+/* the teaser waits on its poster until it's asked to play, and then plays with sound, in its frame. The strip's button
+   plays and pauses (so does a tap on the film), and its speaker mutes. When it ends it rests on its last frame and tells
+   the page (which carries you on to the welcome).
+   The strip's corner button takes it full screen if you like: the screen with its own controls where the browser allows
+   it, else (iPhone) the phone's own player. At the end it leaves full screen first, and only then tells the page */
 (function(){
   var fig = document.querySelector('.teaser');
   if(!fig) return;
-  var v = fig.querySelector('video'), play = fig.querySelector('.teaser-play'), sound = fig.querySelector('.teaser-sound');
-  var screen = fig.querySelector('.teaser-screen'), fullBtn = fig.querySelector('.teaser-full');
-  var userPaused = true, onScreen = true, afterFull = null;
+  var v = fig.querySelector('video'), play = fig.querySelector('.teaser-play'), playLabel = play.querySelector('.label');
+  var sounds = fig.querySelectorAll('.teaser-sound'), fullBtns = fig.querySelectorAll('.teaser-full');
+  var screen = fig.querySelector('.teaser-screen');
+  var userPaused = true, afterFull = null;
+  function each(list, fn){ Array.prototype.forEach.call(list, fn); }
   var canFull = !!((document.fullscreenEnabled || document.webkitFullscreenEnabled) && (screen.requestFullscreen || screen.webkitRequestFullscreen));
   var canNative = !canFull && typeof v.webkitEnterFullscreen === 'function';
-  if(!canFull && !canNative){ fullBtn.hidden = true; }
+  if(!canFull && !canNative){ each(fullBtns, function(b){ b.hidden = true; }); }
   function fullEl(){ return document.fullscreenElement || document.webkitFullscreenElement || null; }
   function isFull(){ return fullEl() === screen || !!v.webkitDisplayingFullscreen; }
   function enterFull(){
@@ -1585,7 +1589,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
     var wasLifted = fig.classList.contains('full');
     if(full){ fullW = window.innerWidth; fullH = window.innerHeight; }
     fig.classList.toggle('full', full && fullEl() === screen);
-    fullBtn.setAttribute('aria-label', full ? 'Exit full screen' : 'Full screen');
+    each(fullBtns, function(b){ b.setAttribute('aria-label', full ? 'Exit full screen' : 'Full screen'); });
     document.dispatchEvent(new CustomEvent('teaser-fullscreen', {detail: {full: full}}));
     if(!full && wasLifted){ shrink(); }
     if(!full && afterFull){ var then = afterFull; afterFull = null; settle(then, wasLifted ? 0 : 450); }
@@ -1627,15 +1631,22 @@ picture{margin-block:clamp(52px,8vw,104px);}
   document.addEventListener('webkitfullscreenchange', onFullChange);
   v.addEventListener('webkitbeginfullscreen', function(){ fullChanged(true); });
   v.addEventListener('webkitendfullscreen', function(){ fullChanged(false); });
+  function mark(){
+    var on = !v.paused;
+    fig.classList.toggle('playing', on);
+    playLabel.textContent = on ? 'Pause' : 'Play';
+    play.setAttribute('aria-label', on ? 'Pause' : fig.classList.contains('started') ? 'Play' : 'Play with sound');
+  }
   function start(){
     var p = v.play();
-    if(p && p.catch){ p.catch(function(){ if(v.paused){ play.hidden = false; } }); }
+    if(p && p.catch){ p.catch(mark); }
   }
   function listen(){ v.muted = false; userPaused = false; fig.classList.add('started'); if(v.paused){ start(); } }
-  v.addEventListener('play', function(){ play.hidden = true; });
-  v.addEventListener('pause', function(){ if(onScreen){ play.hidden = false; } });
+  function toggle(){ if(v.paused){ listen(); } else { userPaused = true; v.pause(); } }
+  v.addEventListener('play', mark);
+  v.addEventListener('pause', mark);
   v.addEventListener('ended', function(){
-    userPaused = true; play.hidden = false;
+    userPaused = true; mark();
     function done(fromFull){ document.dispatchEvent(new CustomEvent('teaser-ended', {detail: {fromFull: fromFull}})); }
     if(!isFull()){ done(false); return; }
     var once = false;
@@ -1647,23 +1658,19 @@ picture{margin-block:clamp(52px,8vw,104px);}
     }, 2500);
   });
   v.addEventListener('volumechange', function(){
-    sound.setAttribute('aria-pressed', String(!v.muted));
-    sound.setAttribute('aria-label', v.muted ? 'Turn sound on' : 'Turn sound off');
+    each(sounds, function(b){
+      b.setAttribute('aria-pressed', String(!v.muted));
+      b.setAttribute('aria-label', v.muted ? 'Turn sound on' : 'Turn sound off');
+    });
   });
-  v.addEventListener('click', function(){
-    if(v.paused){ listen(); } else { userPaused = true; v.pause(); }
-  });
-  play.addEventListener('click', function(){
-    var first = !fig.classList.contains('started') || v.ended;
-    listen();
-    if(first && !isFull()){ enterFull(); }
-  });
-  sound.addEventListener('click', function(){ v.muted = !v.muted; });
-  fullBtn.addEventListener('click', function(){ if(isFull()){ exitFull(); } else { enterFull(); } });
+  v.addEventListener('click', toggle);
+  play.addEventListener('click', toggle);
+  each(sounds, function(b){ b.addEventListener('click', function(){ v.muted = !v.muted; }); });
+  each(fullBtns, function(b){ b.addEventListener('click', function(){ if(isFull()){ exitFull(); } else { enterFull(); } }); });
   /* off screen it rests, to spare the battery, and picks up again on the way back */
   if('IntersectionObserver' in window){
     new IntersectionObserver(function(entries){
-      onScreen = entries[entries.length - 1].isIntersecting || isFull();
+      var onScreen = entries[entries.length - 1].isIntersecting || isFull();
       if(!onScreen){ if(!v.paused){ v.pause(); } }
       else if(!userPaused){ start(); }
     }, {threshold: 0.25}).observe(v);
