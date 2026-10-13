@@ -192,6 +192,9 @@ a:focus-visible{outline:none;}
   box-shadow:0 14px 30px rgba(0,0,0,.5);
   animation:fade-in 1s cubic-bezier(.2,.7,.3,1) both;
 }
+@media (min-width:701px){
+  .teaser{max-width:calc(78vh * 4 / 3);max-width:calc(78svh * 4 / 3);}
+}
 .teaser-screen{position:relative;}
 .teaser video{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#121212;cursor:pointer;}
 .teaser button{appearance:none;border:0;margin:0;padding:0;background:none;cursor:pointer;}
