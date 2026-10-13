@@ -225,6 +225,8 @@ a:focus-visible{outline:none;}
 /* the print sits a hair into the paper */
 .teaser:not(.full) .teaser-screen::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14),inset 0 0 6px rgba(0,0,0,.18);pointer-events:none;}
 .teaser-screen{position:relative;}
+.teaser-bar{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(234,227,214,.85);transform:scaleX(var(--p,0));transform-origin:0 50%;pointer-events:none;opacity:0;transition:opacity .6s ease;}
+.teaser.started .teaser-bar{opacity:.8;}
 .teaser video{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#121212;cursor:pointer;}
 .teaser button{appearance:none;border:0;margin:0;padding:0;background:none;cursor:pointer;}
 .teaser button:focus-visible{outline:1px solid var(--gold);outline-offset:2px;}
@@ -1179,6 +1181,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <figure class="teaser">
 <div class="teaser-screen">
 <video src="video/teaser.mp4" poster="img/teaser-poster.jpg" width="768" height="576" playsinline webkit-playsinline preload="metadata" aria-label="Teaser: Kajal and Adarsh in Mexico City"></video>
+<i class="teaser-bar" aria-hidden="true"></i>
 <button class="teaser-play" type="button" aria-label="Play with sound"><svg class="ico-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5l13 7.5-13 7.5z"/></svg><svg class="ico-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.5h3.5v15H6.5zM14 4.5h3.5v15H14z"/></svg></button>
 <button class="teaser-sound" type="button" aria-pressed="true" aria-label="Turn sound off"><svg class="ico-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg><svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.5a8 8 0 0 1 0 11"/></svg></button>
 <button class="teaser-full" type="button" aria-label="Full screen"><svg class="ico-grow" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><svg class="ico-shrink" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5"/></svg></button>
@@ -1676,6 +1679,13 @@ picture{margin-block:clamp(52px,8vw,104px);}
   function toggle(){ if(v.paused){ listen(); } else { userPaused = true; v.pause(); } }
   v.addEventListener('play', mark);
   v.addEventListener('pause', mark);
+  (function(){
+    var bar = fig.querySelector('.teaser-bar'), raf = 0;
+    function tick(){ if(v.duration) bar.style.setProperty('--p', v.currentTime / v.duration); raf = v.paused ? 0 : requestAnimationFrame(tick); }
+    v.addEventListener('play', function(){ if(!raf) raf = requestAnimationFrame(tick); });
+    v.addEventListener('seeked', tick);
+    v.addEventListener('timeupdate', function(){ if(!raf) tick(); });
+  })();
   v.addEventListener('ended', function(){
     userPaused = true; mark();
     function done(fromFull){ document.dispatchEvent(new CustomEvent('teaser-ended', {detail: {fromFull: fromFull}})); }
