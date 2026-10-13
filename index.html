@@ -8,7 +8,7 @@
 <meta name="description" content="Kajal &amp; Adarsh are getting married in Mexico City, 19–21 February 2027.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jaini&family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jaini&family=EB+Garamond:wght@400;500&family=Caveat:wght@500&display=swap" rel="stylesheet">
 <style>
 :root{
   --ground:#121212;
@@ -181,43 +181,58 @@ a:focus-visible{outline:none;}
   justify-content:center;
   padding:var(--m);
 }
-/* a polaroid: the thin cream border all round, and a deeper strip below (--s) that holds the controls. The film is
-   sized so the whole card fits the screen: a little short of the width on a phone, about two thirds of the height on a
-   larger screen */
+/* a polaroid: an even border (--b, 6% of the film's width) on three sides and a deep one below (--s, 3.6 times as much)
+   with a handwritten caption and the controls. The card (1.12 film widths across, 1.026 down) is sized to fit the
+   screen: about nine tenths of the width on a phone, about three quarters of the height on a larger screen */
 .teaser{
-  --s:clamp(46px,6vh,58px);
-  --w:min(86vw, 100vw - 2 * var(--m) - 2 * var(--b), (100vh - 2 * var(--m) - var(--b) - var(--s)) * 4 / 3);
-  --w:min(86vw, 100vw - 2 * var(--m) - 2 * var(--b), (100svh - 2 * var(--m) - var(--b) - var(--s)) * 4 / 3);
+  --w:min(80vw, (100vw - 2 * var(--m)) / 1.12, (100vh - 2 * var(--m)) / 1.026);
+  --w:min(80vw, (100vw - 2 * var(--m)) / 1.12, (100svh - 2 * var(--m)) / 1.026);
+  --b:calc(var(--w) * .06);
+  --s:calc(var(--b) * 3.6);
+  --ink:#2a2622;
   width:calc(var(--w) + 2 * var(--b));
   flex:none;
   margin:0;
   padding:var(--b) var(--b) 0;
-  background:#EAE3D6;
-  border-radius:2px;
-  box-shadow:0 14px 30px rgba(0,0,0,.5);
+  background:#F3EEE4;
+  border-radius:4px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.55),
+    inset 0 -14px 28px -18px rgba(120,96,60,.18),
+    0 1px 2px rgba(0,0,0,.4),
+    0 6px 14px rgba(0,0,0,.28),
+    0 22px 48px rgba(0,0,0,.42);
   animation:fade-in 1s cubic-bezier(.2,.7,.3,1) both;
 }
 @media (min-width:701px) and (min-height:501px){
-  .teaser{max-width:calc(64vh * 4 / 3 + 2 * var(--b));max-width:calc(64svh * 4 / 3 + 2 * var(--b));}
+  .teaser{
+    --w:min(56vh * 4 / 3, (100vw - 2 * var(--m)) / 1.12, (100vh - 2 * var(--m)) / 1.026);
+    --w:min(56svh * 4 / 3, (100vw - 2 * var(--m)) / 1.12, (100svh - 2 * var(--m)) / 1.026);
+  }
 }
+/* the print sits a hair into the paper */
+.teaser:not(.full) .teaser-screen::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14),inset 0 0 6px rgba(0,0,0,.18);pointer-events:none;}
 .teaser-screen{position:relative;}
 .teaser video{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#121212;cursor:pointer;}
 .teaser button{appearance:none;border:0;margin:0;padding:0;background:none;cursor:pointer;}
 .teaser button:focus-visible{outline:1px solid var(--gold);outline-offset:2px;}
-/* the strip: play/pause on the left in Jaini, sound and full screen on the right, all dark on the cream */
-.teaser-strip{height:var(--s);display:flex;align-items:center;justify-content:space-between;color:#121212;}
-.teaser .teaser-play{
-  display:inline-flex;align-items:center;gap:.36em;min-width:44px;min-height:44px;padding:0 12px 0 2px;
-  font-family:var(--head);font-size:clamp(20px,2.4vh,24px);line-height:1;color:#121212;
+/* the strip: the caption in pen on the left (the one place the site writes by hand); the controls, small and quiet,
+   in the same ink on the right */
+.teaser-strip{height:var(--s);display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--ink);}
+.teaser-caption{
+  margin:0;padding:0 0 .12em .1em;
+  font-family:'Caveat',cursive;font-weight:500;font-size:clamp(24px,calc(var(--w) * .062),40px);line-height:1;
+  color:var(--ink);opacity:.9;white-space:nowrap;
 }
-.teaser-play svg{width:.62em;height:.62em;fill:currentColor;flex:none;}
-.teaser-play .label{padding-bottom:.08em;}
+.teaser-controls{display:flex;align-items:center;margin-right:-10px;}
+.teaser-controls button{width:44px;height:44px;display:grid;place-items:center;opacity:.62;transition:opacity .35s cubic-bezier(.2,.7,.3,1);}
+.teaser-controls button:hover,.teaser-controls button:focus-visible{opacity:1;}
+.teaser-controls svg{width:17px;height:17px;fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.teaser-controls .teaser-play svg{width:26px;height:26px;fill:var(--ink);stroke:none;}
+.teaser-controls .teaser-play{opacity:.78;}
 .teaser.playing .ico-play,.teaser:not(.playing) .ico-pause{display:none;}
 .teaser-tools{display:flex;}
 .teaser:not(.started) .teaser-tools{visibility:hidden;}
-.teaser-tools button{width:44px;height:44px;display:grid;place-items:center;opacity:.72;transition:opacity .35s cubic-bezier(.2,.7,.3,1);}
-.teaser-tools button:hover,.teaser-tools button:focus-visible{opacity:1;}
-.teaser-tools svg{width:19px;height:19px;fill:none;stroke:#121212;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
 /* in full screen the strip is left behind, so the screen carries its own speaker and way out */
 .teaser:not(.full) .teaser-screen .teaser-sound,.teaser:not(.full) .teaser-screen .teaser-full{display:none;}
 .teaser-screen .teaser-sound,.teaser-screen .teaser-full{
@@ -1152,8 +1167,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <button class="teaser-full" type="button" aria-label="Full screen"><svg class="ico-grow" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><svg class="ico-shrink" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5"/></svg></button>
 </div>
 <div class="teaser-strip">
-<button class="teaser-play" type="button" aria-label="Play with sound"><svg class="ico-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg><svg class="ico-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg><span class="label">Play</span></button>
-<span class="teaser-tools"><button class="teaser-sound" type="button" aria-pressed="true" aria-label="Turn sound off"><svg class="ico-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg><svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.5a8 8 0 0 1 0 11"/></svg></button><button class="teaser-full" type="button" aria-label="Full screen"><svg class="ico-grow" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><svg class="ico-shrink" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5"/></svg></button></span>
+<p class="teaser-caption">Mexico City</p>
+<span class="teaser-controls"><span class="teaser-tools"><button class="teaser-sound" type="button" aria-pressed="true" aria-label="Turn sound off"><svg class="ico-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg><svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.5a8 8 0 0 1 0 11"/></svg></button><button class="teaser-full" type="button" aria-label="Full screen"><svg class="ico-grow" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><svg class="ico-shrink" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5"/></svg></button></span><button class="teaser-play" type="button" aria-label="Play with sound"><svg class="ico-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5l13 7.5-13 7.5z"/></svg><svg class="ico-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.5h3.5v15H6.5zM14 4.5h3.5v15H14z"/></svg></button></span>
 </div>
 </figure>
 </header>
@@ -1552,7 +1567,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 (function(){
   var fig = document.querySelector('.teaser');
   if(!fig) return;
-  var v = fig.querySelector('video'), play = fig.querySelector('.teaser-play'), playLabel = play.querySelector('.label');
+  var v = fig.querySelector('video'), play = fig.querySelector('.teaser-play');
   var sounds = fig.querySelectorAll('.teaser-sound'), fullBtns = fig.querySelectorAll('.teaser-full');
   var screen = fig.querySelector('.teaser-screen');
   var userPaused = true, afterFull = null;
@@ -1634,7 +1649,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
   function mark(){
     var on = !v.paused;
     fig.classList.toggle('playing', on);
-    playLabel.textContent = on ? 'Pause' : 'Play';
     play.setAttribute('aria-label', on ? 'Pause' : fig.classList.contains('started') ? 'Play' : 'Play with sound');
   }
   function start(){
