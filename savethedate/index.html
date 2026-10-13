@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <base href="/savethedate/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>K + A · CDMX 2027</title>
+    <meta name="description" content="Meet us in Mexico City. February 19 to 21, 2027." />
+    <meta name="theme-color" content="#0E0E0E" />
+    <link rel="canonical" href="https://kajal-adarsh.club/savethedate/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="K + A · CDMX 2027" />
+    <meta property="og:title" content="K + A · CDMX 2027" />
+    <meta property="og:description" content="Meet us in Mexico City. February 19 to 21, 2027." />
+    <meta property="og:url" content="https://kajal-adarsh.club/savethedate/" />
+    <meta property="og:image" content="https://kajal-adarsh.club/savethedate/assets/og-preview.jpg" />
+    <meta property="og:image:width" content="1536" />
+    <meta property="og:image:height" content="2304" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="K + A · CDMX 2027" />
+    <meta name="twitter:description" content="Meet us in Mexico City. February 19 to 21, 2027." />
+    <meta name="twitter:image" content="https://kajal-adarsh.club/savethedate/assets/og-preview.jpg" />
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
+    />
+    <link rel="stylesheet" href="tokens.css?v=11" />
+    <link rel="stylesheet" href="styles.css?v=95" />
+  </head>
+  <body>
+    <audio id="music" src="https://k-a-savethedate-final.vercel.app/assets/cerca-de-ti.mp3" preload="auto" muted loop playsinline></audio>
+
+    <div class="cover" id="cover" role="dialog" aria-label="Begin">
+      <picture>
+        <source media="(orientation: portrait)" srcset="assets/cdmx-courtyard.jpg" />
+        <img class="cover__logo" src="assets/cdmx-courtyard.jpg" alt="K & A" />
+      </picture>
+      <div class="cover__inner">
+        <div class="cover__brand" role="img" aria-label="K & A"></div>
+        <div class="cover__slot">
+          <form class="cover__password" id="cover-password" novalidate>
+            <div class="cover__pw-row">
+              <input
+                type="password"
+                id="cover-pw-input"
+                class="cover__pw-input"
+                placeholder="password"
+                autocomplete="off"
+                inputmode="numeric"
+                autofocus
+                aria-label="Enter password"
+              />
+              <button type="submit" class="cover__pw-submit" aria-label="Submit password">→</button>
+            </div>
+            <p class="cover__pw-error" id="cover-pw-error" aria-live="polite"></p>
+          </form>
+          <div class="cover__play-group is-hidden" id="cover-play-group">
+            <button class="cover__play" id="cover-play" type="button" aria-label="Begin">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 5 L20 12 L8 19 Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <p class="cover__play-label">Sit back and<br />turn audio on!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls" id="controls" inert>
+      <button class="ctrl" id="prev" type="button" aria-label="Previous scene">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 5 L7 12 L15 19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="ctrl" id="control" type="button" aria-label="Pause" data-state="playing">
+        <svg class="icon icon-pause" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="7" y="5" width="3" height="14" rx="0.5" />
+          <rect x="14" y="5" width="3" height="14" rx="0.5" />
+        </svg>
+        <svg class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 5 L19 12 L7 19 Z" />
+        </svg>
+      </button>
+      <button class="ctrl" id="next" type="button" aria-label="Next scene">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 5 L17 12 L9 19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="audio-toggle ctrl" id="audio-toggle" type="button" aria-label="Mute audio" data-state="on">
+        <svg class="icon icon-on" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9 L4 15 L8 15 L13 19 L13 5 L8 9 Z" fill="currentColor"/>
+          <path d="M16 9 Q18 12 16 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M18.5 7 Q21.5 12 18.5 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <svg class="icon icon-off" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9 L4 15 L8 15 L13 19 L13 5 L8 9 Z" fill="currentColor"/>
+          <path d="M17 9 L21 13 M21 9 L17 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <main class="stage" inert>
+      <!-- 1 — Hero -->
+      <section class="scene scene--hero" id="s1">
+        <div class="scene-grid scene-grid--right-photo">
+          <div class="copy copy--left-mid">
+            <p class="line" data-line="meet"><span class="line-lead"></span><span class="city-fade"> Mexico City.</span></p>
+          </div>
+          <figure class="photo photo--portrait" data-photo="hero">
+            <img
+              src="assets/2C00FF18-B7B0-4F0D-8970-70172557C854.jpg"
+              alt=""
+              loading="eager"
+              decoding="async"
+            />
+          </figure>
+        </div>
+      </section>
+
+      <!-- 2 — Amor -->
+      <section class="scene scene--amor" id="s2">
+        <figure class="photo photo--full" data-photo="amor">
+          <img
+            src="assets/095F6499-72FA-4D0C-A7DA-15443980E794.jpg"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <div class="copy copy--bottom-right">
+          <p class="line" data-line="amor"><span class="line-lead"></span><span class="amor-fade"> <em>amor</em> <span class="heart">♥</span></span></p>
+        </div>
+      </section>
+
+      <!-- 3 — Dates -->
+      <section class="scene scene--dates" id="s3">
+        <div class="scene-grid scene-grid--right-photo">
+          <div class="copy copy--left-mid stack">
+            <p class="line" data-line="d-date"></p>
+            <div class="line-gap line-gap--lg" aria-hidden="true"></div>
+            <div class="stack stack--tight">
+              <p class="line" data-line="d-fri"></p>
+              <p class="line" data-line="d-sat"></p>
+              <p class="line" data-line="d-sun"></p>
+            </div>
+          </div>
+          <figure class="photo photo--portrait" data-photo="dates">
+            <img
+              src="assets/IMG_6207.jpeg"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+        </div>
+      </section>
+
+      <!-- 4 — Why -->
+      <section class="scene scene--why" id="s4">
+        <div class="scene-grid scene-grid--left-photo">
+          <figure class="photo photo--portrait" data-photo="why">
+            <img
+              src="assets/BACC20B3-3A36-4547-9E79-38A7D35BBBCD.jpg"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+          <div class="copy copy--left-mid stack">
+            <p class="line" data-line="why-q"></p>
+            <p class="line" data-line="why-1"></p>
+            <p class="line" data-line="why-2"></p>
+            <p class="line" data-line="why-3"></p>
+            <div class="line-gap" aria-hidden="true"></div>
+            <p class="line" data-line="why-5"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 — Form -->
+      <section class="scene scene--form" id="s6">
+        <div class="scene-grid scene-grid--right-photo">
+          <div class="copy copy--left-top stack">
+            <p class="line" data-line="form-q"></p>
+
+            <form class="rsvp" id="rsvp" novalidate>
+              <label class="field">
+                <span>Name</span>
+                <input type="text" name="name" autocomplete="name" autocapitalize="words" required />
+              </label>
+              <label class="field">
+                <span>Email</span>
+                <input type="email" name="email" autocomplete="email" inputmode="email" required />
+              </label>
+              <label class="field">
+                <span>Phone</span>
+                <input type="tel" name="phone" autocomplete="tel" />
+              </label>
+              <label class="field field--address">
+                <span>Mailing address</span>
+                <input type="text" name="address1" autocomplete="address-line1" aria-label="Mailing address line 1" />
+                <input type="text" name="address2" autocomplete="address-line2" aria-label="Mailing address line 2" />
+              </label>
+              <label class="field field--check">
+                <input type="checkbox" name="recs" />
+                <span>I want Mexico City recommendations</span>
+              </label>
+              <div class="actions actions--single is-locked">
+                <button type="submit" data-action="submit">Submit</button>
+              </div>
+              <p class="rsvp__error" role="alert" aria-live="polite"></p>
+            </form>
+          </div>
+          <figure class="photo photo--portrait" data-photo="form">
+            <img
+              src="assets/amor.jpg"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+        </div>
+      </section>
+
+      <!-- 7 — Thank you -->
+      <section class="scene scene--thanks" id="s7">
+        <div class="scene-grid scene-grid--right-photo">
+          <div class="copy copy--left-mid stack">
+            <div class="stack stack--tight">
+              <p class="line" data-line="t-2a"></p>
+              <p class="line" data-line="t-2b"></p>
+            </div>
+            <div class="line-gap line-gap--lg" aria-hidden="true"></div>
+            <p class="line" data-line="t-3"></p>
+            <div class="line-gap line-gap--lg" aria-hidden="true"></div>
+            <p class="line" data-line="t-4"></p>
+            <div class="line-gap line-gap--lg" aria-hidden="true"></div>
+            <p class="line" data-line="t-6"></p>
+            <div class="line-gap line-gap--lg" aria-hidden="true"></div>
+            <p class="line line--sig" data-line="t-5"><img class="sig-ink" alt="Kajal + Adarsh" width="760" height="197" /></p>
+          </div>
+          <figure class="photo photo--portrait" data-photo="thanks">
+            <img
+              src="assets/9037C69B-EF10-4D41-8F8D-4C4F28CCAF87.jpg"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+        </div>
+      </section>
+
+      <!-- 8 — Logo finale -->
+      <section class="scene scene--logo" id="s8">
+        <div class="logo-mark" role="img" aria-label="K & A"></div>
+      </section>
+    </main>
+
+    <script src="script.js?v=55"></script>
+  </body>
+</html>

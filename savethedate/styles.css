@@ -1,0 +1,1377 @@
+/* =========================================================================
+   K + A · CDMX 2027 — Slideshow stylesheet
+   See design-system.md. One color. One size. One weight. One font.
+   ========================================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "latienne-pro", "Cormorant Garamond", "EB Garamond", Georgia, "Times New Roman", serif;
+  font-size: var(--fs);
+  font-weight: 400;
+  line-height: var(--lh);
+  letter-spacing: var(--tracking);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+html, body { height: 100%; overflow: hidden; }
+
+/* Hide scrollbars globally. This is a single-screen, full-bleed
+   experience; scenes may use `overflow-y: auto` as a safety net so
+   content doesn't get clipped on tiny viewports (s6 form, s7 thanks
+   on 844px-tall phones), but the scrollbar itself should never be
+   visible — the controls bar is the navigation, not a scrollbar.
+   Scroll behavior (touch/wheel/keyboard) is preserved; only the
+   visible chrome is hidden. */
+* {
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* legacy Edge / IE */
+}
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;                  /* WebKit (Safari, Chrome, modern Edge) */
+}
+
+img { max-width: 100%; display: block; }
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  letter-spacing: inherit;
+}
+p { margin: 0; }
+em { font-style: italic; font-weight: 400; }
+
+::selection { background: var(--fg); color: var(--bg); }
+
+/* -----------------------------------------------------------------------
+   Audio toggle (now lives inside .controls)
+----------------------------------------------------------------------- */
+
+.audio-toggle {
+  opacity: 0.45;
+  transition: opacity 320ms var(--ease);
+}
+
+.audio-toggle:hover,
+.audio-toggle:focus-visible { opacity: 0.95; outline: none; }
+
+.audio-toggle .icon {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  transition: opacity 220ms var(--ease);
+}
+
+.audio-toggle[data-state="on"]  .icon-on  { opacity: 1; }
+.audio-toggle[data-state="on"]  .icon-off { opacity: 0; }
+.audio-toggle[data-state="off"] .icon-on  { opacity: 0; }
+.audio-toggle[data-state="off"] .icon-off { opacity: 1; }
+
+/* -----------------------------------------------------------------------
+   Audio hint (only shown when audible autoplay is blocked)
+----------------------------------------------------------------------- */
+
+.audio-hint {
+  position: fixed;
+  left: clamp(16px, 2.4vw, 28px);
+  bottom: clamp(16px, 2.4vw, 28px);
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--fg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 800ms var(--ease);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.audio-hint.is-in {
+  opacity: 0.5;
+}
+
+.audio-hint__glyph {
+  display: inline-block;
+  font-size: 18px;
+  line-height: 1;
+  animation: audio-hint-pulse 2400ms ease-in-out infinite;
+}
+
+.audio-hint__label {
+  font-style: italic;
+  font-weight: 400;
+}
+
+@keyframes audio-hint-pulse {
+  0%, 100% { opacity: 0.55; transform: translateY(0); }
+  50%      { opacity: 1;    transform: translateY(-1px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .audio-hint__glyph { animation: none; }
+}
+
+/* -----------------------------------------------------------------------
+   Controls (prev / pause-play / next)
+----------------------------------------------------------------------- */
+
+.controls {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(16px, 2.4vw, 28px);
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.ctrl {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: var(--fg);
+  opacity: 0.32;
+  transition: opacity 320ms var(--ease);
+}
+
+.ctrl:hover,
+.ctrl:focus-visible { opacity: 0.9; outline: none; }
+
+.ctrl[disabled] {
+  opacity: 0.12;
+  cursor: default;
+  pointer-events: none;
+}
+
+.ctrl .icon {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  transition: opacity 220ms var(--ease);
+}
+
+#control[data-state="playing"] .icon-play  { opacity: 0; }
+#control[data-state="playing"] .icon-pause { opacity: 1; }
+#control[data-state="paused"]  .icon-play  { opacity: 1; }
+#control[data-state="paused"]  .icon-pause { opacity: 0; }
+
+/* -----------------------------------------------------------------------
+   Stage / scenes
+----------------------------------------------------------------------- */
+
+.stage {
+  position: fixed;
+  inset: 0;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms var(--ease);
+  display: grid;
+  align-items: center;
+  padding-top: var(--desk-pad-top);
+  padding-bottom: var(--desk-pad-bottom);
+  padding-left: clamp(28px, 6vw, 96px);
+  padding-right: clamp(28px, 6vw, 96px);
+  overflow: hidden;
+}
+
+.scene.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.scene-grid {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  gap: clamp(40px, 6vw, 96px);
+}
+
+.scene-grid--right-photo,
+.scene-grid--left-photo {
+  grid-template-columns: 1fr 1fr;
+}
+
+.scene-grid--left-photo .photo--portrait {
+  justify-self: start;
+}
+
+.scene-grid--left-photo .copy--left-mid {
+  justify-self: start;
+  padding-left: clamp(16px, 2vw, 32px);
+}
+
+/* -----------------------------------------------------------------------
+   Copy regions
+----------------------------------------------------------------------- */
+
+.copy { display: block; }
+
+.copy--left-mid {
+  align-self: center;
+  justify-self: start;
+  max-width: 720px;
+}
+
+.copy--left-top {
+  align-self: start;
+  justify-self: start;
+  max-width: 720px;
+  padding-top: 4vh;
+}
+
+.copy--center {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(28px, 4vh, 56px);
+}
+
+.copy--bottom-right {
+  position: absolute;
+  right: clamp(28px, 6vw, 96px);
+  bottom: clamp(40px, 8vh, 96px);
+  z-index: 2;
+  text-align: right;
+  max-width: 80%;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.stack--tight { gap: 0.15em; }
+
+.line-gap { height: 0.25em; }
+.line-gap--lg { height: 1em; }
+
+/* -----------------------------------------------------------------------
+   Lines (typewriter targets)
+----------------------------------------------------------------------- */
+
+.line {
+  min-height: 1.35em;
+  position: relative;
+  display: inline-block;
+  white-space: pre-wrap;
+}
+
+.line--center { display: block; }
+
+/* Cursor — only on the element currently typing. */
+.line.is-typing::after,
+.line-lead.is-typing::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 0.95em;
+  margin-left: 6px;
+  vertical-align: -0.08em;
+  background: currentColor;
+  animation: blink 900ms steps(1) infinite;
+}
+
+@keyframes blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Fade-out for line/lead/decoration spans (replaces backspacing). */
+.line.is-out,
+.line-lead.is-out,
+.amor-fade.is-out,
+.city-fade.is-out {
+  opacity: 0;
+  transition: opacity 1400ms var(--ease);
+}
+
+/* -----------------------------------------------------------------------
+   Photos
+----------------------------------------------------------------------- */
+
+.photo {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity var(--photo-fade) var(--ease), transform var(--photo-fade) var(--ease);
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1);
+  /* Exit speed — when .is-in drops, the zoom eases back over the same
+     window as the photo opacity fade (no animation snap). */
+  transition: transform var(--photo-fade) var(--ease);
+}
+
+.photo.is-in { opacity: 1; transform: translate3d(0, 0, 0); }
+
+/* Hero: show the full 2:3 frame with no cropping on any viewport. The box has
+   both a width ceiling (grid column) and a height ceiling (max-height), so no
+   single cover ratio fits every screen. object-fit: contain always fits the
+   whole image inside the box; the unused margin is invisible against the dark
+   stage. The container keeps the image's native 2:3 ratio to minimize gaps. */
+#s1 .photo--portrait {
+  aspect-ratio: 2 / 3;
+}
+
+#s1 .photo--portrait img {
+  object-fit: contain;
+  object-position: center;
+}
+
+.photo--portrait {
+  aspect-ratio: 3 / 4;
+  max-width: 100%;
+  width: 100%;
+  /* Cap to the desktop content box (asymmetric scene padding + controls)
+     so the photo stays inside the stage and clears the bottom bar. */
+  max-height: min(
+    84vh,
+    calc(100vh - var(--desk-pad-top) - var(--desk-pad-bottom) - 16px)
+  );
+  justify-self: end;
+}
+
+.photo--wide {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  max-width: 1100px;
+}
+
+.photo--bleed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  transform: translate3d(-40px, 0, 0);
+}
+
+/* Pull the visible crop window toward the top of the image so the upper
+   architecture (medallion, carved arch) stays in frame. */
+.photo--bleed img {
+  object-position: center 28%;
+}
+
+/* Full-bleed top and sides; leaves a black band at the bottom for the
+   "For a weekend celebrating amor ♥" copy. Absolute-positioned to escape
+   the scene's outer padding. */
+.photo--full {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 82vh;
+  margin: 0;
+}
+
+.photo--full img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.scene--amor .copy--bottom-right {
+  z-index: 2;
+  /* Photo above runs 0 → 82vh; black band 82vh → 100vh. Center the line
+     at the band's midpoint (91vh) so it sits halfway between the bottom of
+     the image and the bottom of the screen. */
+  top: 89vh;
+  bottom: auto;
+  right: clamp(24px, 4vw, 72px);
+  transform: translateY(-50%);
+  text-shadow: none;
+}
+
+/* Scene 2 — "amor ♥" fade-in (replaces the typed "<3") */
+.amor-fade,
+.city-fade {
+  opacity: 0;
+  transition: opacity 2000ms var(--ease);
+  white-space: nowrap;
+}
+
+.amor-fade.is-in,
+.city-fade.is-in { opacity: 1; }
+
+.heart {
+  font-style: normal;
+  display: inline-block;
+}
+
+/* Scene 4 — tighter stack; the magical-place line shrinks just enough
+   to stay on a single line at desktop widths. */
+#s4 .stack { gap: 0.25em; }
+
+/* Scene 7 — thank-you copy sits a bit above center so the first line
+   isn't pushed to the middle. */
+#s7 .copy--left-mid {
+  align-self: start;
+  padding-top: clamp(48px, 14vh, 160px);
+}
+
+/* Animated signature (scene 7) — draw-on WebP replaces typed sign-off. */
+.line--sig {
+  --sig-width: clamp(200px, 11em, 320px);
+  display: block;
+  margin-top: 0.1em;
+  /* Reserve the signature box before the image loads so mobile flex
+     centering doesn't jump when the asset decodes. 760×197 source. */
+  min-height: calc(var(--sig-width) * 197 / 760);
+}
+
+.sig-ink {
+  display: block;
+  width: var(--sig-width);
+  aspect-ratio: 760 / 197;
+  height: auto;
+  opacity: 0;
+  transition: opacity 600ms var(--ease);
+  pointer-events: none;
+  user-select: none;
+}
+
+.sig-ink.is-in { opacity: 1; }
+
+/* -----------------------------------------------------------------------
+   Form (scene 6)
+----------------------------------------------------------------------- */
+
+.rsvp {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4em;
+  width: 100%;
+  max-width: 480px;
+  margin-top: 1.8em;
+  margin-bottom: 1.4em;
+  font-size: 0.78em;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  opacity: 0;
+  transition: opacity 800ms var(--ease);
+}
+
+.field.is-in { opacity: 1; }
+
+.field span {
+  font-size: 0.7em;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 4px;
+}
+
+.field input {
+  width: 100%;
+  padding: 0.05em 0 0.15em;
+  background: transparent;
+  color: var(--fg);
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  border-radius: 0;
+  font: inherit;
+  font-size: 1em;
+  letter-spacing: var(--tracking);
+  line-height: 1.3;
+  outline: none;
+}
+
+.field input:focus { border-bottom-width: 2px; padding-bottom: calc(0.15em - 1px); }
+
+/* Mailing address is two stacked inputs (line1 + line2) under one label so
+   browser autofill — which splits a saved address into address-line1 /
+   address-line2 — populates both at once. Both inputs are empty (no
+   placeholders). The second input's top margin matches the label's
+   margin-bottom (4px) so the gap above line 2 equals the gap above line 1 —
+   the two address rows are spaced identically. */
+.field--address input + input { margin-top: 4px; }
+
+.field--check {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  margin-top: 0.6em;
+}
+
+.field--check input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  margin: 0;
+  border: 1px solid var(--fg);
+  border-radius: 2px;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  opacity: 0.4;
+  transition: opacity 220ms var(--ease), background-color 220ms var(--ease);
+}
+
+.field--check input[type="checkbox"]:checked {
+  background-color: var(--fg);
+  opacity: 1;
+}
+
+.field--check input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 4px;
+  height: 8px;
+  border: 1.5px solid var(--bg);
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+.field--check input[type="checkbox"]:focus-visible {
+  outline: 1px solid var(--fg);
+  outline-offset: 3px;
+  opacity: 0.7;
+}
+
+.field--check span {
+  font-size: 0.75em;
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 0.85;
+  margin: 0;
+}
+
+/* Scene 6 — source is natively 2:3. On desktop, match the container ratio and
+   use contain so the full frame shows with no cropping (same approach as the
+   hero). Unused margin is invisible against the dark stage. Scoped to desktop
+   so the mobile full-width crop below is untouched. */
+@media (min-width: 901px) {
+  #s6 .photo--portrait {
+    aspect-ratio: 2 / 3;
+  }
+
+  .scene--form .photo--portrait img {
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+/* Allow the prompt to wrap inside its column and reserve two lines so the
+   form below doesn't shift down as the typewriter advances onto line two.
+   (At >900px viewports the heading is ~631px wide and the form column is
+   <500px, so a single-line nowrap heading clipped behind the photo.) */
+.scene--form [data-line="form-q"] {
+  white-space: normal;
+  max-width: 100%;
+  min-height: calc(2 * 1.35em);
+}
+
+/* minmax(0,1fr) keeps 1fr 1fr equal even with long heading content. */
+#s6 .scene-grid--right-photo {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+#s6 .copy--left-top {
+  min-width: 0;
+  max-width: 100%;
+  /* Top of the copy is aligned to the top of the (vertically centered) photo
+     by JS on scene enter + resize (see alignFormCopyToPhoto in script.js),
+     which sets padding-top to the photo's centering offset. This 4vh is just
+     a sensible fallback before/without that script. */
+  padding-top: 4vh;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.6em;
+  margin-top: 1.4em;
+  opacity: 0;
+  transition: opacity 600ms var(--ease);
+  pointer-events: none;
+}
+
+.actions--single { justify-content: flex-start; }
+
+.actions.is-in { opacity: 1; pointer-events: auto; }
+.actions.is-locked.is-in { opacity: 0; pointer-events: none; }
+
+.actions button {
+  position: relative;
+  padding: 0;
+  text-align: left;
+}
+
+.actions button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: var(--fg);
+  transform-origin: left;
+  transform: scaleX(1);
+  transition: transform 600ms var(--ease);
+}
+
+.actions button:hover::after,
+.actions button:focus-visible::after {
+  transform-origin: right;
+  transform: scaleX(0);
+}
+
+.actions button[disabled] { opacity: 0.4; cursor: default; }
+
+.rsvp__error {
+  margin: 0.8em 0 0;
+  min-height: 1.2em;
+  font-size: 0.78em;
+  color: #b3261e;
+  opacity: 0;
+  transition: opacity 280ms var(--ease);
+}
+.rsvp__error:not(:empty) { opacity: 1; }
+
+/* -----------------------------------------------------------------------
+   Scene-specific
+----------------------------------------------------------------------- */
+
+#s5 .photo--wide { max-height: 64vh; }
+
+/* -----------------------------------------------------------------------
+   Responsive
+----------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  * { -webkit-tap-highlight-color: rgba(239, 231, 210, 0.12); }
+
+  .stage { height: 100dvh; }
+
+  /* Mobile layout shell — every scene is a vertically-centered flex column
+     so the photo + copy stack reads as a composed slide, not a top-pinned
+     blog post. Padding is identical on every scene; gap between photo and
+     copy is identical on every scene. */
+  .scene {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: var(--m-stack-gap);
+    min-height: 100dvh;
+    overflow-y: auto;
+    padding-top: max(env(safe-area-inset-top, 0px), var(--m-pad-top));
+    padding-bottom: calc(var(--m-controls-clear) + env(safe-area-inset-bottom, 0px));
+    padding-left: max(env(safe-area-inset-left, 0px), var(--m-inset));
+    padding-right: max(env(safe-area-inset-right, 0px), var(--m-inset));
+  }
+
+  /* Keep the logo finale grid-centered (single child, no stack rhythm). */
+  .scene--logo {
+    display: grid;
+    place-items: center;
+  }
+
+  /* Form scene (mobile): plain form on the scene background — no photo,
+     no panel container. The photo figure is hidden on mobile but kept in
+     the DOM for the desktop two-column layout. */
+  #s6 .photo {
+    display: none;
+  }
+
+  /* Vertically center the form within the scene; `safe` keeps the top
+     reachable when content exceeds the viewport (iPhone SE).
+     Extra padding-top bumps the prompt line down off the safe-area edge —
+     without it, `safe center` falls back to flex-start (because the form
+     is taller than the available area) and the heading hugs the top of
+     the viewport with no visual breathing room. The bottom is tightened
+     by the `.rsvp` overrides below so the submit doesn't overlap the
+     fixed controls. */
+  .scene--form {
+    justify-content: safe center;
+    padding-top: max(
+      env(safe-area-inset-top, 0px),
+      clamp(56px, 8.5vh, 88px)
+    );
+    /* Extra bottom clearance (beyond the default --m-controls-clear) so the
+       centered form's Submit row never collides with the fixed controls. */
+    padding-bottom: calc(
+      var(--m-controls-clear) + clamp(36px, 7vh, 72px) +
+      env(safe-area-inset-bottom, 0px)
+    );
+  }
+
+  /* Tighten the form's outer + trailing margins on mobile so the
+     content height shrinks enough to absorb the extra padding-top
+     above without overlapping the fixed controls at the bottom. */
+  .scene--form .rsvp {
+    margin-top: 1em;
+    margin-bottom: 0.4em;
+  }
+
+  /* Don't reserve a min-height row for the (usually empty) error message
+     below the submit on mobile — it adds ~28px of dead space directly
+     below the submit on every viewport. The reserved row still applies
+     on desktop. */
+  .scene--form .rsvp__error {
+    margin-top: 0.4em;
+    min-height: 0;
+  }
+
+  /* The internal scene-grid (desktop two-column) collapses to a single flex
+     column on mobile, sharing the scene's stack gap. */
+  .scene-grid,
+  .scene-grid--right-photo,
+  .scene-grid--left-photo {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    align-items: stretch;
+    justify-content: center;
+    gap: var(--m-stack-gap);
+  }
+
+  /* Photo always leads the stack on mobile (cinematic). */
+  .scene-grid--right-photo .photo,
+  .scene-grid--left-photo .photo {
+    order: -1;
+  }
+
+  /* Portrait photos: stretched to full inset width (matches text edges),
+     tall and impactful, cropped on faces via object-position. */
+  .photo--portrait {
+    aspect-ratio: auto;
+    align-self: stretch;
+    justify-self: stretch;
+    width: 100%;
+    max-width: 100%;
+    height: var(--m-photo-cap);
+    max-height: var(--m-photo-cap);
+    margin: 0;
+  }
+
+  .photo--portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    margin: 0;
+  }
+
+  /* Per-photo object-position tuned so faces stay in frame. */
+  #s1 .photo--portrait img { object-position: center 36%; }
+  #s3 .photo--portrait img { object-position: 38% center; }
+  #s4 .photo--portrait img { object-position: center 70%; }
+  #s6 .photo--portrait img { object-position: center 40%; }
+  #s7 .photo--portrait img { object-position: center 38%; }
+
+  /* Scene 1 — match the frame to the source photo's natural 2:3 aspect on
+     mobile so the full image (marquee, couple, full bodies) shows uncropped
+     at the inset width. Falls back to a 70dvh ceiling on unusually short
+     viewports so the line below + controls stay reachable. */
+  #s1 .photo--portrait {
+    aspect-ratio: 2 / 3;
+    height: auto;
+    max-height: 70dvh;
+  }
+  #s1 .photo--portrait img { object-position: center; }
+
+  /* Full-bleed amor sits in flow on mobile. Portrait 4/5 aspect scales the
+     photo up and (with object-fit: cover on a 3/2 landscape source) crops to
+     the middle ~53% horizontally — empty side chairs drop away and the couple
+     + "CHURROS CALIENTITOS" sign fill the frame. */
+  .photo--full {
+    position: relative;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .photo--full img {
+    object-fit: cover;
+    /* X = 43% (vs default 50%) shifts the source window left so the
+       "CHURROS CALIENTITOS" sign — which sits left-of-center in the
+       source frame — reads more centered in the mobile portrait crop.
+       43% is the sweet spot: it nudges the text closer to frame center
+       (~47% vs original 38%) while keeping the trailing "S" intact
+       (right edge of visible window lands a few source pixels past it). */
+    object-position: 43% 42%;
+  }
+
+  /* Copy regions — full inset width, left-aligned per design system.
+     The compound selectors `.scene-grid--left-photo .copy--left-mid` and
+     `.scene-grid--right-photo .copy--left-mid` add a desktop padding-left
+     at higher specificity (0,2,0), so we have to match that specificity on
+     mobile to zero them out. Otherwise scene 4 (the only left-photo scene)
+     ends up indented past its photo's left edge. */
+  .copy,
+  .copy--left-mid,
+  .copy--left-top,
+  .scene-grid--left-photo .copy--left-mid,
+  .scene-grid--right-photo .copy--left-mid {
+    align-self: stretch;
+    justify-self: stretch;
+    text-align: left;
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Bottom-right (amor) becomes inline on mobile. */
+  .copy--bottom-right {
+    position: static;
+    align-self: stretch;
+    width: 100%;
+    max-width: 100%;
+    top: auto;
+    bottom: auto;
+    right: auto;
+    left: auto;
+    transform: none;
+    text-align: left;
+    padding: 0;
+  }
+
+  /* Controls bar — safe-area lifted, larger gap, brighter on photos. */
+  .controls {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    bottom: max(calc(env(safe-area-inset-bottom, 0px) + 16px), 24px);
+    gap: 28px;
+  }
+
+  .ctrl {
+    width: 44px;
+    height: 44px;
+    opacity: 0.42;
+  }
+
+  /* Form (scene 6) — bigger taps, keyboard-aware, generous breathing room
+     so the form fills the viewport on phones instead of bunching at the top. */
+  .rsvp {
+    font-size: 1em;
+    gap: clamp(1.65em, 4vh, 2.1em);
+  }
+
+  .field input,
+  .cover__pw-input { font-size: 16px; }
+
+  /* Tighten the label→underline gap: smaller top padding pulls each input
+     line up closer to its label, and a shorter min-height keeps the whole
+     form compact enough that Submit clears the fixed controls. */
+  .field span { margin-bottom: 2px; }
+
+  .field input:not([type="checkbox"]) {
+    padding: 6px 0;
+    min-height: 34px;
+  }
+
+  /* Match the label's 2px margin-bottom so the gap above line 2 equals the
+     gap above line 1 (consistent with desktop). */
+  .field--address input + input { margin-top: 2px; }
+
+  .field--check { gap: 14px; }
+
+  .field--check input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    min-height: 22px;
+    flex: 0 0 22px;
+    padding: 0;
+  }
+
+  .field--check input[type="checkbox"]:checked::after {
+    top: 4px;
+    left: 7px;
+    width: 6px;
+    height: 11px;
+  }
+
+  .actions button {
+    padding: 14px 4px;
+    min-height: 44px;
+  }
+
+  /* On mobile, .actions stays hidden via the universal `.actions { opacity: 0 }`
+     default until the JS adds .is-in after the field-stagger loop. The Submit
+     button greys out via its [disabled] attribute (handled by the universal
+     `.actions button[disabled] { opacity: 0.4 }` rule above). We deliberately
+     do NOT make `.is-locked` alone visible here — that caused Submit to flash
+     in during the heading typewriter on first entry. */
+  .scene--form .actions.is-locked.is-in {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .cover__pw-error { font-size: 0.72em; }
+
+  /* Cover — courtyard bg (no baked K&A). Center the gate, use dvh + safe
+     area so the submit control isn't clipped below the fold on iOS. */
+  .cover__inner {
+    justify-content: center;
+    padding-top: max(env(safe-area-inset-top, 0px), 20px);
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 28px);
+  }
+
+  .cover__password {
+    gap: 10px;
+    width: min(320px, 88vw);
+  }
+
+  /* Plain white arrow stacked below the password line — no circle. */
+  .cover__pw-submit {
+    opacity: 1;
+    min-width: 44px;
+    min-height: 44px;
+    display: grid;
+    place-items: center;
+    padding: 4px 8px;
+  }
+
+  .cover__play-group.is-hidden {
+    display: none;
+  }
+
+  /* Scene 7 — same 2:3 portrait frame as s4, but s7 carries 6 lines of
+     signoff copy vs s4's 5, so an identical photo height makes the scene
+     ~13px taller than the viewport on 844px phones. That overflow defeats
+     `justify-content: center` and pins the photo to the very top with no
+     breathing room. Cap the photo slightly shorter (54dvh) so the whole
+     scene fits and re-centers, giving the same top margin as every other
+     screen. object-fit: cover crops the few extra rows off top + bottom. */
+  #s7 .photo--portrait {
+    aspect-ratio: 2 / 3;
+    height: auto;
+    max-height: 54dvh;
+  }
+  #s7 .photo--portrait img { object-position: center; }
+
+  /* Tighter scene-grid gap on s7 only — the 6 signoff lines need room
+     below the now-taller photo and the default --m-stack-gap (~36px)
+     would push the last line into the fixed controls. */
+  #s7 .scene-grid--right-photo {
+    gap: clamp(14px, 2.5vh, 22px);
+  }
+
+  #s7 .copy--left-mid {
+    padding-top: 0;
+    align-self: stretch;
+  }
+
+  #s7 .stack { gap: 0.18em; }
+  #s7 .line-gap--lg { height: 0.4em; }
+
+  #s7 .line--sig {
+    --sig-width: clamp(180px, 52vw, 280px);
+  }
+
+  /* Scene 4 — match the frame to the source photo's natural 2:3 aspect on
+     mobile so the full image (tree canopy, ornate medallion + oval window,
+     iron gate, beetle, couple in motion blur, street) shows uncropped.
+     Capped at 62dvh so the 5 lines of copy below + controls stay reachable
+     on shorter viewports. */
+  #s4 .photo--portrait {
+    aspect-ratio: 2 / 3;
+    height: auto;
+    max-height: 62dvh;
+  }
+  #s4 .photo--portrait img { object-position: center; }
+}
+
+/* The heading wrap + 2-line min-height now applies at every viewport
+   (see .scene--form [data-line="form-q"] above), so this 720px-scoped
+   override is no longer needed. */
+
+@media (max-width: 480px) {
+  .rsvp { max-width: 100%; }
+
+  .field--check span { font-size: 0.85em; }
+
+  .cover__pw-submit {
+    font-size: 1.35em;
+  }
+}
+
+/* Instant restore: disable all transitions/animations on a scene's
+   DESCENDANTS when its snapshot is being applied (so lines/photo/fades
+   don't replay their entrance transitions). The scene element itself
+   keeps its own opacity transition so back-nav still cross-fades in.
+   Class removed on next frame. */
+.scene.is-restoring *,
+.scene.is-restoring *::before,
+.scene.is-restoring *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Motion effects live in no-preference so the global reduce block below
+   cannot zero them out with animation-duration: 0ms on *. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Ken Burns via transition (not keyframes) so exit doesn't snap when
+     .is-in is removed — enter is slow, exit matches the opacity fade. */
+  .photo.is-in > img {
+    transform: scale(1.05) translate3d(-0.8%, -0.5%, 0);
+    transform-origin: center center;
+    transition: transform 12s ease-out;
+    backface-visibility: hidden;
+  }
+
+  /* Hero (s1): zoom from the top edge so the marquee stays pinned. */
+  #s1 .photo.is-in > img {
+    transform: scale(1.05);
+    transform-origin: center top;
+    transition: transform 12s ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0ms !important;
+    transition-duration: 200ms !important;
+  }
+  .line.is-typing::after { animation: none; }
+}
+
+/* -----------------------------------------------------------------------
+   Cover (gates music + slideshow on a user gesture)
+   Photo is full-bleed (object-fit: cover). The IMG sits as a direct
+   sibling of .cover__inner so .cover__inner's z-index wins and the
+   form is clickable.
+----------------------------------------------------------------------- */
+
+.cover {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--bg);
+  opacity: 1;
+  transition: opacity 700ms var(--ease);
+  overflow: hidden;
+}
+
+.cover.is-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Translucent black overlay over the courtyard image: darkens the
+   background while the photo still reads through. Sits above the image
+   (z-index 0) and below the form (z-index 2). */
+.cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+/* Cover ink: white form elements over the darkened image. */
+:root {
+  --cover-ink: #ffffff;
+}
+
+.cover__inner {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-left: clamp(20px, 5vw, 48px);
+  padding-right: clamp(20px, 5vw, 48px);
+  padding-top: var(--gutter);
+  padding-bottom: clamp(40px, 8vh, 96px);
+  /* Space between the white K&A mark and the password gate below it. */
+  gap: clamp(28px, 5vh, 56px);
+}
+
+/* White K&A mark on the cover (same artwork as the finale, trimmed of its
+   surrounding whitespace). Sits above the password gate. */
+.cover__brand {
+  flex: 0 0 auto;
+  width: clamp(200px, 34vw, 360px);
+  aspect-ratio: 1497 / 779;
+  background-color: #ffffff;
+  -webkit-mask: url('assets/ka-logo-alpha-trim.png?v=1') no-repeat center / contain;
+          mask: url('assets/ka-logo-alpha-trim.png?v=1') no-repeat center / contain;
+}
+
+.cover__mark {
+  font-size: clamp(28px, 3.2vw, 38px);
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  opacity: 0.85;
+}
+
+.cover__play {
+  width: clamp(54px, 5.6vw, 64px);
+  height: clamp(54px, 5.6vw, 64px);
+  border-radius: 50%;
+  border: 1px solid var(--cover-ink);
+  color: var(--cover-ink);
+  display: grid;
+  place-items: center;
+  opacity: 0.55;
+  transition: opacity 320ms var(--ease), transform 320ms var(--ease), border-color 320ms var(--ease);
+  background: transparent;
+}
+
+.cover__play:hover,
+.cover__play:focus-visible {
+  opacity: 0.9;
+  outline: none;
+  transform: scale(1.04);
+}
+
+.cover__play svg {
+  width: 28%;
+  height: 28%;
+  transform: translateX(1.5px);
+}
+
+.cover__hint {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  font-style: italic;
+  color: var(--fg);
+  opacity: 0.5;
+}
+
+/* While the cover is up, hide scene controls (audio toggle is inside). */
+body.is-cover .controls {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* -----------------------------------------------------------------------
+   K & A logo mark (cover + final scene)
+   Source PNG is black artwork on white (no alpha); use luminance masking
+   so the white background is treated as transparent.
+----------------------------------------------------------------------- */
+
+.logo-mark {
+  background-color: #ffffff;
+  /* Alpha mask (opaque letters / transparent bg) so it works on iOS Safari,
+     which doesn't support mask-mode: luminance. */
+  -webkit-mask: url('assets/ka-logo-alpha.png?v=1') no-repeat center / contain;
+          mask: url('assets/ka-logo-alpha.png?v=1') no-repeat center / contain;
+}
+
+.cover__logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  z-index: 0;
+}
+
+.scene--logo {
+  display: grid;
+  place-items: center;
+  padding: clamp(24px, 6vw, 96px);
+}
+
+.logo-mark {
+  width: clamp(180px, 30vmin, 380px);
+  aspect-ratio: 1 / 1;
+  opacity: 0;
+  transition: opacity 1400ms var(--ease);
+  background-color: #ffffff;
+}
+
+.logo-mark.is-in { opacity: 1; }
+
+/* -----------------------------------------------------------------------
+   Password gate
+----------------------------------------------------------------------- */
+
+.cover__slot {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 100%;
+}
+
+.cover__slot > * {
+  grid-area: 1 / 1;
+}
+
+.cover__password {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(16px, 2.4vh, 24px);
+  transition: opacity 400ms var(--ease);
+}
+
+/* Input on top, submit arrow stacked below it (all viewports). */
+.cover__pw-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(14px, 2.2vh, 22px);
+  width: 100%;
+}
+
+.cover__password.is-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cover__pw-input {
+  background: transparent;
+  border: 0;
+  border-bottom: 1.5px solid var(--cover-ink);
+  color: var(--cover-ink);
+  font: inherit;
+  font-size: 1em;
+  letter-spacing: 0.14em;
+  text-align: center;
+  width: clamp(200px, 32vw, 260px);
+  padding: 0.45em 0.4em 0.55em;
+  outline: none;
+  opacity: 1;
+  transition: border-bottom-width 200ms ease, padding-bottom 200ms ease;
+}
+
+.cover__pw-input::placeholder {
+  color: var(--cover-ink);
+  opacity: 0.5;
+  letter-spacing: 0.18em;
+  font-style: italic;
+  text-transform: lowercase;
+}
+
+.cover__pw-input:focus {
+  border-bottom-width: 2px;
+  padding-bottom: calc(0.55em - 0.5px);
+}
+
+/* Phones: bigger tap target on the password input (>= 44px). */
+@media (max-width: 900px) {
+  .cover__pw-input {
+    width: min(280px, 78vw);
+    padding: 14px 8px;
+    min-height: 48px;
+    font-size: 16px; /* prevent iOS zoom on focus */
+  }
+}
+
+.cover__pw-error {
+  font-size: 0.72em;
+  letter-spacing: 0.06em;
+  font-style: italic;
+  color: var(--cover-ink);
+  opacity: 0.75;
+  min-height: 1.4em;
+  text-align: center;
+  margin: 0;
+}
+
+.cover__play-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Anchor to the top of the shared cover__slot grid cell so the play
+     button lands in the same position the password input occupied —
+     i.e. tucked right under the K&A — instead of floating in the
+     middle of the slot's natural cell. */
+  align-self: start;
+  gap: clamp(14px, 2vh, 20px);
+}
+
+.cover__play-group.is-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cover__play-label {
+  font-family: inherit;
+  font-style: italic;
+  font-size: 0.78em;
+  letter-spacing: 0.16em;
+  text-transform: lowercase;
+  color: var(--cover-ink);
+  opacity: 0.55;
+  margin: 0;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.cover__pw-submit {
+  color: var(--cover-ink);
+  opacity: 0.9;
+  font-size: 1.25em;
+  letter-spacing: 0;
+  padding: 0.4em 0.8em;
+  transition: opacity 200ms ease, transform 200ms var(--ease);
+  line-height: 1;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.cover__pw-submit:hover,
+.cover__pw-submit:focus-visible {
+  opacity: 1;
+  outline: none;
+  transform: translateX(2px);
+}
+

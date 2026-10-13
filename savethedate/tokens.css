@@ -1,0 +1,45 @@
+/* =========================================================================
+   K + A · CDMX 2027 — Tokens
+   See design-system.md. One color. One size. One weight.
+   ========================================================================= */
+
+:root {
+  --bg: #0E0E0E;
+  --fg: #EFE7D2;
+
+  --fs: clamp(18px, 4.2vw, 30px);
+  --lh: 1.35;
+  --tracking: 0;
+
+  --gutter: clamp(24px, 6vw, 96px);
+  --max: 1100px;
+
+  /* Desktop scene insets — bottom is taller to balance the fixed control strip
+     so portrait slides don't read as sitting low with a huge gap above. */
+  --desk-pad-top: clamp(28px, 4.5vw, 72px);
+  --desk-pad-bottom: clamp(92px, 13vh, 152px);
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur: 1200ms;
+  --photo-fade: 1400ms;
+
+  /* Mobile layout system — consumed inside @media (max-width: 900px) blocks
+     in styles.css. One inset, one stack gap, one photo cap. */
+  --m-inset: clamp(28px, 7vw, 48px);
+  --m-stack-gap: clamp(28px, 5vh, 44px);
+  --m-pad-top: clamp(32px, 5vh, 56px);
+  --m-photo-cap: 56dvh;
+  --m-photo-cap-sm: 44dvh;
+  --m-controls-clear: 120px;
+}
+
+@media (max-width: 480px) {
+  :root {
+    --m-inset: clamp(24px, 7vw, 32px);
+    --m-stack-gap: clamp(24px, 4.5vh, 36px);
+    --m-pad-top: clamp(24px, 4vh, 40px);
+    --m-photo-cap: 50dvh;
+    --m-photo-cap-sm: 40dvh;
+    --m-controls-clear: 108px;
+  }
+}
