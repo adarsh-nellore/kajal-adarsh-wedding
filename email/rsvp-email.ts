@@ -24,7 +24,6 @@ export type Rsvp = {
 export const SITE = "https://adarsh-nellore.github.io/kajal-adarsh-wedding/";
 export const PHOTO = SITE + "email/photo.png";
 export const NAMES = SITE + "email/names-light.png";
-export const NAMES_DARK = SITE + "email/names-dark.png";
 const TZ = "America/Chicago";
 
 export const EVENTS: Record<string, string> = {
@@ -40,10 +39,11 @@ export const BUTTON = "#bf9c74";
 export const BUTTON_INK = "#323232";
 export const LINK = "#222222";
 
-// Dark mode, for clients that honour prefers-color-scheme (Apple Mail) or Outlook's
-// data-ogsc/ogsb hooks: the site's night palette. Gmail ignores these and inverts on its
-// own, which the off-black ink and the haloed wordmark are chosen to survive.
-const NIGHT = { card: "#1d1914", ink: "#EAE3D6", rule: "#6b5734", gold: "#CDA45E", button: "#2a2219" };
+export const BACKDROP = "#e9dbc0";
+
+// The design stays light in dark mode: Apple Mail honours "light only", Outlook gets its
+// data-ogsc/ogsb hooks pointed back at these colours, and for Gmail's forced inversion the
+// off-black ink and the haloed wordmark keep everything legible.
 export const FONT = "'EB Garamond',Georgia,'Times New Roman',serif";
 
 export function esc(s: unknown): string {
@@ -92,9 +92,7 @@ export const photo = (href: string) => `
 export const names = () => `
         <tr>
           <td class="side" align="center" style="padding:4px 32px 14px;">
-            <img src="${NAMES}" class="day" width="300" alt="Kajal y Adarsh" style="display:block;width:300px;max-width:100%;height:auto;border:0;outline:none;font-family:${FONT};font-size:28px;line-height:34px;color:#555555;">
-            <!--[if !mso]><!--><div class="night" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><img src="${NAMES_DARK}" width="300" alt="Kajal y Adarsh" style="display:block;width:300px;max-width:100%;height:auto;border:0;outline:none;"></div><!--<![endif]-->
-          </td>
+            <img src="${NAMES}" width="300" alt="Kajal y Adarsh" style="display:block;width:300px;max-width:100%;height:auto;border:0;outline:none;font-family:${FONT};font-size:28px;line-height:34px;color:#555555;">          </td>
         </tr>`;
 
 export const dates = () =>
@@ -123,13 +121,19 @@ export const QUESTIONS = rule() +
 
 export const QUESTIONS_TEXT = ["Questions? Reach out to us anytime.", "Kajal · 949-293-1051", "Adarsh · 408-752-1100"];
 
-// Tan from edge to edge, with the rows in a centred 640px column.
+// A lighter tan from edge to edge, with the rows on a centred 640px tan card.
 export function card(rows: string): string {
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${CARD}" class="card" style="width:100%;background-color:${CARD};border-collapse:collapse;">
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${BACKDROP}" class="backdrop" style="width:100%;background-color:${BACKDROP};border-collapse:collapse;">
   <tr>
-    <td class="shell" align="center" style="padding:28px 0 20px;">
+    <td class="shell" align="center" style="padding:32px 16px;">
       <!--[if mso]><table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->
-      <table role="presentation" align="center" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:640px;margin:0 auto;border-collapse:collapse;">${rows}
+      <table role="presentation" align="center" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${CARD}" class="card" style="width:100%;max-width:640px;margin:0 auto;background-color:${CARD};border-collapse:collapse;">
+        <tr>
+          <td class="inner" style="padding:28px 0 20px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">${rows}
+            </table>
+          </td>
+        </tr>
       </table>
       <!--[if mso]></td></tr></table><![endif]-->
     </td>
@@ -145,8 +149,8 @@ export function page(o: { title: string; preheader: string; rows: string }): str
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="x-apple-disable-message-reformatting">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
-<meta name="color-scheme" content="light dark">
-<meta name="supported-color-schemes" content="light dark">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light">
 <title>${esc(o.title)}</title>
 <!--[if mso]>
 <noscript><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
@@ -154,12 +158,13 @@ export function page(o: { title: string; preheader: string; rows: string }): str
 <![endif]-->
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:light dark;supported-color-schemes:light dark;}
-body{margin:0;padding:0;width:100% !important;background-color:${CARD};-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+:root{color-scheme:light only;supported-color-schemes:light;}
+body{margin:0;padding:0;width:100% !important;background-color:${BACKDROP};-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 a[x-apple-data-detectors]{color:inherit !important;text-decoration:inherit !important;}
 a img,a:focus,a:active{outline:none !important;}
 @media (max-width:620px){
-  .shell{padding:16px 0 12px !important;}
+  .shell{padding:0 !important;}
+  .inner{padding:20px 0 12px !important;}
   .side{padding-left:20px !important;padding-right:20px !important;}
   .photo{padding:12px 20px 22px !important;}
   .fs-s{font-size:14px !important;}
@@ -167,24 +172,16 @@ a img,a:focus,a:active{outline:none !important;}
   .fs-l{font-size:17px !important;}
   .btn{font-size:19px !important;line-height:26px !important;}
 }
-@media (prefers-color-scheme:dark){
-  body,.card{background-color:${NIGHT.card} !important;}
-  .ink{color:${NIGHT.ink} !important;}
-  .rule{background-color:${NIGHT.rule} !important;}
-  .btn-bg{background-color:${NIGHT.button} !important;border-color:${NIGHT.gold} !important;}
-  .btn{color:${NIGHT.gold} !important;}
-  .day{display:none !important;}
-  .night{display:block !important;max-height:none !important;overflow:visible !important;}
-}
-[data-ogsb] .card{background-color:${NIGHT.card} !important;}
-[data-ogsc] .ink{color:${NIGHT.ink} !important;}
-[data-ogsb] .rule{background-color:${NIGHT.rule} !important;}
-[data-ogsb] .btn-bg{background-color:${NIGHT.button} !important;border-color:${NIGHT.gold} !important;}
-[data-ogsc] .btn{color:${NIGHT.gold} !important;}
+[data-ogsb] body,[data-ogsb] .backdrop{background-color:${BACKDROP} !important;}
+[data-ogsb] .card{background-color:${CARD} !important;}
+[data-ogsc] .ink{color:${INK} !important;}
+[data-ogsb] .rule{background-color:${INK} !important;}
+[data-ogsb] .btn-bg{background-color:${BUTTON} !important;border-color:${INK} !important;}
+[data-ogsc] .btn{color:${BUTTON_INK} !important;}
 </style>
 </head>
-<body style="margin:0;padding:0;background-color:${CARD};">
-<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:${CARD};">${esc(o.preheader)}&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;</div>
+<body style="margin:0;padding:0;background-color:${BACKDROP};">
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:${BACKDROP};">${esc(o.preheader)}&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;</div>
 ${card(o.rows)}
 </body>
 </html>`;
