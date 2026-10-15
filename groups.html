@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#121212">
+<meta name="robots" content="noindex">
+<title>Guest groups — Kajal &amp; Adarsh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jaini&family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#121212;
+  --gold:#CDA45E;
+  --gold-rgb:205,164,94;
+  --white:#EAE3D6;
+  --white-rgb:234,227,214;
+  --head:'Jaini','EB Garamond',Georgia,serif;
+  --body:'EB Garamond',Georgia,'Times New Roman',serif;
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{margin:0;background:var(--ground);color:var(--white);font-family:var(--body);font-size:18px;line-height:1.4;}
+main{max-width:980px;margin:0 auto;padding:40px 20px 80px;}
+h1{font-family:var(--head);font-weight:400;font-size:clamp(40px,7vw,60px);line-height:1;color:var(--gold);margin:0 0 8px;}
+h2{font-family:var(--head);font-weight:400;font-size:30px;line-height:1.1;color:var(--gold);margin:40px 0 12px;}
+a{color:var(--gold);}
+.sub{margin:0 0 24px;color:rgba(var(--white-rgb),.7);}
+.sub a{margin-left:4px;}
+
+.totals{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:0 0 24px;}
+.totals div{border:1px solid rgba(var(--gold-rgb),.3);border-radius:2px;padding:12px 14px;}
+.totals div.event{border-style:dashed;}
+.totals b{display:block;font-family:var(--head);font-weight:400;font-size:32px;line-height:1;color:var(--gold);}
+.totals span{font-size:15px;color:rgba(var(--white-rgb),.75);}
+
+.tools{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin:0 0 16px;}
+.tools input[type=search]{flex:1 1 260px;font:inherit;font-size:18px;color:var(--white);background:transparent;border:1px solid rgba(var(--gold-rgb),.5);border-radius:2px;padding:10px 12px;outline:none;}
+.tools input[type=search]:focus{border-color:var(--gold);}
+.tools input[type=search]::placeholder{color:rgba(var(--white-rgb),.45);}
+.tools label{display:flex;gap:8px;align-items:center;cursor:pointer;}
+.tools input[type=checkbox]{accent-color:var(--gold);width:18px;height:18px;margin:0;}
+.count{font-size:15px;color:rgba(var(--white-rgb),.65);margin:0 0 8px;}
+
+table{width:100%;border-collapse:collapse;}
+th,td{text-align:left;padding:7px 10px;vertical-align:baseline;}
+thead th{position:sticky;top:0;background:var(--ground);color:var(--gold);font-weight:500;font-size:16px;border-bottom:1px solid rgba(var(--gold-rgb),.6);z-index:1;}
+th.ev,td.ev{text-align:center;width:1%;white-space:nowrap;}
+th.ev small{display:block;font-size:13px;color:rgba(var(--white-rgb),.6);font-weight:400;}
+td.party{width:1%;white-space:nowrap;color:var(--gold);font-family:var(--head);font-size:24px;line-height:1;}
+tbody.grp{border-top:1px solid rgba(var(--gold-rgb),.35);}
+tbody.grp tr:not(.subtotal):hover td{background:rgba(var(--white-rgb),.04);}
+tr.subtotal td{font-size:15px;color:rgba(var(--white-rgb),.6);padding-top:2px;padding-bottom:12px;}
+td.ev .yes{color:var(--gold);}
+td.ev .no{color:rgba(var(--white-rgb),.3);}
+.plus{display:inline-block;color:var(--ground);background:var(--gold);font-size:15px;line-height:1;padding:4px 7px 3px;border-radius:2px;font-weight:500;}
+.dupe{font-size:14px;color:rgba(var(--white-rgb),.6);margin-left:6px;white-space:nowrap;}
+mark{background:rgba(var(--gold-rgb),.35);color:inherit;}
+
+.notes{margin:0;padding-left:20px;}
+.notes li{margin:4px 0;}
+.empty{padding:24px 0;color:rgba(var(--white-rgb),.7);}
+
+@media (max-width:640px){
+  main{padding:28px 12px 60px;}
+  body{font-size:17px;}
+  th,td{padding:6px 5px;}
+  td.party{font-size:20px;}
+  th.ev{font-size:14px;}
+  th.ev small{display:none;}
+  .dupe{display:block;margin-left:0;}
+  .totals{grid-template-columns:1fr 1fr;}
+  .totals b{font-size:26px;}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Guest groups</h1>
+<p class="sub"><span id="updated">Loading guests.json…</span> <a id="csv" href="#" download="guest-groups.csv">Download CSV</a></p>
+
+<div class="totals" id="totals"></div>
+
+<div class="tools">
+  <input type="search" id="q" placeholder="Search a name or party number" aria-label="Search a name or party number" autocomplete="off">
+  <label><input type="checkbox" id="only-plus"> Only parties with a plus one</label>
+</div>
+<p class="count" id="count" aria-live="polite"></p>
+
+<table>
+  <thead><tr id="head"><th>Party</th><th>Guest</th></tr></thead>
+</table>
+<p class="empty" id="empty" hidden>No guests match.</p>
+
+<h2>Worth a look</h2>
+<ul class="notes" id="notes"></ul>
+</main>
+
+<script>
+(function(){
+  var EVENTS = [
+    {id: 'welcome-party', name: 'Welcome Party', day: 'Fri 19th', short: 'Fri'},
+    {id: 'saatak-haldi', name: 'Ganesh Pooja, Grah Shanti & Haldi', day: 'Sat 20th', short: 'Sat'},
+    {id: 'baarat-wedding', name: 'Baarat & Wedding', day: 'Sun 21st', short: 'Sun'},
+    {id: 'after-party', name: 'After Party', day: 'Sun 21st', short: 'After'}
+  ];
+  var HEAD_NAMES = {'welcome-party': 'Welcome', 'saatak-haldi': 'Haldi', 'baarat-wedding': 'Wedding', 'after-party': 'After Party'};
+  var $ = function(id){ return document.getElementById(id); };
+  var table = document.querySelector('table');
+  var num = function(p){ var n = parseInt(p, 10); return isNaN(n) ? Infinity : n; };
+  // no "events" on a guest means every event, as on the RSVP
+  var invited = function(g){ return g.events ? g.events : EVENTS.map(function(e){ return e.id; }); };
+  var label = function(g){ return g.plus ? 'Plus one' : g.name; };
+
+  EVENTS.forEach(function(e){
+    var th = document.createElement('th');
+    th.className = 'ev';
+    th.title = e.name + ' · ' + e.day;
+    th.innerHTML = '<span class="full"></span><small></small>';
+    th.firstChild.textContent = window.matchMedia('(max-width:640px)').matches ? e.short : HEAD_NAMES[e.id];
+    th.lastChild.textContent = e.day;
+    $('head').appendChild(th);
+  });
+  window.matchMedia('(max-width:640px)').addEventListener('change', function(m){
+    document.querySelectorAll('#head th.ev .full').forEach(function(s, i){ s.textContent = m.matches ? EVENTS[i].short : HEAD_NAMES[EVENTS[i].id]; });
+  });
+
+  fetch('guests.json', {cache: 'no-store'}).then(function(r){
+    if(!r.ok) throw new Error(r.status);
+    return r.json();
+  }).then(render).catch(function(err){
+    $('updated').textContent = 'Couldn’t load guests.json (' + err.message + ').';
+  });
+
+  function render(data){
+    var guests = data.guests || [];
+    $('updated').textContent = 'From guests.json, synced ' + (data.updated || 'unknown') + '.';
+
+    var parties = {}, order = [];
+    guests.forEach(function(g, i){
+      if(!parties[g.party]){ parties[g.party] = []; order.push(g.party); }
+      parties[g.party].push(g);
+    });
+    order.sort(function(a, b){ return num(a) - num(b) || (a < b ? -1 : 1); });
+
+    // names that are in more than one party
+    var byName = {};
+    guests.forEach(function(g){
+      if(g.plus) return;
+      var k = g.name.toLowerCase();
+      (byName[k] = byName[k] || []).indexOf(g.party) < 0 && byName[k].push(g.party);
+    });
+
+    var plusCount = guests.filter(function(g){ return g.plus; }).length;
+    var perEvent = EVENTS.map(function(e){ return guests.filter(function(g){ return invited(g).indexOf(e.id) >= 0; }).length; });
+    var tiles = [
+      [order.length, 'Parties'],
+      [guests.length, 'Guests (all seats)'],
+      [guests.length - plusCount, 'Named guests'],
+      [plusCount, 'Plus ones'],
+      [order.filter(function(p){ return parties[p].some(function(g){ return g.plus; }); }).length, 'Parties with a plus one']
+    ].concat(EVENTS.map(function(e, i){ return [perEvent[i], 'Invited to ' + HEAD_NAMES[e.id] + ' (' + e.day.split(' ')[0] + ')', 'event']; }));
+    $('totals').innerHTML = '';
+    tiles.forEach(function(t){
+      var d = document.createElement('div');
+      if(t[2]) d.className = t[2];
+      d.innerHTML = '<b></b><span></span>';
+      d.firstChild.textContent = t[0];
+      d.lastChild.textContent = t[1];
+      $('totals').appendChild(d);
+    });
+
+    var groups = order.map(function(p){
+      var members = parties[p];
+      var tb = document.createElement('tbody');
+      tb.className = 'grp';
+      members.forEach(function(g, k){
+        var tr = document.createElement('tr');
+        var td = document.createElement('td');
+        td.className = 'party';
+        if(k === 0) td.textContent = p;
+        tr.appendChild(td);
+        td = document.createElement('td');
+        td.className = 'name';
+        if(g.plus){
+          td.innerHTML = '<span class="plus">Plus one</span>';
+        } else {
+          td.textContent = g.name;
+          var others = byName[g.name.toLowerCase()].filter(function(o){ return o !== p; });
+          if(others.length){
+            var s = document.createElement('span');
+            s.className = 'dupe';
+            s.textContent = 'also in party ' + others.join(', ');
+            td.appendChild(s);
+          }
+        }
+        tr.appendChild(td);
+        var ev = invited(g);
+        EVENTS.forEach(function(e){
+          var c = document.createElement('td');
+          c.className = 'ev';
+          var on = ev.indexOf(e.id) >= 0;
+          c.innerHTML = on ? '<span class="yes" aria-label="Invited">●</span>' : '<span class="no" aria-label="Not invited">–</span>';
+          tr.appendChild(c);
+        });
+        tb.appendChild(tr);
+      });
+      var plus = members.filter(function(g){ return g.plus; }).length;
+      var sub = document.createElement('tr');
+      sub.className = 'subtotal';
+      sub.innerHTML = '<td></td><td></td>';
+      sub.children[1].textContent = members.length + (members.length === 1 ? ' guest' : ' guests') + (plus ? ' · ' + plus + (plus === 1 ? ' plus one' : ' plus ones') : '');
+      EVENTS.forEach(function(e){
+        var c = document.createElement('td');
+        c.className = 'ev';
+        c.textContent = members.filter(function(g){ return invited(g).indexOf(e.id) >= 0; }).length;
+        sub.appendChild(c);
+      });
+      tb.appendChild(sub);
+      table.appendChild(tb);
+      return {party: p, members: members, plus: plus, el: tb, text: members.map(label).join('\n').toLowerCase()};
+    });
+
+    function filter(){
+      var q = $('q').value.trim().toLowerCase(), only = $('only-plus').checked, shownP = 0, shownG = 0;
+      groups.forEach(function(gr){
+        var hit = (!q || gr.party === q || gr.text.indexOf(q) >= 0) && (!only || gr.plus);
+        gr.el.hidden = !hit;
+        if(hit){ shownP++; shownG += gr.members.length; }
+        gr.el.querySelectorAll('td.name').forEach(function(td, k){
+          var g = gr.members[k];
+          if(g.plus) return;
+          var name = g.name, i = (q && gr.party !== q) ? name.toLowerCase().indexOf(q) : -1;
+          var dupe = td.querySelector('.dupe');
+          td.textContent = '';
+          if(i >= 0){
+            td.appendChild(document.createTextNode(name.slice(0, i)));
+            var m = document.createElement('mark');
+            m.textContent = name.slice(i, i + q.length);
+            td.appendChild(m);
+            td.appendChild(document.createTextNode(name.slice(i + q.length)));
+          } else {
+            td.textContent = name;
+          }
+          if(dupe) td.appendChild(dupe);
+        });
+      });
+      $('count').textContent = (q || only) ? 'Showing ' + shownP + ' of ' + groups.length + ' parties (' + shownG + ' guests).' : '';
+      $('empty').hidden = shownP > 0;
+    }
+    $('q').addEventListener('input', filter);
+    $('only-plus').addEventListener('change', filter);
+
+    // CSV of the same table, in the same order
+    var rows = [['Party', 'Guest', 'Plus one'].concat(EVENTS.map(function(e){ return e.name + ' (' + e.day + ')'; }))];
+    order.forEach(function(p){
+      parties[p].forEach(function(g){
+        var ev = invited(g);
+        rows.push([p, label(g), g.plus ? 'Yes' : ''].concat(EVENTS.map(function(e){ return ev.indexOf(e.id) >= 0 ? 'Yes' : ''; })));
+      });
+    });
+    var csv = rows.map(function(r){
+      return r.map(function(v){ v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(',');
+    }).join('\r\n');
+    $('csv').href = URL.createObjectURL(new Blob(['\ufeff' + csv + '\r\n'], {type: 'text/csv;charset=utf-8'}));
+    $('csv').download = 'guest-groups-' + (data.updated || 'latest') + '.csv';
+
+    // things to check in the sheet
+    var notes = [];
+    Object.keys(byName).forEach(function(k){
+      if(byName[k].length > 1){
+        var name = guests.filter(function(g){ return !g.plus && g.name.toLowerCase() === k; })[0].name;
+        notes.push(name + ' is in parties ' + byName[k].sort(function(a, b){ return num(a) - num(b); }).join(' and ') + '.');
+      }
+    });
+    order.forEach(function(p){
+      if(parties[p].every(function(g){ return g.plus; })) notes.push('Party ' + p + ' has only a plus one, so nobody can find it on the RSVP.');
+    });
+    guests.forEach(function(g){
+      if(!invited(g).length) notes.push(label(g) + ' (party ' + g.party + ') isn’t invited to any event.');
+    });
+    var nums = order.map(num).filter(isFinite), missing = [];
+    for(var n = 1; n <= Math.max.apply(null, nums); n++) if(nums.indexOf(n) < 0) missing.push(n);
+    if(missing.length) notes.push('No party numbered ' + missing.join(', ') + '.');
+    if(!guests.some(function(g){ return g.events; })) notes.push('The sheet has no Events column, so everyone is invited to all four events.');
+    var ul = $('notes');
+    (notes.length ? notes : ['Nothing stands out.']).forEach(function(t){
+      var li = document.createElement('li');
+      li.textContent = t;
+      ul.appendChild(li);
+    });
+
+    filter();
+  }
+})();
+</script>
+</body>
+</html>
