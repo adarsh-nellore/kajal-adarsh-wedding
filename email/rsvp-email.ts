@@ -22,7 +22,10 @@ export type Rsvp = {
   phone_kept?: boolean;
 };
 
-export const SITE = "https://adarsh-nellore.github.io/kajal-adarsh-wedding/";
+export const SITE = "https://kajal-adarsh.club/";
+// The site is behind this password; links carrying it skip the prompt.
+export const PASSWORD = "2027";
+export const ENTER = SITE + "?pw=" + PASSWORD;
 export const PHOTO = SITE + "email/photo-v2.png";
 export const NAMES = SITE + "email/names-light.png";
 const TZ = "America/Chicago";
@@ -232,10 +235,10 @@ export function guestEmail(rs: Rsvp[]) {
     : "We’ll miss you, and we’ll be thinking of you from Mexico City.";
   const rows =
     text(`Thank you, ${esc(by)}.`, { size: "l", weight: 600, top: 4 }) +
-    rule() + photo(SITE) + rule() + names() + dates() + rule(20) +
+    rule() + photo(ENTER) + rule() + names() + dates() + rule(20) +
     text(esc(line), { bottom: 20 }) +
     rs.map((g) => guestBlock(g)).join("") + note(rs) +
-    button(SITE + "#rsvp", "Change your reply") +
+    button(ENTER + "#rsvp", "Change your reply") +
     signoff() + QUESTIONS;
   return {
     subject: "Your RSVP for Kajal & Adarsh’s wedding",
@@ -250,7 +253,7 @@ export function guestEmail(rs: Rsvp[]) {
       line,
       "",
       ...plain(rs),
-      `Change your reply: ${SITE}#rsvp`,
+      `Change your reply: ${ENTER}#rsvp`,
       "",
       "With love,",
       "Kajal & Adarsh",

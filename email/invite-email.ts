@@ -2,9 +2,9 @@
 // buildInvitationEmail() gives { subject, html, text } for Resend or any sender;
 // pasteable() gives the same email as one self-contained table to paste into Gmail.
 
-import { QUESTIONS, QUESTIONS_TEXT, button, card, dates, esc, link, names, page, photo, rule, signoff, text } from "./rsvp-email.ts";
+import { ENTER, PASSWORD, QUESTIONS, QUESTIONS_TEXT, button, card, dates, esc, link, names, page, photo, rule, signoff, text } from "./rsvp-email.ts";
 
-export const HOME = "https://kajal-adarsh-wedding.vercel.app/";
+export const HOME = ENTER;
 
 const SUBJECT = "Kajal & Adarsh · Mexico City · February 2027";
 const HEADLINE = "Please join us in celebrating our wedding!";
@@ -18,6 +18,7 @@ function rows(greeting?: string): string {
     (greeting ? text(esc(greeting)) : "") +
     text(`${esc(INVITE)}<br>Visit our ${link(HOME, "wedding website", "#08040a")} for all the details and to RSVP.`) +
     button(HOME, "RSVP", 130) +
+    text(`Password: ${PASSWORD}`, { size: "s", top: 0 }) +
     text(`${esc(REPLY_BY)}<br>${esc(CANT_WAIT)}`) +
     signoff() + QUESTIONS;
 }
@@ -39,6 +40,7 @@ export function buildInvitationEmail({ firstName }: { firstName?: string } = {})
       ...(greeting ? [greeting] : []),
       INVITE,
       `Visit our wedding website for all the details and to RSVP: ${HOME}`,
+      `Password: ${PASSWORD}`,
       "",
       REPLY_BY,
       CANT_WAIT,
