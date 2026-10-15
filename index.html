@@ -655,6 +655,10 @@ a:focus-visible{outline:none;}
 .contact{margin-top:var(--gap);text-align:center;}
 .contact .contact-h{font-family:var(--head);font-size:clamp(26px,3vw,36px);line-height:1.1;color:var(--gold);}
 .contact .contact-h + p{margin-top:8px;}
+@media (pointer:coarse){
+  .contact .contact-h + p a{position:relative;-webkit-tap-highlight-color:transparent;}
+  .contact .contact-h + p a::after{content:"";position:absolute;inset:-10px -6px;}
+}
 .contact a{color:var(--gold);background-size:100% 1px;}
 .contact a:hover,.contact a:focus-visible{background-image:linear-gradient(rgba(var(--gold-rgb),.5),rgba(var(--gold-rgb),.5));}
 .wall figure{position:absolute;margin:0;left:var(--x);top:var(--y);width:var(--w);rotate:var(--r,0deg);}
@@ -1022,7 +1026,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 /* events: a small diamond, the nav's bead, lights up when chosen */
 .checks{display:grid;gap:2px;margin-top:6px;}
 .check > span{display:flex;align-items:center;gap:16px;}
-@media (pointer:coarse){ .check > span{padding-block:6px;} }
+@media (pointer:coarse){ .check > span{padding-block:7px;} }
 .check > span::before{
   content:"";
   flex:none;
@@ -1115,6 +1119,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
   .rsvp .guest{padding:14px 16px 16px;}
   .bulk > span{flex-basis:100%;}
 }
+/* a narrow card can't fit the whole dietary label at full size; it rests a size smaller rather than be cut off */
+@media (max-width:400px){ .rsvp .guest-diet .box > :placeholder-shown:not(:focus) + label{font-size:16px;} }
 .rsvp-done{margin-top:clamp(36px,5vw,60px);}
 .rsvp-done:empty{display:none;}
 .rsvp-done h3{margin-top:0;}
