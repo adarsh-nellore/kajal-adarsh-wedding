@@ -22,6 +22,8 @@ const party: Rsvp[] = [
   { ...base, id: "2", name: "Rohan Shah", attending: true, events: ["baarat-wedding", "welcome-party"], dietary: "Vegetarian, allergic to tree nuts",
     email: "rohan.shah@gmail.com", phone: "(415) 555-0187", email_kept: true, phone_kept: true },
   { ...base, id: "3", name: "Meera Shah", attending: false, guests: 0, events: [], email: null },
+  { ...base, id: "4", name: "Jane Doe", plus_one: true, attending: true, events: ["baarat-wedding", "after-party"],
+    email: "jane.doe@gmail.com", phone: null },
 ];
 
 const dir = new URL(".", import.meta.url);

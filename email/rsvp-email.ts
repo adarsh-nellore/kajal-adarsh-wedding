@@ -20,6 +20,7 @@ export type Rsvp = {
   phone?: string | null;
   email_kept?: boolean;
   phone_kept?: boolean;
+  plus_one?: boolean;
 };
 
 export const SITE = "https://kajal-adarsh.club/";
@@ -199,8 +200,12 @@ function contactOf(g: Rsvp) {
     .map(([v, kept, scheme]) => ({ v: v!, mark: kept ? "confirmed" : "new", href: scheme + (scheme === "tel:" ? v!.replace(/[^\d+]/g, "") : v) }));
 }
 
+// A plus one left unnamed is saved as "Guest of <replier>".
+const who = (g: Rsvp) =>
+  !g.plus_one ? g.name : g.name === `Guest of ${g.submitted_by}` ? "Plus one" : `Plus one: ${g.name}`;
+
 function guestBlock(g: Rsvp, contact = false): string {
-  const parts = [`<span style="font-weight:700;">${esc(g.name)}</span>`, g.attending ? "Joyfully accepts" : "Regretfully declines"];
+  const parts = [`<span style="font-weight:700;">${esc(who(g))}</span>`, g.attending ? "Joyfully accepts" : "Regretfully declines"];
   if (g.attending) {
     parts.push(...eventsOf(g).map((e) => esc(e).replace(/ · (.+)$/, ' · <span style="white-space:nowrap;">$1</span>')));
     if (g.dietary?.trim()) parts.push(`Dietary restrictions or allergies: ${lines(g.dietary)}`);
@@ -217,9 +222,9 @@ function note(rs: Rsvp[]): string {
 const plain = (rs: Rsvp[], contact = false) => [
   ...rs.flatMap((g) => [
     ...(g.attending
-      ? [g.name, "Joyfully accepts", ...eventsOf(g).map((e) => `  ${e}`),
+      ? [who(g), "Joyfully accepts", ...eventsOf(g).map((e) => `  ${e}`),
         ...(g.dietary?.trim() ? [`  Dietary restrictions or allergies: ${g.dietary.trim()}`] : [])]
-      : [g.name, "Regretfully declines"]),
+      : [who(g), "Regretfully declines"]),
     ...(contact ? contactOf(g).map((c) => `  ${c.v} (${c.mark})`) : []),
     "",
   ]),
@@ -284,7 +289,7 @@ export function coupleEmail(rs: Rsvp[]) {
     subject: r.submission_id
       ? `RSVP: ${by}${r.party ? ` (party ${r.party})` : ""}, ${coming} of ${rs.length} coming`
       : `RSVP: ${r.name} ${r.attending ? "accepts" : "declines"}`,
-    html: page({ title: `RSVP: ${by}`, preheader: `${tally}. ${rs.map((g) => g.name).join(", ")}`, rows }),
+    html: page({ title: `RSVP: ${by}`, preheader: `${tally}. ${rs.map(who).join(", ")}`, rows }),
     text: [`${by} replied.`, `${tally}${r.party ? ` · Party ${r.party}` : ""}`, when, ...(fresh ? [fresh] : []), "", ...plain(rs, true)].join("\n"),
   };
 }

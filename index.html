@@ -1091,7 +1091,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .rsvp .guest.missing{border-color:var(--gold);}
 .guest-name{float:left;width:100%;font-size:20px;line-height:1.4;font-weight:500;color:var(--white);}
 .guest > :not(legend){clear:both;}
-.guest .guest-plus{margin-top:12px;}
 .guest .choices{margin-top:6px;}
 .guest .tab{font-size:clamp(20px,2.2vw,24px);}
 .guest-yes{margin-top:12px;}
@@ -1099,7 +1098,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .same-events{margin-top:10px;font-size:16px;line-height:26px;}
 .guest .guest-diet{margin-top:16px;}
 .guest-reach{display:grid;gap:12px;margin-top:16px;}
-@media (min-width:600px){ .guest-reach{grid-template-columns:1fr 1fr;} }
+@media (min-width:600px){ .guest-reach{grid-template-columns:1fr 1fr;} .guest-reach .guest-plus{grid-column:1 / -1;} }
 .guest .err{margin-top:8px;}
 /* fingers: every choice, event and link in the party is at least 44px tall */
 @media (pointer:coarse){
@@ -1532,12 +1531,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <template id="rsvp-guest">
 <fieldset class="guest">
 <legend class="guest-name"></legend>
-<div class="field guest-plus" hidden>
-<div class="box">
-<input type="text" autocomplete="off" autocapitalize="words" maxlength="200" placeholder=" ">
-<label>Guest’s name</label>
-</div>
-</div>
 <div class="choices">
 <label class="choice"><input type="radio" value="yes"><span class="tab">Joyfully accept</span></label>
 <label class="choice"><input type="radio" value="no"><span class="tab">Regretfully decline</span></label>
@@ -1557,10 +1550,15 @@ picture{margin-block:clamp(52px,8vw,104px);}
 </div>
 </div>
 </div>
-<!-- prefilled with what the guest list has for this guest (wedding_party_contacts in Supabase) -->
+<!-- prefilled with what the guest list has for this guest (wedding_party_contacts in Supabase);
+     a plus one also gets a name, which becomes the card's heading -->
 <div class="guest-reach">
 <div class="box">
 <input type="email" autocomplete="off" maxlength="320" placeholder=" " data-reach="email">
+<div class="box guest-plus" hidden>
+<input type="text" autocomplete="off" autocapitalize="words" maxlength="200" placeholder=" ">
+<label>Name</label>
+</div>
 <label>Email</label>
 </div>
 <div class="box">
@@ -2566,7 +2564,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
       }
       c.querySelector('.guest-diet input').id = 'rsvp-diet-' + k;
       c.querySelector('.guest-diet label').htmlFor = 'rsvp-diet-' + k;
-      c.querySelectorAll('.guest-reach .box').forEach(function(b){
+      c.querySelectorAll('.guest-reach .box:not(.guest-plus)').forEach(function(b){
         var i = b.querySelector('input'), id = 'rsvp-' + i.dataset.reach + '-' + k;
         i.id = id;
         b.querySelector('label').htmlFor = id;
@@ -2683,6 +2681,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
     }
     form.addEventListener('change', onEdit);
     form.addEventListener('input', onEdit);
+      if(t.closest('.guest-plus')) t.closest('.guest').querySelector('.guest-name').textContent = t.value.trim() || 'Plus one';
 
     form.addEventListener('submit', function(e){
       e.preventDefault();
@@ -2712,7 +2711,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
           user_agent: (navigator.userAgent || '').slice(0, 1000),
           party: g.party,
           submission_id: sid,
-          submitted_by: by
+          submitted_by: by,
+          plus_one: !!g.plus
         };
       });
 
