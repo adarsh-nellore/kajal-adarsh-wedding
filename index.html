@@ -2044,14 +2044,16 @@ picture{margin-block:clamp(52px,8vw,104px);}
       /* the scrollbar was grabbed mid-glide: let go */
       if(Math.abs(window.scrollY - last) > 3){ done(); return; }
       if(!t0){ t0 = now; }
-      var t = Math.min(1, (now - t0) / ms), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(2 - 2 * t, 3) / 2;
+      var t = Math.min(1, (now - t0) / ms), e = inOut(t);
       last = Math.round(from + (to - from) * e);
       window.scrollTo(0, last);
       if(t < 1){ anim = window.requestAnimationFrame(frame); } else { done(); }
     }
     anim = window.requestAnimationFrame(frame);
   }
-  function inOut(t){ return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(2 - 2 * t, 3) / 2; }
+  /* a glide answers the gesture at once and lands softly: mostly an ease-in-out, with a little ease-out blended in so it
+     doesn't begin from a standstill */
+  function inOut(t){ return 0.7 * (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(2 - 2 * t, 3) / 2) + 0.3 * (1 - Math.pow(1 - t, 4)); }
 
   /* weighted scrolling (Lenis): a mouse or trackpad scroll eases out slowly; touch keeps the phone's own momentum.
      The scroll position is never corrected afterwards */
@@ -2806,6 +2808,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
     }
     /* the last section is too short to reach the line, so claim it at the bottom of the page */
     if(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4){ current = marks.length - 1; }
+    if(current === railAt) return;
+    railAt = current;
     for(var j=0;j<railLinks.length;j++){
       if(j === current){ railLinks[j].setAttribute('aria-current','true'); }
       else { railLinks[j].removeAttribute('aria-current'); }
@@ -2813,6 +2817,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
     rail.classList.toggle('before', current < 0);
     placeBead(current);
   }
+  var railAt = null;
   var thread = rail.querySelector('.thread'), threadFill = thread.firstElementChild, bead = rail.querySelector('.bead');
   function mid(a){ return a.offsetTop + a.offsetHeight / 2; }
   function placeBead(i){
@@ -2822,8 +2827,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
     threadFill.style.height = (y - t) + 'px';
     bead.style.top = y + 'px';
   }
-  window.addEventListener('resize', function(){ markCurrent(); }, {passive:true});
-  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(function(){ markCurrent(); }); }
+  window.addEventListener('resize', function(){ railAt = null; markCurrent(); }, {passive:true});
+  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(function(){ railAt = null; markCurrent(); }); }
   var railTicking = false;
   window.addEventListener('scroll', function(){
     if(!railTicking){ railTicking = true; window.requestAnimationFrame(function(){ markCurrent(); railTicking = false; }); }
@@ -2891,24 +2896,28 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
   var vh = window.innerHeight, pxW = window.innerWidth, ticking = false, lattice = document.querySelector('body > .lattice');
   var depth = coarse ? 0.5 : 1;
+  var layerSpeed = layers.map(function(el){ return parseFloat(el.getAttribute('data-px')) || 0; });
 
   function place(){
     /* the tile repeats every 18px, so the fixed layer only ever needs to slide within one tile */
-    if(lattice){ lattice.style.transform = 'translate3d(0,' + (-((window.scrollY * 0.1) % 18)).toFixed(2) + 'px,0)'; }
-    for(var i=0;i<layers.length;i++){
+    var y = window.scrollY || document.documentElement.scrollTop, shifts = [], i;
+    for(i=0;i<layers.length;i++){
       var el = layers[i];
-      var speed = parseFloat(el.getAttribute('data-px')) || 0;
-      var shift;
+      var speed = layerSpeed[i];
+      var shift = null;
       if(el.hasAttribute('data-px-hero')){
         /* hero: keyed to scroll distance so it rests at zero on load */
-        shift = (window.scrollY || document.documentElement.scrollTop) * speed * depth;
+        shift = y * speed * depth;
       } else {
         var r = el.getBoundingClientRect();
         /* skip anything far outside the viewport */
-        if(r.bottom < -vh || r.top > vh*2){ continue; }
-        shift = ((r.top - magOff(el) + r.height/2) - vh/2) * -speed * depth;
+        if(!(r.bottom < -vh || r.top > vh*2)){ shift = ((r.top - magOff(el) + r.height/2) - vh/2) * -speed * depth; }
       }
-      el.style.transform = 'translate3d(0,' + shift.toFixed(2) + 'px,0)';
+      shifts.push(shift);
+    }
+    if(lattice){ lattice.style.transform = 'translate3d(0,' + (-((y * 0.1) % 18)).toFixed(2) + 'px,0)'; }
+    for(i=0;i<layers.length;i++){
+      if(shifts[i] !== null){ layers[i].style.transform = 'translate3d(0,' + shifts[i].toFixed(2) + 'px,0)'; }
     }
     ticking = false;
   }
