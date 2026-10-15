@@ -81,7 +81,7 @@ body{background:#121212;color:#EAE3D6;font-family:'EB Garamond',Georgia,serif;di
 main{width:100%;max-width:320px;text-align:center;}
 h1{font-family:'Jaini',serif;font-weight:400;font-size:44px;line-height:1.1;color:#CDA45E;margin:0 0 32px;}
 form{display:flex;flex-direction:column;gap:12px;}
-label{font-size:17px;}
+input::placeholder{color:rgba(234,227,214,.45);opacity:1;}
 input{font:inherit;font-size:18px;text-align:center;color:#EAE3D6;background:transparent;border:1px solid rgba(205,164,94,.5);padding:12px 14px;border-radius:2px;outline:none;}
 input:focus{border-color:#CDA45E;}
 button{font:inherit;font-size:18px;color:#121212;background:#CDA45E;border:0;padding:12px 14px;border-radius:2px;cursor:pointer;}
@@ -94,8 +94,7 @@ p{margin:4px 0 0;font-size:16px;color:rgba(234,227,214,.7);min-height:1.4em;}
 <h1>Kajal &amp; Adarsh</h1>
 <form method="post" action="/?unlock">
 <input type="hidden" name="next" value="${esc(next)}">
-<label for="password">Password</label>
-<input id="password" name="password" type="password" inputmode="numeric" autocomplete="current-password" autofocus required>
+<input id="password" name="password" type="password" placeholder="Password" aria-label="Password" inputmode="numeric" autocomplete="current-password" autofocus required>
 <button type="submit">Enter</button>
 <p role="status">${wrong ? 'That isn’t it. Please try again.' : ''}</p>
 </form>
