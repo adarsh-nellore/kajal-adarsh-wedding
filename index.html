@@ -785,7 +785,9 @@ nav{padding-left:24px;}
 }
 /* on the welcome, before Events: the bead waits, faint, at the first link */
 nav.before .bead{opacity:.35;}
-@media (max-width:1180px){ nav{display:none;} }
+@media (max-width:999px){ nav{display:none;} }
+/* laptops and landscape tablets: a slightly tighter rail, so it clears the gallery wall's left-hand pictures */
+@media (min-width:1000px) and (max-width:1180px){ nav{left:14px;padding-left:18px;} nav a{font-size:17px;} }
 @media (prefers-reduced-motion:reduce){ nav,nav a,.thread i,.bead{transition:none;} }
 
 /* while the rail is on screen, keep the text column clear of it —
@@ -794,9 +796,9 @@ nav.before .bead{opacity:.35;}
   body{ max-width:min(74rem, calc(100vw - 26rem)); }
 }
 
-/* ---------- phones and tablets: where the rail is hidden, a slim top bar opens a full-screen menu ---------- */
+/* ---------- phones and upright tablets: where the rail is hidden, a slim top bar opens a full-screen menu ---------- */
 .mnav{display:none;}
-@media (max-width:1180px){
+@media (max-width:999px){
   :root{--bar:56px;}
   .mnav{display:block;}
   #top,h2[id]{scroll-margin-top:calc(var(--bar) + 28px);}
@@ -2162,7 +2164,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
   }
   var mnav = document.querySelector('.mnav');
   var mbar = mnav.querySelector('.mbar');
-  var smallScreen = window.matchMedia('(max-width:1180px)');
+  var smallScreen = window.matchMedia('(max-width:999px)');
   var menuToggle = mnav.querySelector('.mbar-toggle');
   var menuPanel = document.getElementById('mnav-panel');
   var menuLinks = Array.prototype.slice.call(menuPanel.querySelectorAll('a'));
