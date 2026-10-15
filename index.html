@@ -1639,8 +1639,9 @@ picture{margin-block:clamp(52px,8vw,104px);}
     }catch(e){}
   }
   /* the page keeps its place (and its smooth scroll rests) while the film has the screen */
-  var fullW = 0, fullH = 0;
+  var fullW = 0, fullH = 0, fullAt = 0;
   function fullChanged(full){
+    fullAt = Date.now();
     var wasLifted = fig.classList.contains('full');
     if(full){ fullW = window.innerWidth; fullH = window.innerHeight; }
     fig.classList.toggle('full', full && fullEl() === screen);
@@ -1691,14 +1692,61 @@ picture{margin-block:clamp(52px,8vw,104px);}
     fig.classList.toggle('playing', on);
     play.setAttribute('aria-label', on ? 'Pause' : fig.classList.contains('started') ? 'Play' : 'Play with sound');
   }
+  /* the picture never waits on the sound: if the browser won't play it aloud (no gesture it counts, or no sound output
+     to play to) it plays on muted, with the speaker showing off */
   function start(){
     var p = v.play();
-    if(p && p.catch){ p.catch(mark); }
+    if(p && p.catch){
+      p.catch(function(err){
+        if(err && err.name === 'NotAllowedError' && !v.muted && !userPaused){
+          v.muted = true;
+          var q = v.play();
+          if(q && q.catch){ q.catch(mark); }
+        }
+        mark();
+      });
+    }
   }
   function listen(){ v.muted = false; userPaused = false; fig.classList.add('started'); if(v.paused){ start(); } }
   function toggle(){ if(v.paused){ listen(); } else { userPaused = true; v.pause(); } }
+  var onScreen = true, resting = false, lastKick = 0;
   v.addEventListener('play', mark);
   v.addEventListener('pause', mark);
+  /* a pause the page didn't ask for (the browser or the system stopping it, as Safari and Chrome can when the sound
+     output goes away or is silenced) picks up again muted, once; a second one within a few seconds is left to stand */
+  v.addEventListener('pause', function(){
+    if(resting){ resting = false; return; }
+    if(userPaused || v.ended || !onScreen || document.visibilityState !== 'visible') return;
+    var now = Date.now();
+    /* the phone's own full-screen player has its own pause button, and leaving it may pause too */
+    if(isFull() || now - fullAt < 1500){ userPaused = true; return; }
+    if(now - lastKick < 5000){ userPaused = true; mark(); return; }
+    lastKick = now;
+    v.muted = true;
+    setTimeout(function(){ if(!userPaused && v.paused){ start(); } }, 0);
+  });
+  /* the keyboard's media keys and the system's Now Playing pause it as you would */
+  if('mediaSession' in navigator){
+    try{
+      navigator.mediaSession.setActionHandler('play', function(){ if(v.paused){ listen(); } });
+      navigator.mediaSession.setActionHandler('pause', function(){ if(!v.paused){ userPaused = true; v.pause(); } });
+    }catch(e){}
+  }
+  /* a hidden tab may pause it (Safari does); coming back, it carries on */
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible' && !userPaused && onScreen && v.paused && !v.ended){ start(); }
+  });
+  /* playing but not moving with all the data it needs: the clock is held by a sound output that isn't there, so it
+     carries on muted */
+  (function(){
+    var lastT = -1, since = 0;
+    setInterval(function(){
+      if(v.paused || v.ended || v.seeking || v.muted || v.readyState < 3){ lastT = -1; return; }
+      var now = Date.now();
+      if(v.currentTime !== lastT){ lastT = v.currentTime; since = now; return; }
+      if(now - since > 2000){ lastT = -1; v.muted = true; resting = true; v.pause(); start(); }
+    }, 500);
+  })();
   (function(){
     var bar = fig.querySelector('.teaser-bar'), raf = 0;
     function tick(){ if(v.duration) bar.style.setProperty('--p', v.currentTime / v.duration); raf = v.paused ? 0 : requestAnimationFrame(tick); }
@@ -1731,8 +1779,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
   /* off screen it rests, to spare the battery, and picks up again on the way back */
   if('IntersectionObserver' in window){
     new IntersectionObserver(function(entries){
-      var onScreen = entries[entries.length - 1].isIntersecting || isFull();
-      if(!onScreen){ if(!v.paused){ v.pause(); } }
+      onScreen = entries[entries.length - 1].isIntersecting || isFull();
+      if(!onScreen){ if(!v.paused){ resting = true; v.pause(); } }
       else if(!userPaused){ start(); }
     }, {threshold: 0.25}).observe(v);
   }
