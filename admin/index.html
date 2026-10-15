@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#121212">
+<meta name="robots" content="noindex, nofollow">
+<title>Guest list — Kajal &amp; Adarsh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jaini&family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#121212;
+  --gold:#CDA45E;
+  --gold-rgb:205,164,94;
+  --white:#EAE3D6;
+  --white-rgb:234,227,214;
+  --head:'Jaini','EB Garamond',Georgia,serif;
+  --body:'EB Garamond',Georgia,'Times New Roman',serif;
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{margin:0;background:var(--ground);color:var(--white);font-family:var(--body);font-size:18px;line-height:1.4;}
+main{max-width:1440px;margin:0 auto;padding:40px 20px 120px;}
+h1{font-family:var(--head);font-weight:400;font-size:clamp(40px,7vw,60px);line-height:1;color:var(--gold);margin:0 0 8px;}
+h2{font-family:var(--head);font-weight:400;font-size:30px;line-height:1.1;color:var(--gold);margin:40px 0 12px;}
+a{color:var(--gold);}
+button{font:inherit;color:inherit;}
+.sub{margin:0 0 24px;color:rgba(var(--white-rgb),.7);display:flex;flex-wrap:wrap;gap:4px 18px;align-items:baseline;}
+.sub .grow{flex:1 1 auto;}
+#status{font-size:15px;color:rgba(var(--white-rgb),.55);transition:color .3s;}
+#status.busy{color:rgba(var(--white-rgb),.75);}
+#status.err{color:#e59a8a;}
+.linkish{background:none;border:0;padding:0;color:var(--gold);text-decoration:underline;cursor:pointer;}
+
+.totals{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:0 0 24px;}
+.totals div{border:1px solid rgba(var(--gold-rgb),.3);border-radius:2px;padding:12px 14px;}
+.totals div.event{border-style:dashed;}
+.totals div.reply{background:rgba(var(--gold-rgb),.06);}
+.totals b{display:block;font-family:var(--head);font-weight:400;font-size:32px;line-height:1;color:var(--gold);}
+.totals span{font-size:15px;color:rgba(var(--white-rgb),.75);}
+
+.tools{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin:0 0 16px;}
+.tools input[type=search],.tools select{font:inherit;font-size:18px;color:var(--white);background:transparent;border:1px solid rgba(var(--gold-rgb),.5);border-radius:2px;padding:10px 12px;outline:none;}
+.tools input[type=search]{flex:1 1 260px;}
+.tools select option{background:var(--ground);}
+.tools input[type=search]:focus,.tools select:focus{border-color:var(--gold);}
+.tools input[type=search]::placeholder{color:rgba(var(--white-rgb),.45);}
+.tools label{display:flex;gap:8px;align-items:center;cursor:pointer;}
+input[type=checkbox]{accent-color:var(--gold);width:18px;height:18px;margin:0;cursor:pointer;}
+.btn{font-size:17px;color:var(--ground);background:var(--gold);border:0;border-radius:2px;padding:10px 16px;cursor:pointer;}
+.btn:hover{background:#d8b273;}
+.count{font-size:15px;color:rgba(var(--white-rgb),.65);margin:0 0 8px;min-height:1.4em;}
+
+table{width:100%;border-collapse:collapse;}
+th,td{text-align:left;padding:5px 6px;vertical-align:middle;}
+thead th{position:sticky;top:0;background:var(--ground);color:var(--gold);font-weight:500;font-size:16px;border-bottom:1px solid rgba(var(--gold-rgb),.6);z-index:2;white-space:nowrap;}
+th.ev,td.ev,th.pl,td.pl{text-align:center;width:1%;white-space:nowrap;}
+th.ev small{display:block;font-size:13px;color:rgba(var(--white-rgb),.6);font-weight:400;}
+tbody.grp{border-top:1px solid rgba(var(--gold-rgb),.35);}
+tr.g:hover td{background:rgba(var(--white-rgb),.03);}
+tr.g.hit td{background:rgba(var(--gold-rgb),.09);}
+tr.phead{display:none;}
+td.h{width:28px;padding-left:0;padding-right:0;}
+td.party{width:64px;}
+td.em{width:220px;}
+td.ph{width:150px;}
+td.no{width:170px;}
+td.rs{width:170px;font-size:15px;line-height:1.25;}
+td.x{width:36px;padding-right:0;text-align:right;}
+
+/* cells are inputs that look like text until touched */
+td input:not([type=checkbox]){width:100%;min-width:0;font:inherit;font-size:17px;color:var(--white);background:transparent;border:0;border-bottom:1px solid transparent;border-radius:0;padding:4px 3px;outline:none;}
+tr.g:hover td input:not([type=checkbox]){border-bottom-color:rgba(var(--gold-rgb),.25);}
+td input:not([type=checkbox]):focus{border-bottom-color:var(--gold);background:rgba(var(--white-rgb),.05);}
+td input::placeholder{color:rgba(var(--white-rgb),.22);opacity:1;}
+td input.bad{border-bottom-color:#e59a8a;}
+td.party input{color:rgba(var(--white-rgb),.5);font-size:15px;text-align:center;}
+tr.g.first td.party input{font-family:var(--head);font-size:26px;line-height:1;color:var(--gold);padding:0 2px;}
+td.em input,td.ph input,td.no input{font-size:16px;}
+td.no input{color:rgba(var(--white-rgb),.75);}
+.nm{display:flex;gap:6px;}
+.nm input:first-child{flex:0 0 auto;max-width:60%;}
+.nm input:last-child{flex:1 1 0;width:auto;}
+.plus{display:none;color:var(--ground);background:var(--gold);font-size:15px;line-height:1;padding:4px 7px 3px;border-radius:2px;font-weight:500;}
+tr.g.is-plus .nm{display:none;}
+tr.g.is-plus .plus{display:inline-block;}
+.dupe{display:block;font-size:13px;color:rgba(var(--white-rgb),.55);padding-left:3px;}
+.dupe:empty{display:none;}
+label .m{display:none;}
+
+.grip{display:flex;align-items:center;justify-content:center;width:28px;height:34px;padding:0;background:none;border:0;color:rgba(var(--white-rgb),.3);cursor:grab;touch-action:none;border-radius:2px;}
+.grip:hover,.grip:focus-visible{color:var(--gold);outline:none;}
+.grip svg{display:block;}
+.del{width:32px;height:32px;padding:0;background:none;border:0;border-radius:2px;color:rgba(var(--white-rgb),.3);font-size:22px;line-height:1;cursor:pointer;white-space:nowrap;}
+.del:hover,.del:focus-visible{color:var(--white);outline:none;}
+.del.sure{width:auto;padding:4px 8px;font-size:15px;color:var(--ground);background:#e59a8a;}
+
+.reply{display:block;}
+.reply.yes{color:var(--gold);}
+.reply.nope{color:rgba(var(--white-rgb),.8);}
+.reply.none{color:rgba(var(--white-rgb),.3);}
+td.rs small{display:block;font-size:13px;color:rgba(var(--white-rgb),.6);}
+
+tr.subtotal td{font-size:15px;color:rgba(var(--white-rgb),.6);padding-top:2px;padding-bottom:12px;}
+tr.subtotal .add{background:none;border:0;padding:0 0 0 14px;color:var(--gold);cursor:pointer;font-size:15px;}
+tr.subtotal .add:hover{text-decoration:underline;}
+
+/* dragging */
+body.is-dragging{cursor:grabbing;user-select:none;-webkit-user-select:none;}
+body.is-dragging .grip{cursor:grabbing;}
+tr.g.dragging{pointer-events:none;}
+tr.g.dragging td{background:rgba(var(--gold-rgb),.16)!important;}
+tr.g.dragging td:first-child{box-shadow:inset 2px 0 0 var(--gold);}
+tr.g.flash td{animation:flash 1.4s ease-out;}
+@keyframes flash{from{background:rgba(var(--gold-rgb),.3);}to{background:transparent;}}
+#newparty{display:none;position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:5;border:1px dashed var(--gold);border-radius:2px;background:rgba(18,18,18,.94);color:var(--gold);padding:16px 28px;font-size:18px;white-space:nowrap;}
+body.is-dragging #newparty{display:block;}
+#newparty.over{background:var(--gold);color:var(--ground);border-style:solid;}
+
+.notes{margin:0;padding-left:20px;}
+.notes li{margin:4px 0;}
+.empty{padding:24px 0;color:rgba(var(--white-rgb),.7);}
+.loading{padding:24px 0;color:rgba(var(--white-rgb),.7);}
+
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6;display:flex;gap:16px;align-items:baseline;background:#1d1b18;border:1px solid rgba(var(--gold-rgb),.5);border-radius:2px;padding:12px 18px;font-size:17px;max-width:calc(100vw - 24px);box-shadow:0 8px 30px rgba(0,0,0,.5);}
+#toast[hidden]{display:none;}
+
+/* below a wide screen each guest becomes a card */
+@media (max-width:1099px){
+  main{max-width:720px;padding:28px 12px 120px;}
+  thead{display:none;}
+  table,tbody.grp{display:block;}
+  tbody.grp{padding:6px 0 4px;}
+  tbody.grp[hidden]{display:none;}
+  tr.phead{display:block;}
+  tr.phead td{display:block;font-family:var(--head);font-size:26px;line-height:1;color:var(--gold);padding:8px 0 4px 28px;}
+  tr.g{display:grid;grid-template-columns:28px repeat(10,minmax(0,1fr)) 34px;grid-template-areas:
+    "h pa pa n n n n n n n n x"
+    "h pl pl pl e1 e1 e2 e2 e3 e3 e4 e4"
+    "h em em em em em em ph ph ph ph ."
+    "h no no no no no no no no no no ."
+    "h rs rs rs rs rs rs rs rs rs rs .";
+    column-gap:6px;padding:8px 0;border-top:1px solid rgba(var(--white-rgb),.08);}
+  tr.g td{display:block;width:auto;padding:2px 0;}
+  td.h{grid-area:h;}
+  td.party{grid-area:pa;}
+  td.name{grid-area:n;}
+  td.pl{grid-area:pl;text-align:left;}
+  td.e1{grid-area:e1;} td.e2{grid-area:e2;} td.e3{grid-area:e3;} td.e4{grid-area:e4;}
+  td.em{grid-area:em;} td.ph{grid-area:ph;} td.no{grid-area:no;} td.rs{grid-area:rs;padding-left:3px;}
+  td.x{grid-area:x;}
+  td.h .grip{height:100%;min-height:44px;}
+  td.ev,td.pl{text-align:left;}
+  td.ev label,td.pl label{display:flex;align-items:center;gap:6px;min-height:36px;font-size:15px;color:rgba(var(--white-rgb),.8);}
+  label .m{display:inline;}
+  td.party input,tr.g.first td.party input{font-family:var(--body);font-size:15px;color:rgba(var(--white-rgb),.5);text-align:left;}
+  tr.subtotal{display:flex;flex-wrap:wrap;align-items:baseline;padding:4px 0 10px 28px;}
+  tr.subtotal td{display:block;padding:0;}
+  tr.subtotal td.ev{display:none;}
+  .totals{grid-template-columns:1fr 1fr;}
+  .totals b{font-size:26px;}
+  body{font-size:17px;}
+  td input:not([type=checkbox]){font-size:16px;border-bottom-color:rgba(var(--gold-rgb),.15);}
+}
+@media (prefers-reduced-motion:reduce){ tr.g.flash td{animation:none;} }
+</style>
+</head>
+<body>
+<main>
+<h1>Guest list</h1>
+<p class="sub">
+  <span class="grow">The RSVP reads this list as it is now: edits save as you type.</span>
+  <span id="status" aria-live="polite"></span>
+  <button type="button" class="linkish" id="add-party">Add a party</button>
+  <a id="csv" href="#" download="guest-list.csv">Download CSV</a>
+  <a href="/?logout">Log out</a>
+</p>
+
+<div class="totals" id="totals"></div>
+
+<div class="tools">
+  <input type="search" id="q" placeholder="Search a name, party number, email or phone" aria-label="Search a name, party number, email or phone" autocomplete="off">
+  <select id="reply-filter" aria-label="Filter by reply">
+    <option value="">Every reply</option>
+    <option value="none">No reply yet</option>
+    <option value="yes">Coming</option>
+    <option value="nope">Not coming</option>
+  </select>
+  <label><input type="checkbox" id="only-plus"> Only parties with a plus one</label>
+</div>
+<p class="count" id="count" aria-live="polite"></p>
+
+<table id="sheet">
+  <thead><tr id="head"><th></th><th>Party</th><th>Guest</th><th class="pl">Plus one</th></tr></thead>
+</table>
+<p class="loading" id="loading">Loading the guest list…</p>
+<p class="empty" id="empty" hidden>No guests match.</p>
+
+<h2>Worth a look</h2>
+<ul class="notes" id="notes"></ul>
+</main>
+
+<div id="newparty" aria-hidden="true">Drop here for a new party</div>
+<div id="toast" role="status" hidden><span id="toast-text"></span><button type="button" class="linkish" id="toast-undo">Undo</button></div>
+
+<template id="row">
+<tr class="g">
+<td class="h"><button type="button" class="grip"><svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><g fill="currentColor"><circle cx="2" cy="2" r="1.5"/><circle cx="8" cy="2" r="1.5"/><circle cx="2" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="2" cy="14" r="1.5"/><circle cx="8" cy="14" r="1.5"/></g></svg></button></td>
+<td class="party"><input data-f="party" inputmode="numeric" autocomplete="off" aria-label="Party number"></td>
+<td class="name"><div class="nm"><input data-f="first_name" placeholder="First name" aria-label="First name" autocomplete="off"><input data-f="last_name" placeholder="Last name" aria-label="Last name" autocomplete="off"></div><span class="plus">Plus one</span><span class="dupe"></span></td>
+<td class="pl"><label><input type="checkbox" data-f="is_plus_one" aria-label="Plus one"><span class="m">Plus one</span></label></td>
+<td class="ev e1"><label><input type="checkbox" data-ev="welcome-party"><span class="m">Fri</span></label></td>
+<td class="ev e2"><label><input type="checkbox" data-ev="saatak-haldi"><span class="m">Sat</span></label></td>
+<td class="ev e3"><label><input type="checkbox" data-ev="baarat-wedding"><span class="m">Sun</span></label></td>
+<td class="ev e4"><label><input type="checkbox" data-ev="after-party"><span class="m">After</span></label></td>
+<td class="em"><input data-f="email" type="email" placeholder="Email" aria-label="Email" autocomplete="off"></td>
+<td class="ph"><input data-f="phone" type="tel" placeholder="Phone" aria-label="Phone" autocomplete="off"></td>
+<td class="no"><input data-f="note" placeholder="Note" aria-label="Note" autocomplete="off"></td>
+<td class="rs"></td>
+<td class="x"><button type="button" class="del" aria-label="Delete">×</button></td>
+</tr>
+</template>
+
+<script>
+(function(){
+  var EVENTS = [
+    {id: 'welcome-party', name: 'Welcome Party', day: 'Fri 19th', short: 'Fri', head: 'Welcome'},
+    {id: 'saatak-haldi', name: 'Ganesh Pooja, Grah Shanti & Haldi', day: 'Sat 20th', short: 'Sat', head: 'Haldi'},
+    {id: 'baarat-wedding', name: 'Baarat & Wedding', day: 'Sun 21st', short: 'Sun', head: 'Wedding'},
+    {id: 'after-party', name: 'After Party', day: 'Sun 21st', short: 'After', head: 'After Party'}
+  ];
+  var ALL = EVENTS.map(function(e){ return e.id; });
+  var $ = function(id){ return document.getElementById(id); };
+  var table = $('sheet'), tpl = $('row');
+  var guests = [], rsvps = [], byId = {}, replies = null;
+
+  ['Fri', 'Sat', 'Sun', 'After'].forEach(function(_, i){
+    var e = EVENTS[i], th = document.createElement('th');
+    th.className = 'ev';
+    th.title = e.name + ' · ' + e.day;
+    th.innerHTML = '<span></span><small></small>';
+    th.firstChild.textContent = e.head;
+    th.lastChild.textContent = e.day;
+    $('head').appendChild(th);
+  });
+  ['Email', 'Phone', 'Note', 'RSVP', ''].forEach(function(t){
+    var th = document.createElement('th');
+    th.textContent = t;
+    $('head').appendChild(th);
+  });
+
+  /* ---------- talking to the server ---------- */
+
+  var inflight = 0, failed = null, savedAt = null;
+  function api(method, path, body){
+    var write = method !== 'GET';
+    if(write){ inflight++; status(); }
+    return fetch(path, {
+      method: method,
+      headers: {'Content-Type': 'application/json'},
+      body: body === undefined ? undefined : JSON.stringify(body),
+      credentials: 'same-origin'
+    }).then(function(r){
+      return r.json().catch(function(){ return {}; }).then(function(d){
+        if(r.status === 401){ location.reload(); throw new Error('signed out'); }
+        if(!r.ok) throw new Error(d.error || ('error ' + r.status));
+        return d;
+      });
+    }).then(function(d){
+      if(write){ inflight--; failed = null; savedAt = new Date(); status(); }
+      return d;
+    }, function(err){
+      if(write){ inflight--; failed = err.message; status(); }
+      throw err;
+    });
+  }
+  function status(){
+    var s = $('status'), n = inflight + Object.keys(pend).length;
+    s.className = failed ? 'err' : n ? 'busy' : '';
+    if(failed) s.textContent = 'Couldn’t save: ' + failed + '.' + (Object.keys(pend).length ? ' Trying again…' : '');
+    else if(n) s.textContent = 'Saving…';
+    else if(savedAt) s.textContent = 'Saved ' + savedAt.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
+    else s.textContent = '';
+  }
+  window.addEventListener('beforeunload', function(e){
+    if(inflight || Object.keys(pend).length){ e.preventDefault(); e.returnValue = ''; }
+  });
+
+  function load(){
+    return api('GET', '/api/guests').then(function(d){
+      guests = d.guests; rsvps = d.rsvps;
+      $('loading').hidden = true;
+      render();
+    }, function(err){
+      $('loading').textContent = 'Couldn’t load the guest list (' + err.message + '). Refresh to try again.';
+    });
+  }
+  /* back on the tab: pick up other people's edits and new replies, if nothing is mid-edit */
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState !== 'visible' || inflight || Object.keys(pend).length || drag) return;
+    var a = document.activeElement;
+    if(a && a.tagName === 'INPUT' && table.contains(a)) return;
+    load();
+  });
+
+  /* edits wait a moment for more typing, then save */
+  var pend = {};
+  function queue(g, changes, ms){
+    var p = pend[g.id] || (pend[g.id] = {changes: {}});
+    Object.keys(changes).forEach(function(k){ p.changes[k] = changes[k]; });
+    clearTimeout(p.t);
+    p.t = setTimeout(function(){ flush(g.id); }, ms == null ? 700 : ms);
+    status();
+  }
+  function flush(id){
+    var p = pend[id];
+    if(!p) return;
+    clearTimeout(p.t);
+    delete pend[id];
+    api('PATCH', '/api/guests?id=' + id, p.changes).then(function(d){
+      var g = byId[id];
+      if(!g) return;
+      g.display_name = d.guest.display_name;
+      g.updated_at = d.guest.updated_at;
+      if(!pend[id]){ g.email = d.guest.email; g.phone = d.guest.phone; g.note = d.guest.note; }
+      summary();
+    }, function(){
+      /* keep the edit and try again */
+      if(!byId[id]) return;
+      var again = pend[id] ? pend[id].changes : {};
+      Object.keys(again).forEach(function(k){ p.changes[k] = again[k]; });
+      pend[id] = p;
+      p.t = setTimeout(function(){ flush(id); }, 4000);
+    });
+  }
+  function flushAll(){ Object.keys(pend).forEach(flush); }
+
+  /* ---------- helpers ---------- */
+
+  var num = function(p){ var n = parseInt(p, 10); return isNaN(n) ? Infinity : n; };
+  var invited = function(g){ return g.events ? g.events : ALL; };
+  var label = function(g){ return g.is_plus_one ? 'Plus one' + (g.note ? ' (' + g.note + ')' : '') : (g.display_name || 'Unnamed guest'); };
+  var named = function(g){ return !g.is_plus_one && g.display_name; };
+  function displayName(g){ return g.is_plus_one ? 'Guest' : (g.first_name.trim() + ' ' + g.last_name.trim()).trim(); }
+  function sortGuests(){
+    guests.sort(function(a, b){ return a.party - b.party || a.sort_order - b.sort_order || (a.created_at < b.created_at ? -1 : a.created_at > b.created_at ? 1 : 0); });
+    byId = {};
+    guests.forEach(function(g){ byId[g.id] = g; });
+  }
+  function parties(){
+    var map = {}, order = [];
+    guests.forEach(function(g){
+      if(!map[g.party]){ map[g.party] = []; order.push(g.party); }
+      map[g.party].push(g);
+    });
+    return {map: map, order: order};
+  }
+  function maxParty(){ return guests.reduce(function(m, g){ return Math.max(m, g.party); }, 0); }
+
+  /* each guest's latest reply: by party and name; a party's plus ones take its latest plus one replies in order;
+     replies from before parties existed match on name alone */
+  function matchReplies(){
+    var byKey = {}, byName = {}, plusBy = {}, used = {};
+    rsvps.forEach(function(r){
+      if(r.plus_one && r.party){
+        var s = plusBy[r.party] || (plusBy[r.party] = {sid: r.submission_id, rows: []});
+        if(r.submission_id === s.sid) s.rows.push(r);
+        return;
+      }
+      var n = String(r.name || '').toLowerCase().trim();
+      if(r.party){ if(!byKey[r.party + '|' + n]) byKey[r.party + '|' + n] = r; }
+      else if(!byName[n]) byName[n] = r;
+    });
+    Object.keys(plusBy).forEach(function(p){ plusBy[p].rows.reverse(); });
+    var out = {};
+    var ps = parties();
+    ps.order.forEach(function(p){
+      var k = 0;
+      ps.map[p].forEach(function(g){
+        var r;
+        if(g.is_plus_one){ r = plusBy[p] && plusBy[p].rows[k++]; }
+        else if(g.display_name){
+          var n = g.display_name.toLowerCase();
+          r = byKey[p + '|' + n] || byName[n];
+        }
+        if(r){ out[g.id] = r; used[r.id] = true; }
+      });
+    });
+    out.unmatched = rsvps.filter(function(r){
+      if(used[r.id] || !r.party) return false;
+      var latest = byKey[r.party + '|' + String(r.name || '').toLowerCase().trim()];
+      return r.plus_one ? false : latest === r;
+    });
+    return out;
+  }
+  function replyOf(g){ var r = replies && replies[g.id]; return r ? (r.attending ? 'yes' : 'nope') : 'none'; }
+  function fillReply(td, g){
+    var r = replies[g.id];
+    td.textContent = '';
+    var s = document.createElement('span');
+    s.className = 'reply ' + replyOf(g);
+    s.textContent = !r ? 'No reply' : r.attending ? 'Coming' : 'Not coming';
+    td.appendChild(s);
+    if(r){
+      var bits = [];
+      if(g.is_plus_one && r.name) bits.push(r.name);
+      if(r.attending) bits.push(EVENTS.filter(function(e){ return (r.events || []).indexOf(e.id) >= 0; }).map(function(e){ return e.short; }).join(', ') || 'no events');
+      if(r.dietary) bits.push(r.dietary);
+      if(bits.length){
+        var sm = document.createElement('small');
+        sm.textContent = bits.join(' · ');
+        td.appendChild(sm);
+      }
+      td.title = 'Replied ' + new Date(r.created_at).toLocaleString() + (r.submitted_by && r.submitted_by !== r.name ? ' by ' + r.submitted_by : '');
+    } else {
+      td.removeAttribute('title');
+    }
+  }
+
+  /* ---------- the table ---------- */
+
+  var groups = [];
+  function render(){
+    var a = document.activeElement, keep = null;
+    if(a && table.contains(a) && a.closest('tr.g')){
+      keep = {id: a.closest('tr.g').dataset.id, f: a.dataset.f || a.dataset.ev || (a.classList.contains('grip') ? 'grip' : null)};
+      try { keep.s = a.selectionStart; keep.e = a.selectionEnd; } catch(err){}
+    }
+    sortGuests();
+    replies = matchReplies();
+    Array.prototype.slice.call(table.tBodies).forEach(function(tb){ tb.remove(); });
+    var ps = parties();
+    groups = ps.order.map(function(p){
+      var tb = document.createElement('tbody');
+      tb.className = 'grp';
+      tb.dataset.party = p;
+      var ph = document.createElement('tr');
+      ph.className = 'phead';
+      ph.innerHTML = '<td colspan="13"></td>';
+      ph.firstChild.textContent = 'Party ' + p;
+      tb.appendChild(ph);
+      ps.map[p].forEach(function(g, k){ tb.appendChild(row(g, k === 0)); });
+      var sub = document.createElement('tr');
+      sub.className = 'subtotal';
+      sub.innerHTML = '<td></td><td></td><td class="st"></td><td></td>';
+      EVENTS.forEach(function(){ var c = document.createElement('td'); c.className = 'ev'; sub.appendChild(c); });
+      var add = document.createElement('button');
+      add.type = 'button'; add.className = 'add'; add.textContent = 'Add guest';
+      add.addEventListener('click', function(){ addGuest(Number(p)); });
+      sub.children[2].appendChild(document.createElement('span'));
+      sub.children[2].appendChild(add);
+      tb.appendChild(sub);
+      table.appendChild(tb);
+      return {party: p, el: tb};
+    });
+    summary();
+    filter();
+    if(keep){
+      var n = table.querySelector('tr.g[data-id="' + keep.id + '"] ' + (keep.f === 'grip' ? '.grip' : '[data-f="' + keep.f + '"],tr.g[data-id="' + keep.id + '"] [data-ev="' + keep.f + '"]'));
+      if(n){
+        n.focus({preventScroll: true});
+        if(keep.s != null){ try { n.setSelectionRange(keep.s, keep.e); } catch(err){} }
+      }
+    }
+  }
+
+  function row(g, first){
+    var tr = tpl.content.firstElementChild.cloneNode(true);
+    tr.dataset.id = g.id;
+    if(first) tr.classList.add('first');
+    tr.classList.toggle('is-plus', g.is_plus_one);
+    tr.querySelector('[data-f=party]').value = g.party;
+    tr.querySelector('[data-f=first_name]').value = g.first_name;
+    fit(tr.querySelector('[data-f=first_name]'));
+    tr.querySelector('[data-f=last_name]').value = g.last_name;
+    tr.querySelector('[data-f=is_plus_one]').checked = g.is_plus_one;
+    tr.querySelector('[data-f=email]').value = g.email || '';
+    tr.querySelector('[data-f=phone]').value = g.phone || '';
+    tr.querySelector('[data-f=note]').value = g.note || '';
+    var ev = invited(g);
+    tr.querySelectorAll('[data-ev]').forEach(function(c){ c.checked = ev.indexOf(c.dataset.ev) >= 0; });
+    names(tr, g);
+    fillReply(tr.querySelector('td.rs'), g);
+    return tr;
+  }
+  /* the first name's box is as wide as the name, so first and last read as one name */
+  function fit(input){ input.style.width = 'calc(' + Math.max(5, input.value.length + 1) + 'ch + 8px)'; }
+  function names(tr, g){
+    var who = g.is_plus_one ? 'plus one' : (g.display_name || 'this guest');
+    tr.querySelector('.grip').setAttribute('aria-label', 'Move ' + who + ' (drag, or use the arrow keys)');
+    tr.querySelector('.del').setAttribute('aria-label', 'Delete ' + who);
+    tr.querySelectorAll('[data-ev]').forEach(function(c){
+      var e = EVENTS[ALL.indexOf(c.dataset.ev)];
+      c.setAttribute('aria-label', who + ': ' + e.name);
+    });
+  }
+
+  /* totals, subtotals, the notes and the CSV: everything that follows from the list */
+  var summaryT = null;
+  function summary(){
+    clearTimeout(summaryT);
+    summaryT = setTimeout(summaryNow, 50);
+  }
+  function summaryNow(){
+    var ps = parties();
+    var byName = {};
+    guests.forEach(function(g){
+      if(!named(g)) return;
+      var k = g.display_name.toLowerCase();
+      (byName[k] = byName[k] || []).indexOf(g.party) < 0 && byName[k].push(g.party);
+    });
+    replies = matchReplies();
+    table.querySelectorAll('tr.g').forEach(function(tr){
+      var g = byId[tr.dataset.id];
+      if(!g) return;
+      fillReply(tr.querySelector('td.rs'), g);
+      var others = named(g) ? byName[g.display_name.toLowerCase()].filter(function(o){ return o !== g.party; }) : [];
+      tr.querySelector('.dupe').textContent = others.length ? 'also in party ' + others.join(', ') : '';
+    });
+    groups.forEach(function(gr){
+      var members = ps.map[gr.party] || [];
+      var plus = members.filter(function(g){ return g.is_plus_one; }).length;
+      var sub = gr.el.querySelector('tr.subtotal');
+      sub.querySelector('.st span').textContent = members.length + (members.length === 1 ? ' guest' : ' guests') + (plus ? ' · ' + plus + (plus === 1 ? ' plus one' : ' plus ones') : '');
+      sub.querySelectorAll('td.ev').forEach(function(c, i){
+        c.textContent = members.filter(function(g){ return invited(g).indexOf(EVENTS[i].id) >= 0; }).length;
+      });
+    });
+
+    var plusCount = guests.filter(function(g){ return g.is_plus_one; }).length;
+    var tally = {yes: 0, nope: 0, none: 0};
+    guests.forEach(function(g){ tally[replyOf(g)]++; });
+    var tiles = [
+      [ps.order.length, 'Parties'],
+      [guests.length, 'Guests (all seats)'],
+      [guests.length - plusCount, 'Named guests'],
+      [plusCount, 'Plus ones'],
+      [ps.order.filter(function(p){ return ps.map[p].some(function(g){ return g.is_plus_one; }); }).length, 'Parties with a plus one']
+    ].concat(EVENTS.map(function(e){
+      return [guests.filter(function(g){ return invited(g).indexOf(e.id) >= 0; }).length, 'Invited to ' + e.head + ' (' + e.short + ')', 'event'];
+    })).concat([
+      [tally.yes, 'Coming', 'reply'],
+      [tally.nope, 'Not coming', 'reply'],
+      [tally.none, 'No reply yet', 'reply']
+    ]);
+    $('totals').innerHTML = '';
+    tiles.forEach(function(t){
+      var d = document.createElement('div');
+      if(t[2]) d.className = t[2];
+      d.innerHTML = '<b></b><span></span>';
+      d.firstChild.textContent = t[0];
+      d.lastChild.textContent = t[1];
+      $('totals').appendChild(d);
+    });
+
+    var notes = [];
+    Object.keys(byName).forEach(function(k){
+      if(byName[k].length > 1){
+        var name = guests.filter(function(g){ return named(g) && g.display_name.toLowerCase() === k; })[0].display_name;
+        notes.push(name + ' is in parties ' + byName[k].sort(function(a, b){ return a - b; }).join(' and ') + '.');
+      }
+    });
+    ps.order.forEach(function(p){
+      var m = ps.map[p], seen = {};
+      if(m.every(function(g){ return g.is_plus_one || !g.display_name; })) notes.push('Party ' + p + ' has nobody named, so nobody can find it on the RSVP.');
+      m.forEach(function(g){
+        if(!named(g)) return;
+        var k = g.display_name.toLowerCase();
+        if(seen[k]) notes.push(g.display_name + ' is in party ' + p + ' twice.');
+        seen[k] = true;
+      });
+    });
+    guests.forEach(function(g){
+      if(!g.is_plus_one && !g.display_name) notes.push('A guest in party ' + g.party + ' has no name yet, so the RSVP leaves them out.');
+      if(!invited(g).length) notes.push(label(g) + ' (party ' + g.party + ') isn’t invited to any event.');
+      if(g.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(g.email)) notes.push(label(g) + '’s email (' + g.email + ') doesn’t look right.');
+    });
+    var nums = ps.order.map(Number), missing = [];
+    for(var n = 1; n <= Math.max.apply(null, nums.concat([0])); n++) if(nums.indexOf(n) < 0) missing.push(n);
+    if(missing.length) notes.push('No party numbered ' + missing.join(', ') + '.');
+    replies.unmatched.forEach(function(r){
+      notes.push('A reply from ' + r.name + ' (party ' + r.party + ') doesn’t match anyone on the list now.');
+    });
+    var ul = $('notes');
+    ul.innerHTML = '';
+    (notes.length ? notes : ['Nothing stands out.']).forEach(function(t){
+      var li = document.createElement('li');
+      li.textContent = t;
+      ul.appendChild(li);
+    });
+
+    var rows = [['Party', 'First name', 'Last name', 'Plus one', 'Note'].concat(EVENTS.map(function(e){ return e.name + ' (' + e.day + ')'; })).concat(['Email', 'Phone', 'RSVP', 'RSVP name', 'Coming to', 'Dietary'])];
+    guests.forEach(function(g){
+      var ev = invited(g), r = replies[g.id];
+      rows.push([g.party, g.is_plus_one ? '' : g.first_name, g.is_plus_one ? '' : g.last_name, g.is_plus_one ? 'Yes' : '', g.note || '']
+        .concat(EVENTS.map(function(e){ return ev.indexOf(e.id) >= 0 ? 'Yes' : ''; }))
+        .concat([g.email || '', g.phone || '', !r ? 'No reply' : r.attending ? 'Coming' : 'Not coming', r ? r.name : '',
+          r && r.attending ? EVENTS.filter(function(e){ return (r.events || []).indexOf(e.id) >= 0; }).map(function(e){ return e.short; }).join(', ') : '',
+          r && r.dietary || '']));
+    });
+    var csv = rows.map(function(r){
+      return r.map(function(v){ v = String(v); if(/^(=|@|[+\-](?![\d\s(]))/.test(v)) v = "'" + v; return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(',');
+    }).join('\r\n');
+    var link = $('csv');
+    if(link.href.indexOf('blob:') === 0) URL.revokeObjectURL(link.href);
+    link.href = URL.createObjectURL(new Blob(['\ufeff' + csv + '\r\n'], {type: 'text/csv;charset=utf-8'}));
+    link.download = 'guest-list-' + new Date().toISOString().slice(0, 10) + '.csv';
+  }
+
+  function filter(){
+    var q = $('q').value.trim().toLowerCase(), only = $('only-plus').checked, rf = $('reply-filter').value;
+    var ps = parties(), shownP = 0, shownG = 0;
+    groups.forEach(function(gr){
+      var m = ps.map[gr.party] || [];
+      var hits = m.filter(function(g){
+        if(!q) return false;
+        return String(g.party) === q || [g.display_name, g.email, g.phone, g.note].some(function(v){ return v && String(v).toLowerCase().indexOf(q) >= 0; });
+      });
+      var show = (!q || hits.length) && (!only || m.some(function(g){ return g.is_plus_one; })) && (!rf || m.some(function(g){ return replyOf(g) === rf; }));
+      gr.el.hidden = !show;
+      gr.el.querySelectorAll('tr.g').forEach(function(tr){ tr.classList.toggle('hit', !!q && hits.indexOf(byId[tr.dataset.id]) >= 0 && String(gr.party) !== q); });
+      if(show){ shownP++; shownG += m.length; }
+    });
+    $('count').textContent = (q || only || rf) ? 'Showing ' + shownP + ' of ' + groups.length + ' parties (' + shownG + ' guests).' : '';
+    $('empty').hidden = shownP > 0 || !groups.length;
+  }
+  $('q').addEventListener('input', filter);
+  $('only-plus').addEventListener('change', filter);
+  $('reply-filter').addEventListener('change', filter);
+
+  /* ---------- editing ---------- */
+
+  function guestOf(el){ var tr = el.closest('tr.g'); return tr ? byId[tr.dataset.id] : null; }
+  table.addEventListener('input', function(e){
+    var t = e.target, g = guestOf(t), f = t.dataset.f;
+    if(!g || !f || t.type === 'checkbox' || f === 'party') return;
+    g[f] = t.value;
+    if(f === 'first_name' || f === 'last_name'){
+      if(f === 'first_name') fit(t);
+      g.display_name = displayName(g);
+      names(t.closest('tr.g'), g);
+    }
+    var ch = {}; ch[f] = t.value;
+    queue(g, ch);
+    summary();
+  });
+  table.addEventListener('change', function(e){
+    var t = e.target, g = guestOf(t);
+    if(!g) return;
+    var tr = t.closest('tr.g');
+    if(t.dataset.ev){
+      var on = Array.prototype.filter.call(tr.querySelectorAll('[data-ev]'), function(c){ return c.checked; }).map(function(c){ return c.dataset.ev; });
+      g.events = on.length === ALL.length ? null : on;
+      queue(g, {events: g.events}, 300);
+      summary();
+    } else if(t.dataset.f === 'is_plus_one'){
+      g.is_plus_one = t.checked;
+      g.display_name = displayName(g);
+      tr.classList.toggle('is-plus', g.is_plus_one);
+      names(tr, g);
+      queue(g, {is_plus_one: g.is_plus_one}, 0);
+      replies = matchReplies();
+      fillReply(tr.querySelector('td.rs'), g);
+      summary();
+    } else if(t.dataset.f === 'party'){
+      var p = parseInt(t.value, 10);
+      if(!/^\s*\d+\s*$/.test(t.value) || p < 1 || p > 9999){ t.classList.add('bad'); t.value = g.party; setTimeout(function(){ t.classList.remove('bad'); }, 1200); return; }
+      if(p === g.party) return;
+      moveTo(g, p);
+    } else if(t.dataset.f){
+      flush(g.id);
+    }
+  });
+  table.addEventListener('keydown', function(e){
+    var t = e.target;
+    if(t.dataset && t.dataset.f === 'party' && e.key === 'Enter'){ t.blur(); }
+    if(t.classList && t.classList.contains('grip') && (e.key === 'ArrowUp' || e.key === 'ArrowDown')){
+      e.preventDefault();
+      nudge(guestOf(t), e.key === 'ArrowUp' ? -1 : 1);
+    }
+  });
+  table.addEventListener('focusout', function(e){
+    var t = e.target, g = guestOf(t);
+    if(g && t.dataset.f && t.type !== 'checkbox' && t.dataset.f !== 'party' && pend[g.id]) flush(g.id);
+  });
+
+  /* moves and order: the server sets party and order for a whole party at once */
+  function place(p, list){
+    list.forEach(function(g, i){ g.party = p; g.sort_order = i; });
+    if(!list.length) return Promise.resolve();
+    return api('POST', '/api/guests', {place: {party: p, ids: list.map(function(g){ return g.id; })}}).catch(function(){ return load(); });
+  }
+  function members(p, except){ return guests.filter(function(g){ return g.party === p && g !== except; }).sort(function(a, b){ return a.sort_order - b.sort_order; }); }
+  function moveTo(g, p){
+    var from = g.party;
+    var rest = members(from, g);
+    var to = members(p, g).concat([g]);
+    place(p, to);
+    if(rest.length) place(from, rest);
+    render();
+    reveal(g);
+  }
+  function nudge(g, d){
+    var list = members(g.party), i = list.indexOf(g), j = i + d;
+    if(j < 0 || j >= list.length) return;
+    list.splice(i, 1); list.splice(j, 0, g);
+    place(g.party, list);
+    render();
+  }
+  function reveal(g, field){
+    var tr = table.querySelector('tr.g[data-id="' + g.id + '"]');
+    if(!tr) return;
+    if(tr.closest('tbody').hidden){ $('q').value = ''; $('only-plus').checked = false; $('reply-filter').value = ''; filter(); }
+    tr.classList.remove('flash'); void tr.offsetWidth; tr.classList.add('flash');
+    var r = tr.getBoundingClientRect();
+    if(r.top < 60 || r.bottom > window.innerHeight - 80) tr.scrollIntoView({block: 'center', behavior: 'smooth'});
+    if(field){ var n = tr.querySelector('[data-f="' + field + '"]'); if(n) n.focus({preventScroll: true}); }
+  }
+
+  function addGuest(p){
+    var last = members(p).pop();
+    api('POST', '/api/guests', {row: {party: p, sort_order: last ? last.sort_order + 1 : 0, first_name: '', last_name: '', events: last ? last.events : null}}).then(function(d){
+      d.guests.forEach(function(g){ guests.push(g); });
+      render();
+      reveal(d.guests[0], 'first_name');
+    }, function(){});
+  }
+  $('add-party').addEventListener('click', function(){ addGuest(maxParty() + 1); });
+
+  /* delete: a second press within a few seconds confirms; Undo puts the guest back as they were */
+  var undoT = null, undone = null;
+  table.addEventListener('click', function(e){
+    var b = e.target.closest('.del');
+    if(!b) return;
+    var g = guestOf(b);
+    if(!g) return;
+    if(!b.classList.contains('sure')){
+      b.classList.add('sure');
+      b.textContent = 'Delete?';
+      b.setAttribute('aria-label', 'Press again to delete ' + (g.is_plus_one ? 'this plus one' : g.display_name || 'this guest'));
+      setTimeout(function(){ if(b.isConnected){ b.classList.remove('sure'); b.textContent = '×'; names(b.closest('tr.g'), g); } }, 3000);
+      return;
+    }
+    if(pend[g.id]){ clearTimeout(pend[g.id].t); delete pend[g.id]; }
+    guests = guests.filter(function(o){ return o !== g; });
+    render();
+    api('DELETE', '/api/guests?id=' + g.id).then(function(d){
+      toast('Deleted ' + label(d.guest) + ' from party ' + d.guest.party + '.', d.guest);
+    }, function(){ load(); });
+  });
+  function toast(text, row){
+    $('toast-text').textContent = text;
+    $('toast').hidden = false;
+    undone = row;
+    clearTimeout(undoT);
+    undoT = setTimeout(function(){ $('toast').hidden = true; undone = null; }, 12000);
+  }
+  $('toast-undo').addEventListener('click', function(){
+    var row = undone;
+    $('toast').hidden = true;
+    clearTimeout(undoT);
+    undone = null;
+    if(!row) return;
+    api('POST', '/api/guests', {row: row}).then(function(d){
+      d.guests.forEach(function(g){ guests.push(g); });
+      render();
+      reveal(d.guests[0]);
+    }, function(){});
+  });
+
+  /* ---------- drag and drop (mouse, pen and touch): the row moves through the list as you drag;
+     drop it in another party to move the guest there, or on "new party" ---------- */
+
+  var drag = null, zone = $('newparty');
+  table.addEventListener('pointerdown', function(e){
+    var grip = e.target.closest('.grip');
+    if(!grip || e.button > 0 || drag) return;
+    var tr = grip.closest('tr.g'), g = byId[tr.dataset.id];
+    e.preventDefault();
+    flushAll();
+    try { grip.setPointerCapture(e.pointerId); } catch(err){}
+    drag = {tr: tr, g: g, grip: grip, id: e.pointerId, x: e.clientX, y: e.clientY, over: false, moved: false};
+    tr.classList.add('dragging');
+    document.body.classList.add('is-dragging');
+    drag.raf = requestAnimationFrame(autoscroll);
+  });
+  /* a native drag would swallow the pointer's moves */
+  table.addEventListener('dragstart', function(e){ if(e.target.closest && e.target.closest('.grip, tr.g')) e.preventDefault(); });
+  document.addEventListener('pointermove', function(e){
+    if(!drag || e.pointerId !== drag.id) return;
+    drag.x = e.clientX; drag.y = e.clientY; drag.moved = true;
+    position();
+  });
+  document.addEventListener('pointerup', function(e){ if(drag && e.pointerId === drag.id) endDrag(true); });
+  document.addEventListener('pointercancel', function(e){ if(drag && e.pointerId === drag.id) endDrag(false); });
+  document.addEventListener('keydown', function(e){ if(drag && e.key === 'Escape') endDrag(false); });
+
+  function position(){
+    var el = document.elementFromPoint(drag.x, drag.y);
+    drag.over = !!(el && zone.contains(el));
+    zone.classList.toggle('over', drag.over);
+    if(drag.over || !el) return;
+    var tr = el.closest('#sheet tbody.grp tr');
+    if(!tr || tr === drag.tr) return;
+    var tb = tr.parentNode;
+    if(tr.classList.contains('subtotal')){ if(tr.previousElementSibling !== drag.tr) tb.insertBefore(drag.tr, tr); return; }
+    if(tr.classList.contains('phead')){ tb.insertBefore(drag.tr, tr.nextSibling); return; }
+    var r = tr.getBoundingClientRect(), after = drag.y > r.top + r.height / 2;
+    var ref = after ? tr.nextSibling : tr;
+    if(ref !== drag.tr) tb.insertBefore(drag.tr, ref);
+  }
+  function autoscroll(){
+    if(!drag) return;
+    var edge = 70, v = 0;
+    if(drag.y < edge) v = -Math.ceil((edge - drag.y) / 5);
+    else if(drag.y > window.innerHeight - edge) v = Math.ceil((drag.y - (window.innerHeight - edge)) / 5);
+    if(v){ window.scrollBy(0, v); position(); }
+    drag.raf = requestAnimationFrame(autoscroll);
+  }
+  function endDrag(commit){
+    var d = drag;
+    drag = null;
+    cancelAnimationFrame(d.raf);
+    try { d.grip.releasePointerCapture(d.id); } catch(err){}
+    document.body.classList.remove('is-dragging');
+    zone.classList.remove('over');
+    d.tr.classList.remove('dragging');
+    var g = d.g, from = g.party;
+    if(!commit || !d.moved){ render(); return; }
+    if(d.over){
+      moveTo(g, maxParty() + 1);
+      return;
+    }
+    var tb = d.tr.closest('tbody.grp');
+    var to = Number(tb.dataset.party);
+    var list = Array.prototype.map.call(tb.querySelectorAll('tr.g'), function(tr){ return byId[tr.dataset.id]; });
+    var before = members(to, null).map(function(o){ return o.id; }).join();
+    if(to === from && list.map(function(o){ return o.id; }).join() === before){ render(); return; }
+    var rest = to === from ? [] : members(from, g);
+    place(to, list);
+    if(rest.length) place(from, rest);
+    render();
+    reveal(g);
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>

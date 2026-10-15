@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Rebuild guests.json (the RSVP name lookup) from the guest list sheet.
+"""DEPRECATED: don't run this. The guest list now lives in Supabase
+(public.wedding_guests) and is edited on the admin site (admin/); the RSVP reads
+it from there, and guests.json and the Google Sheet are no longer used. Running
+this would only write a stale guests.json (and, with the service role key, fail:
+wedding_contacts_load is gone). Kept for reference.
+
+Rebuild guests.json (the RSVP name lookup) from the guest list sheet.
 
     python3 scripts/sync_guests.py            # download the sheet, write guests.json
     python3 scripts/sync_guests.py list.csv   # or read a CSV you exported yourself
