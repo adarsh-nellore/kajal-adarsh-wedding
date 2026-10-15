@@ -3,7 +3,12 @@
 // for a year. The save-the-date and the images the emails load stay public.
 // The project's vercel.app address forwards to the domain.
 
-const PASSWORD = '2027';
+const PASSWORD = 'churro';
+// 2027 was the first password: its links still work, and cookies are still sealed
+// with it so guests who unlocked before the change stay unlocked.
+const ACCEPTED = [PASSWORD, '2027'];
+const SEAL = '2027';
+const ok = (pw) => ACCEPTED.includes(String(pw ?? '').trim().toLowerCase());
 const COOKIE = 'ka_pass';
 const YEAR = 60 * 60 * 24 * 365;
 
@@ -24,7 +29,7 @@ const unlock = async (location) => new Response(null, {
   status: 303,
   headers: {
     location,
-    'set-cookie': `${COOKIE}=${await token(PASSWORD)}; Path=/; Max-Age=${YEAR}; HttpOnly; Secure; SameSite=Lax`,
+    'set-cookie': `${COOKIE}=${await token(SEAL)}; Path=/; Max-Age=${YEAR}; HttpOnly; Secure; SameSite=Lax`,
     'cache-control': 'no-store',
   },
 });
@@ -40,7 +45,7 @@ export default async function middleware(request) {
   if (PUBLIC.some((re) => re.test(url.pathname))) return;
 
   if (url.searchParams.has('pw')) {
-    if (url.searchParams.get('pw') === PASSWORD) {
+    if (ok(url.searchParams.get('pw'))) {
       url.searchParams.delete('pw');
       return unlock(url.pathname + url.search);
     }
@@ -51,11 +56,11 @@ export default async function middleware(request) {
   if (request.method === 'POST' && url.searchParams.has('unlock')) {
     const form = await request.formData().catch(() => null);
     const next = safe(String(form?.get('next') || '/'));
-    if (form?.get('password') === PASSWORD) return unlock(next);
+    if (ok(form?.get('password'))) return unlock(next);
     return page(next, true);
   }
 
-  if (cookie(request, COOKIE) === (await token(PASSWORD))) return;
+  if (cookie(request, COOKIE) === (await token(SEAL))) return;
 
   return page(url.pathname + url.search, false);
 }
@@ -94,7 +99,7 @@ p{margin:4px 0 0;font-size:16px;color:rgba(234,227,214,.7);min-height:1.4em;}
 <h1>Kajal &amp; Adarsh</h1>
 <form method="post" action="/?unlock">
 <input type="hidden" name="next" value="${esc(next)}">
-<input id="password" name="password" type="password" placeholder="Password" aria-label="Password" inputmode="numeric" autocomplete="current-password" autofocus required>
+<input id="password" name="password" type="password" placeholder="Password" aria-label="Password" autocapitalize="none" autocomplete="current-password" autofocus required>
 <button type="submit">Enter</button>
 <p role="status">${wrong ? 'That isn’t it. Please try again.' : ''}</p>
 </form>

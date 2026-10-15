@@ -25,7 +25,7 @@ export type Rsvp = {
 
 export const SITE = "https://kajal-adarsh.club/";
 // The site is behind this password; links carrying it skip the prompt.
-export const PASSWORD = "2027";
+export const PASSWORD = "churro";
 export const ENTER = SITE + "?pw=" + PASSWORD;
 export const PHOTO = SITE + "email/photo-v2.png";
 export const NAMES = SITE + "email/names-light.png";

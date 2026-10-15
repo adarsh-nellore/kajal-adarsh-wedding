@@ -18,7 +18,7 @@ function rows(greeting?: string): string {
     (greeting ? text(esc(greeting)) : "") +
     text(`${esc(INVITE)}<br>Visit our ${link(HOME, "wedding website", "#08040a")} for all the details and to RSVP.`) +
     button(HOME, "RSVP", 130) +
-    text(`Password: ${PASSWORD}`, { size: "s", top: 0 }) +
+    text(`Password: <span style="font-weight:700;">${esc(PASSWORD)}</span>`, { size: "l", top: 2, bottom: 20 }) +
     text(`${esc(REPLY_BY)}<br>${esc(CANT_WAIT)}`) +
     signoff() + QUESTIONS;
 }
