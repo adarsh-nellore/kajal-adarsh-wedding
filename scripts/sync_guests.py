@@ -6,14 +6,20 @@
 
 Only names, party numbers and (if the sheet has an "Events" column) invited
 events are written: guests.json is public, so emails, phones and addresses
-never leave the sheet.
+never go in it.
+
+With SUPABASE_SERVICE_ROLE_KEY set, the "Email" and "Phone" columns are also
+loaded into the private wedding_contacts table (replacing what's there), so
+the RSVP can show guests a masked copy to confirm:
+
+    SUPABASE_SERVICE_ROLE_KEY=... python3 scripts/sync_guests.py
 
 Sheet columns: "Group #" (party number, first column), "First Name",
 "Last Name", optionally "Events" (comma-separated; e.g. "Welcome, Haldi,
-Wedding, After Party", or "All"; blank means all events).
+Wedding, After Party", or "All"; blank means all events), "Email", "Phone".
 Rows without a party number are skipped (Kajal and Adarsh themselves).
 """
-import csv, io, json, re, sys, urllib.request
+import csv, io, json, os, re, sys, urllib.request
 from datetime import date
 from pathlib import Path
 
@@ -21,6 +27,8 @@ SHEET = "1-TaY1Emb2IPlAyZFJNWPQbfAHwNS0lYSMXcNcJHpjvo"
 GID = "273057248"
 URL = f"https://docs.google.com/spreadsheets/d/{SHEET}/export?format=csv&gid={GID}"
 OUT = Path(__file__).resolve().parent.parent / "guests.json"
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://zfhhknasebbhaifabszd.supabase.co")
+SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 
 EVENTS = [  # same values as the RSVP form's checkboxes
     ("welcome-party", r"welcome"),
@@ -86,10 +94,12 @@ def main():
     c_first = col(header, "first name", "first", "name")
     c_last = col(header, "last name", "last", "surname")
     c_events = col(header, "events", "invited", "invited events", "invited to")
+    c_email = col(header, "email", "e-mail", "email address")
+    c_phone = col(header, "phone", "phone number", "mobile", "cell")
     if c_first is None:
         sys.exit("Couldn't find a 'First Name' column in the sheet.")
 
-    guests, seen = [], {}
+    guests, seen, contacts = [], {}, []
     for i, row in enumerate(body, start=2):
         row = row + [""] * (len(header) - len(row))
         party = row[c_party].strip()
@@ -109,6 +119,15 @@ def main():
         firsts = [p.strip() for p in re.split(r"\s*&\s*|\s+and\s+", first) if p.strip()] if not re.search(r"\(", first) else [first]
         if len(firsts) > 1:
             warnings.append(f"row {i}: split “{first}” into {', '.join(firsts)}")
+        email = re.search(r"[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+", row[c_email]) if c_email is not None else None
+        phone = row[c_phone].strip() if c_phone is not None else ""
+        if email or phone:
+            contacts.append({
+                "party": party, "row_no": i,
+                "names": [f"{f} {last}".strip().lower() for f in firsts if not NOTE.search(f)],
+                "email": email.group(0).lower() if email else None,
+                "phone": phone[:40] or None,
+            })
         for f in firsts:
             g = {"party": party}
             if is_note(f, i):
@@ -141,10 +160,25 @@ def main():
     OUT.write_text(f'{{"updated": "{date.today().isoformat()}", "guests": [\n{lines}\n]}}\n', encoding="utf-8")
     json.loads(OUT.read_text(encoding="utf-8"))
     print(f"Wrote {len(guests)} guests in {len({g['party'] for g in guests})} parties to {OUT.name}")
+    if SERVICE_KEY:
+        load_contacts(contacts)
     if warnings:
         print("\nCheck these in the sheet:")
         for w in warnings:
             print(" -", w)
+
+
+def load_contacts(contacts):
+    if len(contacts) < 20:
+        sys.exit(f"Only {len(contacts)} rows have an email or phone; not replacing wedding_contacts.")
+    req = urllib.request.Request(
+        f"{SUPABASE_URL}/rest/v1/rpc/wedding_contacts_load",
+        data=json.dumps({"rows": contacts}).encode(),
+        headers={"apikey": SERVICE_KEY, "Authorization": f"Bearer {SERVICE_KEY}", "Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=30) as r:
+        print(f"Loaded {json.loads(r.read())} contacts into wedding_contacts")
 
 
 if __name__ == "__main__":

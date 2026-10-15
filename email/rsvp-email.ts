@@ -17,6 +17,8 @@ export type Rsvp = {
   party: string | null;
   submission_id: string | null;
   submitted_by: string | null;
+  phone?: string | null;
+  contact_confirmed?: boolean | null;
 };
 
 export const SITE = "https://adarsh-nellore.github.io/kajal-adarsh-wedding/";
@@ -256,10 +258,12 @@ export function coupleEmail(rs: Rsvp[]) {
     timeZone: TZ, weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit",
   }).replace(/, (\d+:\d+)/, " at $1");
   const tally = rs.length > 1 ? `${coming} of ${rs.length} coming` : (coming ? "Coming" : "Not coming");
+  const reach = r.contact_confirmed === true ? "Contact info confirmed"
+    : r.contact_confirmed === false ? "New contact info, not in the sheet yet" : "";
   const rows =
     text(`${esc(by)} replied.`, { size: "l", weight: 600, top: 4 }) +
     rule() + names() +
-    text(`<span style="font-weight:700;">${esc(tally)}${r.party ? ` · Party ${esc(r.party)}` : ""}</span><br>${link("mailto:" + r.email, r.email, LINK)}<br>${esc(when)}`, { size: "s" }) +
+    text(`<span style="font-weight:700;">${esc(tally)}${r.party ? ` · Party ${esc(r.party)}` : ""}</span><br>${link("mailto:" + r.email, r.email, LINK)}${r.phone ? ` · ${link("tel:" + r.phone.replace(/[^\d+]/g, ""), r.phone, LINK)}` : ""}${reach ? `<br>${reach}` : ""}<br>${esc(when)}`, { size: "s" }) +
     rule(20) +
     rs.map(guestBlock).join("") + note(rs) +
     rule(24);
@@ -268,6 +272,6 @@ export function coupleEmail(rs: Rsvp[]) {
       ? `RSVP: ${by}${r.party ? ` (party ${r.party})` : ""}, ${coming} of ${rs.length} coming`
       : `RSVP: ${r.name} ${r.attending ? "accepts" : "declines"}`,
     html: page({ title: `RSVP: ${by}`, preheader: `${tally}. ${rs.map((g) => g.name).join(", ")}`, rows }),
-    text: [`${by} replied.`, `${tally}${r.party ? ` · Party ${r.party}` : ""}`, `${r.email} · ${when}`, "", ...plain(rs)].join("\n"),
+    text: [`${by} replied.`, `${tally}${r.party ? ` · Party ${r.party}` : ""}`, [r.email, r.phone].filter(Boolean).join(" · "), ...(reach ? [reach] : []), when, "", ...plain(rs)].join("\n"),
   };
 }

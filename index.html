@@ -973,7 +973,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 /* boxed fields: the label rests inside the box like a placeholder, then floats to the top edge
    once focused or filled (input precedes its label so the sibling selectors can see its state) */
 .box{position:relative;}
-.rsvp input[type="text"],.rsvp input[type="email"],.rsvp input[type="number"],.rsvp textarea{
+.rsvp input[type="text"],.rsvp input[type="email"],.rsvp input[type="tel"],.rsvp input[type="number"],.rsvp textarea{
   display:block;
   width:100%;
   margin:0;
@@ -1086,6 +1086,29 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .bulk .rsvp-again:hover,.same-events .rsvp-again:hover,.find-note .rsvp-again:hover,.bulk .rsvp-again[aria-pressed="true"]{color:var(--gold);background-image:linear-gradient(var(--gold),var(--gold));}
 .bulk .rsvp-again:active,.same-events .rsvp-again:active,.find-note .rsvp-again:active{opacity:.7;}
 .bulk .rsvp-again:focus-visible,.same-events .rsvp-again:focus-visible,.find-note .rsvp-again:focus-visible{outline:1px solid var(--gold);outline-offset:3px;border-radius:2px;}
+/* contact info: what the list has, masked, as plain lines to confirm; or the two fields */
+.reach-h{font-size:17px;line-height:28px;color:rgba(234,227,214,.74);margin-bottom:8px;}
+.on-file-v{font-size:19px;line-height:30px;color:var(--white);}
+.on-file-v span{display:block;}
+.on-file-v span:empty{display:none;}
+.on-file-act{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 28px;margin-top:10px;font-size:17px;line-height:28px;}
+.on-file-act .check{color:rgba(234,227,214,.86);}
+.reach .box[hidden]{display:none;}
+.on-file:not([hidden]) ~ .box:not([hidden]){margin-top:20px;}
+.reach .box + .box{margin-top:clamp(16px,2vw,20px);}
+.reach-keep{margin-top:10px;font-size:16px;line-height:26px;}
+.reach .rsvp-again{
+  display:inline;padding:0 0 1px;line-height:inherit;color:var(--gold);
+  background:linear-gradient(rgba(var(--gold-rgb),.4),rgba(var(--gold-rgb),.4)) no-repeat 0 100% / 100% 1px;
+  transition:color .35s cubic-bezier(.2,.7,.3,1);
+}
+.reach .rsvp-again:hover{background-image:linear-gradient(var(--gold),var(--gold));}
+.reach .rsvp-again:active{opacity:.7;}
+.reach .rsvp-again:focus-visible{outline:1px solid var(--gold);outline-offset:3px;border-radius:2px;}
+@media (pointer:coarse){
+  .reach .rsvp-again{position:relative;}
+  .reach .rsvp-again::after{content:"";position:absolute;inset:-12px -6px;}
+}
 .party{display:grid;gap:12px;}
 .rsvp .guest{padding:16px 20px 18px;border:1px solid rgba(var(--gold-rgb),.22);border-radius:4px;background:rgba(234,227,214,.02);}
 .rsvp .guest.missing{border-color:var(--gold);}
@@ -1567,12 +1590,27 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <label for="rsvp-note">A note to us <span class="opt">(optional)</span></label>
 </div>
 </div>
-<div class="field">
-<div class="box">
+<!-- what the guest list has for them, masked (wedding_contact in Supabase); they confirm it or type new details -->
+<div class="field reach">
+<p class="reach-h">Your contact info</p>
+<div class="on-file" hidden>
+<p class="on-file-v"><span></span><span></span></p>
+<div class="on-file-act">
+<label class="check"><input type="checkbox" id="rsvp-confirm" aria-describedby="rsvp-email-err"><span>This is still right</span></label>
+<button type="button" class="rsvp-again" data-reach="update">Update</button>
+</div>
+</div>
+<div class="box box-email">
 <input id="rsvp-email" name="email" type="email" autocomplete="email" aria-describedby="rsvp-email-err" placeholder=" " required>
 <label for="rsvp-email">Email</label>
 </div>
+<div class="box box-phone">
+<input id="rsvp-phone" name="phone" type="tel" autocomplete="tel" maxlength="40" aria-describedby="rsvp-phone-err" placeholder=" ">
+<label for="rsvp-phone">Phone <span class="opt">(optional)</span></label>
+</div>
+<p class="reach-keep" hidden><button type="button" class="rsvp-again" data-reach="keep">Keep what we have</button></p>
 <p class="err" id="rsvp-email-err"></p>
+<p class="err" id="rsvp-phone-err"></p>
 </div>
 <div class="field">
 <label class="check"><input type="checkbox" name="copy" id="rsvp-copy"><span>Please send me a copy of my RSVP responses</span></label>
@@ -2327,6 +2365,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
     var f = {
       name: document.getElementById('rsvp-name'),
       email: document.getElementById('rsvp-email'),
+      phone: document.getElementById('rsvp-phone'),
+      confirm: document.getElementById('rsvp-confirm'),
       note: document.getElementById('rsvp-note'),
       copy: document.getElementById('rsvp-copy'),
       matches: document.getElementById('rsvp-matches'),
@@ -2474,6 +2514,43 @@ picture{margin-block:clamp(52px,8vw,104px);}
     });
     f.name.addEventListener('blur', function(){ setTimeout(function(){ if(document.activeElement !== f.name) closeList(); }, 150); });
 
+    /* contact info: the guest list's email and phone stay in Supabase; the site only gets them masked
+       ("ad••••@gmail.com"), and on "This is still right" the database fills in the real ones */
+    var reach = form.querySelector('.reach'), onFile = reach.querySelector('.on-file');
+    var contact = null, updating = false;
+    function showReach(){
+      var have = contact && !updating;
+      var v = onFile.querySelectorAll('.on-file-v span');
+      v[0].textContent = have && contact.email || '';
+      v[1].textContent = have && contact.phone || '';
+      onFile.hidden = !have;
+      reach.querySelector('.box-email').hidden = !!(have && contact.email);
+      reach.querySelector('.box-phone').hidden = !!(have && contact.phone);
+      reach.querySelector('.reach-keep').hidden = !(contact && updating);
+    }
+    function lookUp(g){
+      contact = null; updating = false; f.confirm.checked = false;
+      showReach();
+      fetch(SUPABASE_URL + '/rest/v1/rpc/wedding_contact', {
+        method: 'POST',
+        headers: {'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json'},
+        body: JSON.stringify({p_party: g.party, p_name: g.name})
+      }).then(function(r){ return r.ok ? r.json() : null; }).then(function(c){
+        if(picked !== g || !c || !(c.email || c.phone)) return;
+        contact = c;
+        showReach();
+      }).catch(function(){});
+    }
+    reach.addEventListener('click', function(e){
+      var b = e.target.closest('[data-reach]');
+      if(!b) return;
+      updating = b.dataset.reach === 'update';
+      f.confirm.checked = false;
+      showReach();
+      if(tried){ rules.email(); rules.phone(); }
+      (updating ? f.email : f.confirm).focus();
+    });
+
     function cards(){ return Array.prototype.slice.call(partyEl.querySelectorAll('.guest')); }
     function answer(c){
       var r = c.querySelector('.choice input:checked');
@@ -2515,6 +2592,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
       delete kept[g.i];
       bulk.hidden = party.length < 2;
       groupParty.hidden = false;
+      lookUp(g);
       update();
       var top = groupParty.getBoundingClientRect().top;
       if(top > window.innerHeight * 0.8){
@@ -2582,11 +2660,22 @@ picture{margin-block:clamp(52px,8vw,104px);}
         return ok;
       },
       email: function(){
-        var v = f.email.value.trim();
+        var have = contact && !updating, v = f.email.value.trim();
+        if(have && !f.confirm.checked){
+          f.email.removeAttribute('aria-invalid');
+          return flag('email', 'Please confirm this is still right, or update it.', [f.confirm]);
+        }
+        f.confirm.removeAttribute('aria-invalid');
+        if(have && contact.email) return flag('email', '', [f.email]);
         return flag('email', !v ? 'Please enter your email.' : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'Please check your email address.', [f.email]);
+      },
+      phone: function(){
+        var v = f.phone.value.trim(), shown = !(contact && !updating && contact.phone);
+        return flag('phone', shown && v && v.replace(/\D/g, '').length < 7 ? 'Please check your phone number.' : '', [f.phone]);
       }
     };
     function firstOf(k){
+      if(k === 'email' && contact && !updating && !f.confirm.checked) return f.confirm;
       if(k !== 'attending') return f[k];
       var c = partyEl.querySelector('.guest.missing');
       return c && (c.querySelector('[aria-invalid="true"]') || c.querySelector('.check:not([hidden]) input'));
@@ -2596,7 +2685,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
       var t = e.target;
       if(t === f.name) return;
       if(t.closest('.guest')){ update(); if(tried) rules.attending(); return; }
-      if(tried && t === f.email) rules.email();
+      if(tried && (t === f.email || t === f.confirm)) rules.email();
+      if(tried && t === f.phone) rules.phone();
     }
     form.addEventListener('change', onEdit);
     form.addEventListener('input', onEdit);
@@ -2612,13 +2702,18 @@ picture{margin-block:clamp(52px,8vw,104px);}
 
       var by = picked.name, sid = uuid(), cs = cards();
       var going = cs.some(function(c){ return answer(c) === 'yes'; });
-      var email = f.email.value.trim(), note = f.note.value.trim();
+      var note = f.note.value.trim(), have = contact && !updating;
+      /* a confirmed email or phone is left empty here; the database copies it from the guest list */
+      var email = have && contact.email ? '' : f.email.value.trim();
+      var phone = have && contact.phone ? '' : f.phone.value.trim();
       var rows = cs.map(function(c, k){
         var g = party[k], on = answer(c) === 'yes', plus = c.querySelector('.guest-plus:not([hidden]) input');
         return {
           id: uuid(),
           name: g.plus ? (plus.value.trim() || 'Guest of ' + by) : g.name,
           email: email,
+          phone: phone || null,
+          contact_confirmed: contact ? have : null,
           attending: on,
           guests: on ? 1 : 0,
           events: on ? Array.prototype.filter.call(c.querySelectorAll('.check:not([hidden]) input'), function(i){ return i.checked; }).map(function(i){ return i.value; }) : [],
