@@ -337,6 +337,8 @@ a:focus-visible{outline:none;}
 /* stickers: sized by height from --stk, so every one reads at the same scale whatever its shape;
    all share the tilt (sign alternating down the page), shadow and rock. margin:0 and width:auto override the global picture rules.
    The rock drives the separate `rotate` property, so it stacks on the tilt and on the hero parallax transform */
+/* parallax layers move on every frame of a scroll: each gets its own layer, so moving it never repaints its shadow */
+[data-px]{will-change:transform;}
 .stk{--h:var(--stk);--tilt:var(--stk-tilt);--swing:calc(.2 * var(--h));position:absolute;z-index:1;display:block;margin:0;pointer-events:none;}
 .stk img{
   display:block;
@@ -2054,7 +2056,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
   /* weighted scrolling (Lenis): a mouse or trackpad scroll eases out slowly; touch keeps the phone's own momentum.
      The scroll position is never corrected afterwards */
   var lenis = !reduce && window.Lenis ? new window.Lenis({
-    lerp: 0.08, wheelMultiplier: 0.85, autoRaf: true,
+    lerp: 0.07, wheelMultiplier: 0.85, autoRaf: true,
     /* sideways swipes step through a section's cards, so they're left alone */
     virtualScroll: function(d){
       /* Lenis halts any glide on a touch; the swipe glide off the teaser has to run on */
@@ -2062,6 +2064,20 @@ picture{margin-block:clamp(52px,8vw,104px);}
       return Math.abs(d.deltaY) >= Math.abs(d.deltaX) && !heroHandoff(d);
     }
   }) : null;
+  /* on a touch-only phone Lenis smooths nothing (the phone scrolls itself), yet its touch listeners can't be passive,
+     and one that can't be makes the phone wait on the page before every swipe moves. They go; what they did is kept:
+     a finger on the glass stops a glide (except the opening screens' own) */
+  if(lenis && !window.matchMedia('(any-pointer: fine)').matches){
+    var vs = lenis.virtualScroll;
+    if(vs && vs.element && vs.onTouchStart && vs.onTouchMove && vs.onTouchEnd){
+      vs.element.removeEventListener('touchstart', vs.onTouchStart, {passive:false});
+      vs.element.removeEventListener('touchmove', vs.onTouchMove, {passive:false});
+      vs.element.removeEventListener('touchend', vs.onTouchEnd, {passive:false});
+      window.addEventListener('touchstart', function(){
+        if(lenis.isScrolling === 'smooth' && !hopGliding()){ lenis.scrollTo(window.scrollY, {immediate: true, force: true}); }
+      }, {passive:true});
+    }
+  }
   if(lenis){ lenis.on('scroll', onScrollSettle); }
   window.addEventListener('scroll', onScrollSettle, {passive:true});
   /* while the teaser is full screen the page holds still underneath; coming back, it's put back where it was */
@@ -2163,7 +2179,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
       hopTouch = e.touches.length === 1 && !menuOpen() && !teaserFull && !hopExempt(e.target)
         ? {x: e.touches[0].clientX, y: e.touches[0].clientY, held: false, decided: false, clamp: null, dir: 0} : null;
     }, {passive:true});
-    window.addEventListener('touchmove', function(e){
+    var hopMove = function(e){
       var t = hopTouch;
       if(!t) return;
       if(t.held){ e.preventDefault(); return; }
@@ -2184,7 +2200,23 @@ picture{margin-block:clamp(52px,8vw,104px);}
       }
       if(gliding){ reelGlideEnd = 0; lenis.scrollTo(window.scrollY, {immediate: true, force: true}); }
       if(p){ t.clamp = p.clamp; t.dir = dir; }
-    }, {passive:false});
+    };
+    /* only a swipe on the opening screens can glide (and so has to hold the page); past them the listener goes passive,
+       so the phone never waits on the page to start a swipe */
+    var hopBlocking = null, hopZone = 0;
+    var hopZoneMeasure = function(){ var ev = document.querySelector('.journey h2'); hopZone = ev ? stopOf(ev) + window.innerHeight * 0.5 : Infinity; };
+    var hopMode = function(){
+      var near = window.scrollY < hopZone;
+      if(near === hopBlocking) return;
+      window.removeEventListener('touchmove', hopMove);
+      window.addEventListener('touchmove', hopMove, {passive: !near});
+      hopBlocking = near;
+    };
+    hopZoneMeasure();
+    hopMode();
+    window.addEventListener('scroll', hopMode, {passive:true});
+    window.addEventListener('resize', function(){ hopZoneMeasure(); hopMode(); }, {passive:true});
+    window.addEventListener('load', function(){ hopZoneMeasure(); hopMode(); });
     var hopEnd = function(){
       var t = hopTouch;
       hopTouch = null;
