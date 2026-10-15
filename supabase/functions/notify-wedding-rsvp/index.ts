@@ -87,12 +87,14 @@ Deno.serve(async (req: Request) => {
   if (!r) return json({ ok: true, skipped: "not found, too old, or already notified" });
   const by = r.submitted_by || r.name;
   rs.sort((a, b) => Number(b.name === by) - Number(a.name === by));
+  // each guest has their own email now; replies and the copy go to the replier's, else the party's first
+  const email = rs.find((g) => g.email)?.email || "";
 
   // One message per address, so a rejected recipient (e.g. while sending from
   // onboarding@resend.dev) doesn't block the other.
   const { subject, ...body } = coupleEmail(rs);
   const couple: Record<string, Awaited<ReturnType<typeof send>>> = {};
-  for (const to of TO) couple[to] = await send([to], subject, body, r.email);
+  for (const to of TO) couple[to] = await send([to], subject, body, email || undefined);
   const anyOk = Object.values(couple).some((c) => c.ok);
 
   if (!anyOk) {
@@ -104,9 +106,9 @@ Deno.serve(async (req: Request) => {
   }
 
   let guest = null;
-  if (r.send_copy) {
+  if (rs[0].send_copy && email) {
     const { subject: guestSubject, ...copy } = guestEmail(rs);
-    guest = await send([r.email], guestSubject, copy, TO[0]);
+    guest = await send([email], guestSubject, copy, TO[0]);
   }
 
   return json({ ok: anyOk, couple, guest }, anyOk ? 200 : 502);

@@ -7,7 +7,7 @@ export type Rsvp = {
   id: string;
   created_at: string;
   name: string;
-  email: string;
+  email: string | null;
   attending: boolean;
   guests: number | null;
   events: string[];
@@ -188,12 +188,21 @@ ${card(o.rows)}
 </html>`;
 }
 
-function guestBlock(g: Rsvp): string {
+// A guest's email and phone for the couple: "confirmed" matches the guest list,
+// "new" doesn't (so isn't in the sheet yet). The database sets the *_kept flags.
+function contactOf(g: Rsvp) {
+  return ([[g.email, g.email_kept, "mailto:"], [g.phone, g.phone_kept, "tel:"]] as const)
+    .filter(([v]) => v)
+    .map(([v, kept, scheme]) => ({ v: v!, mark: kept ? "confirmed" : "new", href: scheme + (scheme === "tel:" ? v!.replace(/[^\d+]/g, "") : v) }));
+}
+
+function guestBlock(g: Rsvp, contact = false): string {
   const parts = [`<span style="font-weight:700;">${esc(g.name)}</span>`, g.attending ? "Joyfully accepts" : "Regretfully declines"];
   if (g.attending) {
     parts.push(...eventsOf(g).map((e) => esc(e).replace(/ · (.+)$/, ' · <span style="white-space:nowrap;">$1</span>')));
     if (g.dietary?.trim()) parts.push(`Dietary restrictions or allergies: ${lines(g.dietary)}`);
   }
+  if (contact) parts.push(...contactOf(g).map((c) => `${link(c.href, c.v, LINK)} (${c.mark})`));
   return text(parts.join("<br>"), { bottom: 20 });
 }
 
@@ -202,11 +211,15 @@ function note(rs: Rsvp[]): string {
   return n ? text(`<span style="font-weight:700;">A note to us</span><br>${lines(n)}`, { bottom: 20 }) : "";
 }
 
-const plain = (rs: Rsvp[]) => [
-  ...rs.flatMap((g) => g.attending
-    ? [g.name, "Joyfully accepts", ...eventsOf(g).map((e) => `  ${e}`),
-      ...(g.dietary?.trim() ? [`  Dietary restrictions or allergies: ${g.dietary.trim()}`] : []), ""]
-    : [g.name, "Regretfully declines", ""]),
+const plain = (rs: Rsvp[], contact = false) => [
+  ...rs.flatMap((g) => [
+    ...(g.attending
+      ? [g.name, "Joyfully accepts", ...eventsOf(g).map((e) => `  ${e}`),
+        ...(g.dietary?.trim() ? [`  Dietary restrictions or allergies: ${g.dietary.trim()}`] : [])]
+      : [g.name, "Regretfully declines"]),
+    ...(contact ? contactOf(g).map((c) => `  ${c.v} (${c.mark})`) : []),
+    "",
+  ]),
   ...(rs[0].note?.trim() ? ["A note to us", rs[0].note.trim(), ""] : []),
 ];
 
@@ -221,7 +234,7 @@ export function guestEmail(rs: Rsvp[]) {
     text(`Thank you, ${esc(by)}.`, { size: "l", weight: 600, top: 4 }) +
     rule() + photo(SITE) + rule() + names() + dates() + rule(20) +
     text(esc(line), { bottom: 20 }) +
-    rs.map(guestBlock).join("") + note(rs) +
+    rs.map((g) => guestBlock(g)).join("") + note(rs) +
     button(SITE + "#rsvp", "Change your reply") +
     signoff() + QUESTIONS;
   return {
@@ -256,26 +269,19 @@ export function coupleEmail(rs: Rsvp[]) {
     timeZone: TZ, weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit",
   }).replace(/, (\d+:\d+)/, " at $1");
   const tally = rs.length > 1 ? `${coming} of ${rs.length} coming` : (coming ? "Coming" : "Not coming");
-  // kept: left as the guest list had it; new: typed on the form, so not in the sheet yet
-  const fields = [["email", r.email, r.email_kept], ["phone", r.phone, r.phone_kept]] as const;
-  const kept = fields.filter(([, v, k]) => v && k).map(([n]) => n);
-  const fresh = fields.filter(([, v, k]) => v && !k).map(([n]) => n);
-  const reach = [
-    kept.length ? `Confirmed ${kept.join(" and ")}` : "",
-    fresh.length ? `New ${fresh.join(" and ")}, not in the sheet yet` : "",
-  ].filter(Boolean).join(" · ");
+  const fresh = rs.some((g) => contactOf(g).some((c) => c.mark === "new")) ? "Anything marked new isn’t in the sheet yet" : "";
   const rows =
     text(`${esc(by)} replied.`, { size: "l", weight: 600, top: 4 }) +
     rule() + names() +
-    text(`<span style="font-weight:700;">${esc(tally)}${r.party ? ` · Party ${esc(r.party)}` : ""}</span><br>${link("mailto:" + r.email, r.email, LINK)}${r.phone ? ` · ${link("tel:" + r.phone.replace(/[^\d+]/g, ""), r.phone, LINK)}` : ""}${reach ? `<br>${reach}` : ""}<br>${esc(when)}`, { size: "s" }) +
+    text(`<span style="font-weight:700;">${esc(tally)}${r.party ? ` · Party ${esc(r.party)}` : ""}</span><br>${esc(when)}${fresh ? `<br>${fresh}` : ""}`, { size: "s" }) +
     rule(20) +
-    rs.map(guestBlock).join("") + note(rs) +
+    rs.map((g) => guestBlock(g, true)).join("") + note(rs) +
     rule(24);
   return {
     subject: r.submission_id
       ? `RSVP: ${by}${r.party ? ` (party ${r.party})` : ""}, ${coming} of ${rs.length} coming`
       : `RSVP: ${r.name} ${r.attending ? "accepts" : "declines"}`,
     html: page({ title: `RSVP: ${by}`, preheader: `${tally}. ${rs.map((g) => g.name).join(", ")}`, rows }),
-    text: [`${by} replied.`, `${tally}${r.party ? ` · Party ${r.party}` : ""}`, [r.email, r.phone].filter(Boolean).join(" · "), ...(reach ? [reach] : []), when, "", ...plain(rs)].join("\n"),
+    text: [`${by} replied.`, `${tally}${r.party ? ` · Party ${r.party}` : ""}`, when, ...(fresh ? [fresh] : []), "", ...plain(rs, true)].join("\n"),
   };
 }

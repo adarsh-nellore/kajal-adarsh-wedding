@@ -14,15 +14,14 @@ const base = {
   party: "12",
   submission_id: "6f1c2a8e-3b7d-4e0a-9c55-2d8f1b7e4a90",
   submitted_by: "Priya Shah",
-  phone: "(415) 555-0142",
-  email_kept: true,
-  phone_kept: false,
 };
 
 const party: Rsvp[] = [
-  { ...base, id: "1", name: "Priya Shah", attending: true, events: ["welcome-party", "saatak-haldi", "baarat-wedding", "after-party"] },
-  { ...base, id: "2", name: "Rohan Shah", attending: true, events: ["baarat-wedding", "welcome-party"], dietary: "Vegetarian, allergic to tree nuts" },
-  { ...base, id: "3", name: "Meera Shah", attending: false, guests: 0, events: [] },
+  { ...base, id: "1", name: "Priya Shah", attending: true, events: ["welcome-party", "saatak-haldi", "baarat-wedding", "after-party"],
+    phone: "(415) 555-0142", email_kept: true, phone_kept: false },
+  { ...base, id: "2", name: "Rohan Shah", attending: true, events: ["baarat-wedding", "welcome-party"], dietary: "Vegetarian, allergic to tree nuts",
+    email: "rohan.shah@gmail.com", phone: "(415) 555-0187", email_kept: true, phone_kept: true },
+  { ...base, id: "3", name: "Meera Shah", attending: false, guests: 0, events: [], email: null },
 ];
 
 const dir = new URL(".", import.meta.url);

@@ -10,7 +10,7 @@ never go in it.
 
 With SUPABASE_SERVICE_ROLE_KEY set, the "Email" and "Phone" columns are also
 loaded into the private wedding_contacts table (replacing what's there), so
-the RSVP can show guests a masked copy to confirm:
+the RSVP can prefill each guest's email and phone for them to confirm:
 
     SUPABASE_SERVICE_ROLE_KEY=... python3 scripts/sync_guests.py
 
