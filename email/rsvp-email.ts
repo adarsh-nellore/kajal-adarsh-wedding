@@ -21,7 +21,8 @@ export type Rsvp = {
 
 export const SITE = "https://adarsh-nellore.github.io/kajal-adarsh-wedding/";
 export const PHOTO = SITE + "email/photo.png";
-export const NAMES = SITE + "email/names.png";
+export const NAMES = SITE + "email/names-light.png";
+export const NAMES_DARK = SITE + "email/names-dark.png";
 const TZ = "America/Chicago";
 
 export const EVENTS: Record<string, string> = {
@@ -31,12 +32,16 @@ export const EVENTS: Record<string, string> = {
   "after-party": "After Party · Sunday 21st",
 };
 
-export const GROUND = "#f0f1f5";
 export const CARD = "#d4b481";
-export const INK = "#000000";
+export const INK = "#141414";
 export const BUTTON = "#bf9c74";
 export const BUTTON_INK = "#323232";
 export const LINK = "#222222";
+
+// Dark mode, for clients that honour prefers-color-scheme (Apple Mail) or Outlook's
+// data-ogsc/ogsb hooks: the site's night palette. Gmail ignores these and inverts on its
+// own, which the off-black ink and the haloed wordmark are chosen to survive.
+const NIGHT = { card: "#1d1914", ink: "#EAE3D6", rule: "#6b5734", gold: "#CDA45E", button: "#2a2219" };
 export const FONT = "'EB Garamond',Georgia,'Times New Roman',serif";
 
 export function esc(s: unknown): string {
@@ -54,53 +59,53 @@ function eventsOf(g: Rsvp): string[] {
     .map((e) => EVENTS[e] || e);
 }
 
-// The card's pieces. Font sizes carry a class so phones get the design's smaller step.
-const SIZES = { 17.3: ["fs-173", 1.7], 18.7: ["fs-187", 1.4], 21.3: ["fs-213", 1.4] } as const;
+// The column's pieces. Each size carries a class so phones get one step smaller.
+const SIZES = { s: ["fs-s", 15, 1.7], m: ["fs-m", 16, 1.5], l: ["fs-l", 18, 1.4] } as const;
 
-export function text(html: string, o: { size?: 17.3 | 18.7 | 21.3; weight?: number; top?: number; bottom?: number } = {}): string {
-  const size = o.size ?? 18.7;
-  const [cls, lh] = SIZES[size];
+export function text(html: string, o: { size?: keyof typeof SIZES; weight?: number; top?: number; bottom?: number } = {}): string {
+  const [cls, size, lh] = SIZES[o.size ?? "m"];
   return `
         <tr>
-          <td class="${cls}" align="center" style="padding:${o.top ?? 0}px 24px ${o.bottom ?? 16}px;font-family:${FONT};font-size:${size}px;line-height:${lh};${o.weight ? `font-weight:${o.weight};` : ""}color:${INK};text-align:center;">${html}</td>
+          <td class="${cls} ink side" align="center" style="padding:${o.top ?? 0}px 32px ${o.bottom ?? 16}px;font-family:${FONT};font-size:${size}px;line-height:${lh};${o.weight ? `font-weight:${o.weight};` : ""}color:${INK};text-align:center;">${html}</td>
         </tr>`;
 }
 
 export const rule = (bottom = 16) => `
         <tr>
-          <td style="padding:0 24px ${bottom}px;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td height="1" style="height:1px;line-height:1px;font-size:0;background-color:${INK};">&nbsp;</td></tr></table>
+          <td class="side" style="padding:0 32px ${bottom}px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td class="rule" height="1" style="height:1px;line-height:1px;font-size:0;background-color:${INK};">&nbsp;</td></tr></table>
           </td>
         </tr>`;
 
 export const link = (href: string, label: string, color = INK) =>
-  `<a href="${esc(href)}" style="color:${color};text-decoration:underline;">${esc(label)}</a>`;
+  `<a href="${esc(href)}" class="ink" style="color:${color};text-decoration:underline;">${esc(label)}</a>`;
 
 export const photo = (href: string) => `
         <tr>
-          <td class="photo" align="center" style="padding:20px 36px 28px;">
-            <a href="${esc(href)}" style="display:block;text-decoration:none;border:0;"><img src="${PHOTO}" width="528" alt="Kajal and Adarsh walking hand in hand up a green hill" style="display:block;width:528px;max-width:100%;height:auto;border:0;outline:none;"></a>
+          <td class="photo" align="center" style="padding:20px 40px 28px;">
+            <a href="${esc(href)}" style="display:block;text-decoration:none;border:0;outline:none;"><img src="${PHOTO}" width="560" alt="Kajal and Adarsh walking hand in hand up a green hill" style="display:block;width:560px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;"></a>
           </td>
         </tr>`;
 
 export const names = () => `
         <tr>
-          <td align="center" style="padding:0 24px 16px;">
-            <img src="${NAMES}" width="454" alt="Kajal y Adarsh" style="display:block;width:454px;max-width:100%;height:auto;border:0;outline:none;font-family:${FONT};font-size:40px;line-height:48px;color:#555555;">
+          <td class="side" align="center" style="padding:4px 32px 14px;">
+            <img src="${NAMES}" class="day" width="300" alt="Kajal y Adarsh" style="display:block;width:300px;max-width:100%;height:auto;border:0;outline:none;font-family:${FONT};font-size:28px;line-height:34px;color:#555555;">
+            <!--[if !mso]><!--><div class="night" style="display:none;max-height:0;overflow:hidden;mso-hide:all;"><img src="${NAMES_DARK}" width="300" alt="Kajal y Adarsh" style="display:block;width:300px;max-width:100%;height:auto;border:0;outline:none;"></div><!--<![endif]-->
           </td>
         </tr>`;
 
 export const dates = () =>
-  text(`<span style="font-weight:700;">February 19–21, 2027</span><br>Mexico City, Mexico`, { size: 21.3 });
+  text(`<span style="font-weight:700;">February 19–21, 2027</span><br>Mexico City, Mexico`, { size: "l" });
 
 // The design's button: beige fill, thin black rule, square corners.
 export const button = (href: string, label: string, width?: number) => `
         <tr>
-          <td align="center" style="padding:0 24px 16px;">
+          <td class="side" align="center" style="padding:4px 32px 18px;">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
               <tr>
-                <td bgcolor="${BUTTON}"${width ? ` width="${width}"` : ""} style="${width ? `width:${width}px;` : ""}background-color:${BUTTON};border:1px solid ${INK};">
-                  <a href="${esc(href)}" class="btn" style="display:block;padding:9px ${width ? 8 : 24}px;text-align:center;font-family:${FONT};font-size:26.5px;line-height:37px;color:${BUTTON_INK};text-decoration:none;">${esc(label)}</a>
+                <td class="btn-bg" bgcolor="${BUTTON}"${width ? ` width="${width}"` : ""} style="${width ? `width:${width}px;` : ""}background-color:${BUTTON};border:1px solid ${INK};">
+                  <a href="${esc(href)}" class="btn" style="display:block;padding:7px ${width ? 8 : 22}px;text-align:center;font-family:${FONT};font-size:20px;line-height:28px;color:${BUTTON_INK};text-decoration:none;">${esc(label)}</a>
                 </td>
               </tr>
             </table>
@@ -110,16 +115,24 @@ export const button = (href: string, label: string, width?: number) => `
 export const signoff = () => text("With love,<br>Kajal &amp; Adarsh");
 
 export const QUESTIONS = rule() +
-  text("Questions? Reach out to us anytime.", { size: 17.3 }) +
-  text(`Kajal · ${link("tel:+19492931051", "949-293-1051", LINK)}<br>Adarsh · ${link("tel:+14087521100", "408-752-1100", LINK)}`, { size: 17.3 }) +
+  text("Questions? Reach out to us anytime.", { size: "s", bottom: 8 }) +
+  text(`Kajal · ${link("tel:+19492931051", "949-293-1051", LINK)}<br>Adarsh · ${link("tel:+14087521100", "408-752-1100", LINK)}`, { size: "s" }) +
   rule(24);
 
 export const QUESTIONS_TEXT = ["Questions? Reach out to us anytime.", "Kajal · 949-293-1051", "Adarsh · 408-752-1100"];
 
-// The 600px tan card holding the rows; on phones it fills the screen.
-export function card(rows: string, inline = false): string {
-  return `<table role="presentation" align="center" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="${CARD}" class="card" style="${inline ? "width:100%;" : "width:600px;"}max-width:600px;margin:0 auto;background-color:${CARD};border-collapse:collapse;">${rows}
-      </table>`;
+// Tan from edge to edge, with the rows in a centred 640px column.
+export function card(rows: string): string {
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${CARD}" class="card" style="width:100%;background-color:${CARD};border-collapse:collapse;">
+  <tr>
+    <td class="shell" align="center" style="padding:28px 0 20px;">
+      <!--[if mso]><table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->
+      <table role="presentation" align="center" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:640px;margin:0 auto;border-collapse:collapse;">${rows}
+      </table>
+      <!--[if mso]></td></tr></table><![endif]-->
+    </td>
+  </tr>
+</table>`;
 }
 
 export function page(o: { title: string; preheader: string; rows: string }): string {
@@ -130,8 +143,8 @@ export function page(o: { title: string; preheader: string; rows: string }): str
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="x-apple-disable-message-reformatting">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
-<meta name="color-scheme" content="light">
-<meta name="supported-color-schemes" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
 <title>${esc(o.title)}</title>
 <!--[if mso]>
 <noscript><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
@@ -139,33 +152,38 @@ export function page(o: { title: string; preheader: string; rows: string }): str
 <![endif]-->
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:light;supported-color-schemes:light;}
-body{margin:0;padding:0;width:100% !important;background-color:${GROUND};-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+:root{color-scheme:light dark;supported-color-schemes:light dark;}
+body{margin:0;padding:0;width:100% !important;background-color:${CARD};-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 a[x-apple-data-detectors]{color:inherit !important;text-decoration:inherit !important;}
+a img,a:focus,a:active{outline:none !important;}
 @media (max-width:620px){
-  .shell{padding:0 !important;}
-  .card{width:100% !important;}
-  .photo{padding:16px 20px 24px !important;}
+  .shell{padding:16px 0 12px !important;}
+  .side{padding-left:20px !important;padding-right:20px !important;}
+  .photo{padding:12px 20px 22px !important;}
+  .fs-s{font-size:14px !important;}
+  .fs-m{font-size:15px !important;}
+  .fs-l{font-size:17px !important;}
+  .btn{font-size:19px !important;line-height:26px !important;}
 }
-@media (max-width:550px){
-  .fs-173{font-size:16.7px !important;}
-  .fs-187{font-size:17.4px !important;}
-  .fs-213{font-size:18.7px !important;}
-  .btn{font-size:24px !important;line-height:34px !important;}
+@media (prefers-color-scheme:dark){
+  body,.card{background-color:${NIGHT.card} !important;}
+  .ink{color:${NIGHT.ink} !important;}
+  .rule{background-color:${NIGHT.rule} !important;}
+  .btn-bg{background-color:${NIGHT.button} !important;border-color:${NIGHT.gold} !important;}
+  .btn{color:${NIGHT.gold} !important;}
+  .day{display:none !important;}
+  .night{display:block !important;max-height:none !important;overflow:visible !important;}
 }
+[data-ogsb] .card{background-color:${NIGHT.card} !important;}
+[data-ogsc] .ink{color:${NIGHT.ink} !important;}
+[data-ogsb] .rule{background-color:${NIGHT.rule} !important;}
+[data-ogsb] .btn-bg{background-color:${NIGHT.button} !important;border-color:${NIGHT.gold} !important;}
+[data-ogsc] .btn{color:${NIGHT.gold} !important;}
 </style>
 </head>
-<body style="margin:0;padding:0;background-color:${GROUND};">
-<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:${GROUND};">${esc(o.preheader)}&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${GROUND}" style="background-color:${GROUND};">
-  <tr>
-    <td class="shell" align="center" style="padding:32px 0;">
-      <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->
-      ${card(o.rows)}
-      <!--[if mso]></td></tr></table><![endif]-->
-    </td>
-  </tr>
-</table>
+<body style="margin:0;padding:0;background-color:${CARD};">
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:${CARD};">${esc(o.preheader)}&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;</div>
+${card(o.rows)}
 </body>
 </html>`;
 }
@@ -200,7 +218,7 @@ export function guestEmail(rs: Rsvp[]) {
     ? "Your reply is in. We can’t wait to celebrate with you in Mexico City."
     : "We’ll miss you, and we’ll be thinking of you from Mexico City.";
   const rows =
-    text(`Thank you, ${esc(by)}.`, { weight: 600, top: 24 }) +
+    text(`Thank you, ${esc(by)}.`, { size: "l", weight: 600, top: 4 }) +
     rule() + photo(SITE) + rule() + names() + dates() + rule(20) +
     text(esc(line), { bottom: 20 }) +
     rs.map(guestBlock).join("") + note(rs) +
@@ -239,9 +257,9 @@ export function coupleEmail(rs: Rsvp[]) {
   }).replace(/, (\d+:\d+)/, " at $1");
   const tally = rs.length > 1 ? `${coming} of ${rs.length} coming` : (coming ? "Coming" : "Not coming");
   const rows =
-    text(`${esc(by)} replied.`, { weight: 600, top: 24 }) +
+    text(`${esc(by)} replied.`, { size: "l", weight: 600, top: 4 }) +
     rule() + names() +
-    text(`<span style="font-weight:700;">${esc(tally)}${r.party ? ` · Party ${esc(r.party)}` : ""}</span><br>${link("mailto:" + r.email, r.email, LINK)}<br>${esc(when)}`, { size: 17.3 }) +
+    text(`<span style="font-weight:700;">${esc(tally)}${r.party ? ` · Party ${esc(r.party)}` : ""}</span><br>${link("mailto:" + r.email, r.email, LINK)}<br>${esc(when)}`, { size: "s" }) +
     rule(20) +
     rs.map(guestBlock).join("") + note(rs) +
     rule(24);

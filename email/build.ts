@@ -51,7 +51,7 @@ body{margin:0;background:#f0f1f5;color:#2a2722;font:15px/1.5 -apple-system,Blink
 .bar button{font:inherit;padding:8px 14px;border:1px solid #2a2722;background:#fff;border-radius:6px;cursor:pointer;}
 .bar button.on{background:#2a2722;color:#fff;}
 .bar span{color:#6b665d;}
-#mail{max-width:640px;margin:0 auto 48px;}
+#mail{margin:0 0 48px;}
 </style>
 </head>
 <body>

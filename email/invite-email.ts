@@ -13,11 +13,11 @@ const REPLY_BY = "Kindly reply by December 1, 2026.";
 const CANT_WAIT = "We can't wait to celebrate with you!";
 
 function rows(greeting?: string): string {
-  return text(HEADLINE, { weight: 600, top: 24 }) +
+  return text(HEADLINE, { size: "l", weight: 600, top: 4 }) +
     rule() + photo(HOME) + rule() + names() + dates() + rule() +
     (greeting ? text(esc(greeting)) : "") +
     text(`${esc(INVITE)}<br>Visit our ${link(HOME, "wedding website", "#08040a")} for all the details and to RSVP.`) +
-    button(HOME, "RSVP", 169) +
+    button(HOME, "RSVP", 130) +
     text(`${esc(REPLY_BY)}<br>${esc(CANT_WAIT)}`) +
     signoff() + QUESTIONS;
 }
@@ -53,5 +53,5 @@ export function buildInvitationEmail({ firstName }: { firstName?: string } = {})
 
 // For pasting into Gmail compose: no <head> or media queries, everything inline on one tan table.
 export function pasteable(greeting?: string): string {
-  return card(rows(greeting), true);
+  return card(rows(greeting));
 }
