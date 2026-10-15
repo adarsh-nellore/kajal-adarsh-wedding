@@ -1,5 +1,5 @@
-// RSVP emails in the site's look: the guest's copy and the note to Kajal and Adarsh.
-// Drop-in for supabase/functions/notify-wedding-rsvp: pass the party's rows, the
+// RSVP emails in the invitation's look: the guest's copy and the note to Kajal and Adarsh.
+// Imported by supabase/functions/notify-wedding-rsvp: pass the party's rows, the
 // submitter first, and send the returned { subject, html, text } through Resend.
 // Built with tables and inline styles so Gmail, Apple Mail and Outlook agree.
 
@@ -20,7 +20,8 @@ export type Rsvp = {
 };
 
 export const SITE = "https://adarsh-nellore.github.io/kajal-adarsh-wedding/";
-const LATTICE = SITE + "email/lattice.png";
+export const PHOTO = SITE + "email/photo.png";
+export const NAMES = SITE + "email/names.png";
 const TZ = "America/Chicago";
 
 export const EVENTS: Record<string, string> = {
@@ -30,14 +31,13 @@ export const EVENTS: Record<string, string> = {
   "after-party": "After Party · Sunday 21st",
 };
 
-export const GROUND = "#121212";
-export const GOLD = "#CDA45E";
-export const WHITE = "#EAE3D6";
-export const MUTED = "#98948C";   // the off-white at 62% on the ground
-export const RULE = "#3B3223";    // the gold at 22%, the site's card border
-export const CARD = "#161615";
-export const HEAD = "'Jaini','EB Garamond',Georgia,serif";
-export const BODY = "'EB Garamond',Georgia,'Times New Roman',serif";
+export const GROUND = "#f0f1f5";
+export const CARD = "#d4b481";
+export const INK = "#000000";
+export const BUTTON = "#bf9c74";
+export const BUTTON_INK = "#323232";
+export const LINK = "#222222";
+export const FONT = "'EB Garamond',Georgia,'Times New Roman',serif";
 
 export function esc(s: unknown): string {
   return String(s ?? "").replace(/[&<>"']/g, (c) => (
@@ -54,85 +54,75 @@ function eventsOf(g: Rsvp): string[] {
     .map((e) => EVENTS[e] || e);
 }
 
-function guestCard(g: Rsvp): string {
-  const reply = g.attending
-    ? `<div style="margin:2px 0 0;font-family:${HEAD};font-size:20px;line-height:28px;color:${GOLD};">Joyfully accepts</div>`
-    : `<div style="margin:2px 0 0;font-family:${HEAD};font-size:20px;line-height:28px;color:${MUTED};">Regretfully declines</div>`;
-  const events = g.attending
-    ? eventsOf(g).map((e) => `
-              <tr>
-                <td width="18" valign="top" style="width:18px;padding:0;font-size:10px;line-height:26px;color:${GOLD};">&#9670;</td>
-                <td style="padding:0;font-family:${BODY};font-size:16px;line-height:26px;color:${WHITE};">${esc(e).replace(/ · (.+)$/, ' · <span style="white-space:nowrap;">$1</span>')}</td>
-              </tr>`).join("")
-    : "";
+// The card's pieces. Font sizes carry a class so phones get the design's smaller step.
+const SIZES = { 17.3: ["fs-173", 1.7], 18.7: ["fs-187", 1.4], 21.3: ["fs-213", 1.4] } as const;
+
+export function text(html: string, o: { size?: 17.3 | 18.7 | 21.3; weight?: number; top?: number; bottom?: number } = {}): string {
+  const size = o.size ?? 18.7;
+  const [cls, lh] = SIZES[size];
   return `
         <tr>
-          <td style="padding:0 0 10px;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid ${RULE};border-radius:4px;background-color:${CARD};">
+          <td class="${cls}" align="center" style="padding:${o.top ?? 0}px 24px ${o.bottom ?? 16}px;font-family:${FONT};font-size:${size}px;line-height:${lh};${o.weight ? `font-weight:${o.weight};` : ""}color:${INK};text-align:center;">${html}</td>
+        </tr>`;
+}
+
+export const rule = (bottom = 16) => `
+        <tr>
+          <td style="padding:0 24px ${bottom}px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td height="1" style="height:1px;line-height:1px;font-size:0;background-color:${INK};">&nbsp;</td></tr></table>
+          </td>
+        </tr>`;
+
+export const link = (href: string, label: string, color = INK) =>
+  `<a href="${esc(href)}" style="color:${color};text-decoration:underline;">${esc(label)}</a>`;
+
+export const photo = (href: string) => `
+        <tr>
+          <td class="photo" align="center" style="padding:20px 36px 28px;">
+            <a href="${esc(href)}" style="display:block;text-decoration:none;border:0;"><img src="${PHOTO}" width="528" alt="Kajal and Adarsh walking hand in hand up a green hill" style="display:block;width:528px;max-width:100%;height:auto;border:0;outline:none;"></a>
+          </td>
+        </tr>`;
+
+export const names = () => `
+        <tr>
+          <td align="center" style="padding:0 24px 16px;">
+            <img src="${NAMES}" width="454" alt="Kajal y Adarsh" style="display:block;width:454px;max-width:100%;height:auto;border:0;outline:none;font-family:${FONT};font-size:40px;line-height:48px;color:#555555;">
+          </td>
+        </tr>`;
+
+export const dates = () =>
+  text(`<span style="font-weight:700;">February 19–21, 2027</span><br>Mexico City, Mexico`, { size: 21.3 });
+
+// The design's button: beige fill, thin black rule, square corners.
+export const button = (href: string, label: string, width?: number) => `
+        <tr>
+          <td align="center" style="padding:0 24px 16px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
               <tr>
-                <td style="padding:16px 20px 18px;">
-                  <div style="font-family:${BODY};font-size:18px;line-height:26px;font-weight:500;color:${WHITE};">${esc(g.name)}</div>
-                  ${reply}${events ? `
-                  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:8px;">${events}
-                  </table>` : ""}${g.attending && g.dietary?.trim() ? `
-                  <div style="padding-top:12px;font-family:${BODY};font-size:15px;line-height:22px;color:${MUTED};">Dietary restrictions or allergies</div>
-                  <div style="font-family:${BODY};font-size:16px;line-height:26px;color:${WHITE};">${lines(g.dietary)}</div>` : ""}
+                <td bgcolor="${BUTTON}"${width ? ` width="${width}"` : ""} style="${width ? `width:${width}px;` : ""}background-color:${BUTTON};border:1px solid ${INK};">
+                  <a href="${esc(href)}" class="btn" style="display:block;padding:9px ${width ? 8 : 24}px;text-align:center;font-family:${FONT};font-size:26.5px;line-height:37px;color:${BUTTON_INK};text-decoration:none;">${esc(label)}</a>
                 </td>
               </tr>
             </table>
           </td>
         </tr>`;
-}
 
-function detail(label: string, value: string): string {
-  return `
-        <tr>
-          <td style="padding:18px 0 0;">
-            <div style="font-family:${BODY};font-size:15px;line-height:22px;color:${MUTED};">${esc(label)}</div>
-            <div style="padding-top:2px;font-family:${BODY};font-size:17px;line-height:27px;color:${WHITE};">${lines(value)}</div>
-          </td>
-        </tr>`;
-}
+export const signoff = () => text("With love,<br>Kajal &amp; Adarsh");
 
-function details(rs: Rsvp[]): string {
-  const r = rs[0];
-  let out = "";
-  if (r.note?.trim()) out += detail("A note to us", r.note);
-  return out;
-}
+export const QUESTIONS = rule() +
+  text("Questions? Reach out to us anytime.", { size: 17.3 }) +
+  text(`Kajal · ${link("tel:+19492931051", "949-293-1051", LINK)}<br>Adarsh · ${link("tel:+14087521100", "408-752-1100", LINK)}`, { size: 17.3 }) +
+  rule(24);
 
-export const link = (href: string, text: string) =>
-  `<a href="${esc(href)}" style="color:${GOLD};text-decoration:underline;text-decoration-color:${RULE};text-underline-offset:3px;">${esc(text)}</a>`;
+export const QUESTIONS_TEXT = ["Questions? Reach out to us anytime.", "Kajal · 949-293-1051", "Adarsh · 408-752-1100"];
 
-export const QUESTIONS = `
-        <tr>
-          <td class="col" align="center" style="padding:56px 20px 0;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-top:1px solid ${RULE};font-size:0;line-height:0;">&nbsp;</td></tr></table>
-            <div style="padding-top:40px;font-family:${HEAD};font-size:30px;line-height:34px;color:${GOLD};">Questions?</div>
-            <div style="padding-top:6px;font-family:${BODY};font-size:17px;line-height:27px;color:${WHITE};">Message ${link("https://wa.me/19492931051", "Kajal")} or ${link("https://wa.me/14087521100", "Adarsh")}</div>
-          </td>
-        </tr>`;
-
-// The 560px column: names, dates and place, then the body rows and the footer.
-export function frame(o: { body: string; footer: string; home?: string; names?: number }): string {
-  const size = o.names ?? 52;
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
-        <tr>
-          <td class="col" align="center" style="padding:0 20px;">
-            <a href="${esc(o.home ?? SITE)}" class="names" style="font-family:${HEAD};font-size:${size}px;line-height:${size + 6}px;color:${GOLD};text-decoration:none;letter-spacing:.01em;">Kajal y Adarsh</a>
-            <div style="padding-top:18px;font-family:${BODY};font-size:17px;line-height:26px;color:${WHITE};"><span style="white-space:nowrap;">Friday, February 19 –</span> <span style="white-space:nowrap;">Sunday, February 21, 2027</span><br>Mexico City, Mexico</div>
-          </td>
-        </tr>
-        <tr>
-          <td class="col" style="padding:56px 20px 0;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${o.body}
-            </table>
-          </td>
-        </tr>${o.footer}
+// The 600px tan card holding the rows; on phones it fills the screen.
+export function card(rows: string, inline = false): string {
+  return `<table role="presentation" align="center" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="${CARD}" class="card" style="${inline ? "width:100%;" : "width:600px;"}max-width:600px;margin:0 auto;background-color:${CARD};border-collapse:collapse;">${rows}
       </table>`;
 }
 
-export function page(o: { title: string; preheader: string; body: string; footer: string; home?: string }): string {
+export function page(o: { title: string; preheader: string; rows: string }): string {
   return `<!doctype html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -140,38 +130,58 @@ export function page(o: { title: string; preheader: string; body: string; footer
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="x-apple-disable-message-reformatting">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
-<meta name="color-scheme" content="dark">
-<meta name="supported-color-schemes" content="dark">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
 <title>${esc(o.title)}</title>
 <!--[if mso]>
-<noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+<noscript><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
 <style>td,div,a,span{font-family:Georgia,serif !important;}</style>
 <![endif]-->
-<link href="https://fonts.googleapis.com/css2?family=Jaini&family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:dark;supported-color-schemes:dark;}
-body{margin:0;padding:0;width:100% !important;background-color:${GROUND};-webkit-text-size-adjust:100%;}
-a{color:${GOLD};}
-@media (max-width:600px){
-  .shell{padding:40px 14px 48px !important;}
-  .col{padding-left:10px !important;padding-right:10px !important;}
-  .names{font-size:44px !important;line-height:48px !important;}
+:root{color-scheme:light;supported-color-schemes:light;}
+body{margin:0;padding:0;width:100% !important;background-color:${GROUND};-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+a[x-apple-data-detectors]{color:inherit !important;text-decoration:inherit !important;}
+@media (max-width:620px){
+  .shell{padding:0 !important;}
+  .card{width:100% !important;}
+  .photo{padding:16px 20px 24px !important;}
+}
+@media (max-width:550px){
+  .fs-173{font-size:16.7px !important;}
+  .fs-187{font-size:17.4px !important;}
+  .fs-213{font-size:18.7px !important;}
+  .btn{font-size:24px !important;line-height:34px !important;}
 }
 </style>
 </head>
 <body style="margin:0;padding:0;background-color:${GROUND};">
 <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:${GROUND};">${esc(o.preheader)}&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${GROUND}" background="${LATTICE}" style="background-color:${GROUND};background-image:url('${LATTICE}');">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${GROUND}" style="background-color:${GROUND};">
   <tr>
-    <td class="shell" align="center" style="padding:64px 16px 72px;">
-      <!--[if mso]><table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
-      ${frame(o)}
+    <td class="shell" align="center" style="padding:32px 0;">
+      <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->
+      ${card(o.rows)}
       <!--[if mso]></td></tr></table><![endif]-->
     </td>
   </tr>
 </table>
 </body>
 </html>`;
+}
+
+function guestBlock(g: Rsvp): string {
+  const parts = [`<span style="font-weight:700;">${esc(g.name)}</span>`, g.attending ? "Joyfully accepts" : "Regretfully declines"];
+  if (g.attending) {
+    parts.push(...eventsOf(g).map((e) => esc(e).replace(/ · (.+)$/, ' · <span style="white-space:nowrap;">$1</span>')));
+    if (g.dietary?.trim()) parts.push(`Dietary restrictions or allergies: ${lines(g.dietary)}`);
+  }
+  return text(parts.join("<br>"), { bottom: 20 });
+}
+
+function note(rs: Rsvp[]): string {
+  const n = rs[0].note?.trim();
+  return n ? text(`<span style="font-weight:700;">A note to us</span><br>${lines(n)}`, { bottom: 20 }) : "";
 }
 
 const plain = (rs: Rsvp[]) => [
@@ -189,32 +199,32 @@ export function guestEmail(rs: Rsvp[]) {
   const line = going
     ? "Your reply is in. We can’t wait to celebrate with you in Mexico City."
     : "We’ll miss you, and we’ll be thinking of you from Mexico City.";
-  const body = `
-        <tr>
-          <td style="padding:0 0 24px;">
-            <div style="font-family:${BODY};font-size:24px;line-height:32px;font-weight:500;color:${GOLD};">Thank you, ${esc(by)}.</div>
-            <div style="padding-top:8px;font-family:${BODY};font-size:17px;line-height:27px;color:${WHITE};">${esc(line)}</div>
-          </td>
-        </tr>${rs.map(guestCard).join("")}${details(rs)}
-        <tr>
-          <td style="padding:24px 0 0;font-family:${BODY};font-size:17px;line-height:27px;color:${WHITE};">${link(SITE + "#rsvp", "Change your reply")}</td>
-        </tr>`;
+  const rows =
+    text(`Thank you, ${esc(by)}.`, { weight: 600, top: 24 }) +
+    rule() + photo(SITE) + rule() + names() + dates() + rule(20) +
+    text(esc(line), { bottom: 20 }) +
+    rs.map(guestBlock).join("") + note(rs) +
+    button(SITE + "#rsvp", "Change your reply") +
+    signoff() + QUESTIONS;
   return {
     subject: "Your RSVP for Kajal & Adarsh’s wedding",
-    html: page({ title: "Kajal y Adarsh", preheader: line, body, footer: QUESTIONS }),
+    html: page({ title: "Kajal y Adarsh", preheader: line, rows }),
     text: [
+      `Thank you, ${by}.`,
+      "",
       "Kajal y Adarsh",
-      "Friday, February 19 – Sunday, February 21, 2027",
+      "February 19–21, 2027",
       "Mexico City, Mexico",
       "",
-      `Thank you, ${by}.`,
       line,
       "",
       ...plain(rs),
       `Change your reply: ${SITE}#rsvp`,
       "",
-      "Questions?",
-      "Message Kajal (https://wa.me/19492931051) or Adarsh (https://wa.me/14087521100)",
+      "With love,",
+      "Kajal & Adarsh",
+      "",
+      ...QUESTIONS_TEXT,
     ].join("\n"),
   };
 }
@@ -228,19 +238,18 @@ export function coupleEmail(rs: Rsvp[]) {
     timeZone: TZ, weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit",
   }).replace(/, (\d+:\d+)/, " at $1");
   const tally = rs.length > 1 ? `${coming} of ${rs.length} coming` : (coming ? "Coming" : "Not coming");
-  const body = `
-        <tr>
-          <td style="padding:0 0 24px;">
-            <div style="font-family:${BODY};font-size:24px;line-height:32px;font-weight:500;color:${GOLD};">${esc(by)} replied.</div>
-            <div style="padding-top:8px;font-family:${BODY};font-size:17px;line-height:27px;color:${WHITE};">${esc(tally)}${r.party ? ` · Party ${esc(r.party)}` : ""}</div>
-            <div style="font-family:${BODY};font-size:15px;line-height:24px;color:${MUTED};">${link("mailto:" + r.email, r.email)} · ${esc(when)}</div>
-          </td>
-        </tr>${rs.map(guestCard).join("")}${details(rs)}`;
+  const rows =
+    text(`${esc(by)} replied.`, { weight: 600, top: 24 }) +
+    rule() + names() +
+    text(`<span style="font-weight:700;">${esc(tally)}${r.party ? ` · Party ${esc(r.party)}` : ""}</span><br>${link("mailto:" + r.email, r.email, LINK)}<br>${esc(when)}`, { size: 17.3 }) +
+    rule(20) +
+    rs.map(guestBlock).join("") + note(rs) +
+    rule(24);
   return {
     subject: r.submission_id
       ? `RSVP: ${by}${r.party ? ` (party ${r.party})` : ""}, ${coming} of ${rs.length} coming`
       : `RSVP: ${r.name} ${r.attending ? "accepts" : "declines"}`,
-    html: page({ title: `RSVP: ${by}`, preheader: `${tally}. ${rs.map((g) => g.name).join(", ")}`, body, footer: "" }),
+    html: page({ title: `RSVP: ${by}`, preheader: `${tally}. ${rs.map((g) => g.name).join(", ")}`, rows }),
     text: [`${by} replied.`, `${tally}${r.party ? ` · Party ${r.party}` : ""}`, `${r.email} · ${when}`, "", ...plain(rs)].join("\n"),
   };
 }

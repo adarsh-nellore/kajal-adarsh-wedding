@@ -23,18 +23,18 @@ const party: Rsvp[] = [
 ];
 
 const dir = new URL(".", import.meta.url);
-const local = (html: string) => html.replaceAll(SITE + "email/lattice.png", "lattice.png");
+const local = (html: string) => html.replaceAll(SITE + "email/", "");
 for (const [file, mail] of [
   ["rsvp-confirmation", guestEmail(party)],
   ["rsvp-notification", coupleEmail(party)],
-  ["invitation", buildInvitationEmail({ firstName: "Priya" })],
+  ["invitation", buildInvitationEmail()],
 ] as const) {
   writeFileSync(new URL(file + ".html", dir), local(mail.html));
   writeFileSync(new URL(file + ".txt", dir), `Subject: ${mail.subject}\n\n${mail.text}\n`);
 }
 
 // A page to copy the invitation from and paste into Gmail compose.
-const versions = { plain: pasteable("Hello,"), merge: pasteable("Dear {{First Name}},") };
+const versions = { plain: pasteable(), merge: pasteable("Dear {{First Name}},") };
 writeFileSync(new URL("invitation-gmail.html", dir), `<!doctype html>
 <html lang="en">
 <head>
@@ -42,7 +42,7 @@ writeFileSync(new URL("invitation-gmail.html", dir), `<!doctype html>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Invitation for Gmail</title>
 <style>
-body{margin:0;background:#f4f2ee;color:#2a2722;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+body{margin:0;background:#f0f1f5;color:#2a2722;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
 .how{max-width:640px;margin:0 auto;padding:28px 16px 20px;}
 .how h1{margin:0 0 8px;font-size:18px;}
 .how ol{margin:0 0 14px;padding-left:20px;}
@@ -64,7 +64,7 @@ body{margin:0;background:#f4f2ee;color:#2a2722;font:15px/1.5 -apple-system,Blink
 </ol>
 <p>For one email per guest with their name, use the mail-merge greeting with an add-on like YAMM or GMass: paste it into a Gmail draft and they fill in <code>{{First Name}}</code> from your sheet. Both also accept <code>invitation.html</code> directly.</p>
 <div class="bar">
-<button type="button" data-v="plain" class="on">“Hello,”</button>
+<button type="button" data-v="plain" class="on">No greeting</button>
 <button type="button" data-v="merge">“Dear {{First Name}},”</button>
 <button type="button" id="copy">Copy email</button>
 <span id="said" aria-live="polite"></span>
