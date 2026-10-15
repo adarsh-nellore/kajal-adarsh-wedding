@@ -1553,12 +1553,12 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <!-- prefilled with what the guest list has for this guest (wedding_party_contacts in Supabase);
      a plus one also gets a name, which becomes the card's heading -->
 <div class="guest-reach">
-<div class="box">
-<input type="email" autocomplete="off" maxlength="320" placeholder=" " data-reach="email">
 <div class="box guest-plus" hidden>
 <input type="text" autocomplete="off" autocapitalize="words" maxlength="200" placeholder=" ">
 <label>Name</label>
 </div>
+<div class="box">
+<input type="email" autocomplete="off" maxlength="320" placeholder=" " data-reach="email">
 <label>Email</label>
 </div>
 <div class="box">
@@ -2677,11 +2677,11 @@ picture{margin-block:clamp(52px,8vw,104px);}
     function onEdit(e){
       var t = e.target;
       if(t === f.name) return;
+      if(t.closest('.guest-plus')) t.closest('.guest').querySelector('.guest-name').textContent = t.value.trim() || 'Plus one';
       if(t.closest('.guest')){ update(); if(tried) rules.attending(); }
     }
     form.addEventListener('change', onEdit);
     form.addEventListener('input', onEdit);
-      if(t.closest('.guest-plus')) t.closest('.guest').querySelector('.guest-name').textContent = t.value.trim() || 'Plus one';
 
     form.addEventListener('submit', function(e){
       e.preventDefault();
