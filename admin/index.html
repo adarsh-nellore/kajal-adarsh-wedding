@@ -104,8 +104,9 @@ label .m{display:none;}
 td.rs small{display:block;font-size:13px;color:rgba(var(--white-rgb),.6);}
 
 tr.subtotal td{font-size:15px;color:rgba(var(--white-rgb),.6);padding-top:2px;padding-bottom:12px;}
-tr.subtotal .add{background:none;border:0;padding:0 0 0 14px;color:var(--gold);cursor:pointer;font-size:15px;}
-tr.subtotal .add:hover{text-decoration:underline;}
+tr.subtotal .add{margin-left:14px;background:transparent;border:1px solid rgba(var(--gold-rgb),.6);border-radius:2px;padding:5px 12px;color:var(--gold);cursor:pointer;font-size:15px;line-height:1.2;}
+tr.subtotal .add:hover,tr.subtotal .add:focus-visible{background:rgba(var(--gold-rgb),.14);border-color:var(--gold);outline:none;}
+.sub .btn{padding:7px 14px;font-size:16px;}
 
 /* dragging */
 body.is-dragging{cursor:grabbing;user-select:none;-webkit-user-select:none;}
@@ -173,7 +174,7 @@ body.is-dragging #newparty{display:block;}
 <p class="sub">
   <span class="grow">The RSVP reads this list as it is now: edits save as you type.</span>
   <span id="status" aria-live="polite"></span>
-  <button type="button" class="linkish" id="add-party">Add a party</button>
+  <button type="button" class="btn" id="add-party">+ Add a party</button>
   <a id="csv" href="#" download="guest-list.csv">Download CSV</a>
   <a href="/?logout">Log out</a>
 </p>
@@ -447,7 +448,7 @@ body.is-dragging #newparty{display:block;}
       sub.innerHTML = '<td></td><td></td><td class="st"></td><td></td>';
       EVENTS.forEach(function(){ var c = document.createElement('td'); c.className = 'ev'; sub.appendChild(c); });
       var add = document.createElement('button');
-      add.type = 'button'; add.className = 'add'; add.textContent = 'Add guest';
+      add.type = 'button'; add.className = 'add'; add.textContent = '+ Add guest';
       add.addEventListener('click', function(){ addGuest(Number(p)); });
       sub.children[2].appendChild(document.createElement('span'));
       sub.children[2].appendChild(add);
