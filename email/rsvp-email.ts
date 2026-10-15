@@ -121,7 +121,7 @@ export const signoff = () => text("With love,<br>Kajal &amp; Adarsh");
 
 export const QUESTIONS = rule() +
   text("Questions? Reach out to us anytime.", { size: "s", bottom: 8 }) +
-  text(`Kajal · ${link("tel:+19492931051", "949-293-1051", LINK)}<br>Adarsh · ${link("tel:+14087521100", "408-752-1100", LINK)}`, { size: "s" }) +
+  text(`Kajal · ${link("sms:+19492931051", "949-293-1051", LINK)}<br>Adarsh · ${link("sms:+14087521100", "408-752-1100", LINK)}`, { size: "s" }) +
   rule(24);
 
 export const QUESTIONS_TEXT = ["Questions? Reach out to us anytime.", "Kajal · 949-293-1051", "Adarsh · 408-752-1100"];

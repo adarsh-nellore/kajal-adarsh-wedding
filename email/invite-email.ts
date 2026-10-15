@@ -2,7 +2,7 @@
 // buildInvitationEmail() gives { subject, html, text } for Resend or any sender;
 // pasteable() gives the same email as one self-contained table to paste into Gmail.
 
-import { BUTTON, BUTTON_INK, ENTER, FONT, INK, PASSWORD, QUESTIONS, QUESTIONS_TEXT, card, dates, esc, link, names, page, photo, rule, signoff, text } from "./rsvp-email.ts";
+import { BACKDROP, BUTTON, BUTTON_INK, ENTER, FONT, INK, PASSWORD, QUESTIONS, QUESTIONS_TEXT, card, dates, esc, link, names, page, photo, rule, signoff, text } from "./rsvp-email.ts";
 
 export const HOME = ENTER;
 
@@ -12,15 +12,21 @@ const INVITE = "We're getting married in CDMX, and we'd love to celebrate with y
 const REPLY_BY = "Kindly reply by December 1, 2026.";
 const CANT_WAIT = "We can't wait to celebrate with you!";
 
-// The RSVP button with the site's password set inside it, the whole box one link.
+// The RSVP button with the site's password on a lighter stub just beneath it.
 const rsvpButton = (href: string) => `
         <tr>
           <td class="side" align="center" style="padding:4px 32px 20px;">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
               <tr>
-                <td class="btn-bg" bgcolor="${BUTTON}" width="180" style="width:180px;background-color:${BUTTON};border:1px solid ${INK};">
-                  <a href="${esc(href)}" class="btn" style="display:block;padding:8px 12px 9px;text-align:center;font-family:${FONT};font-size:20px;line-height:28px;color:${BUTTON_INK};text-decoration:none;">RSVP<br><span style="font-size:15px;line-height:20px;">Password: <span style="font-weight:700;">${esc(PASSWORD)}</span></span></a>
+                <td class="btn-bg" bgcolor="${BUTTON}" width="130" style="width:130px;background-color:${BUTTON};border:1px solid ${INK};">
+                  <a href="${esc(href)}" class="btn" style="display:block;padding:7px 8px;text-align:center;font-family:${FONT};font-size:20px;line-height:28px;color:${BUTTON_INK};text-decoration:none;">RSVP</a>
                 </td>
+              </tr>
+            </table>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td height="10" style="height:10px;line-height:10px;font-size:0;">&nbsp;</td></tr></table>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
+              <tr>
+                <td class="backdrop ink" bgcolor="${BACKDROP}" align="center" style="padding:6px 16px;background-color:${BACKDROP};border:1px dashed ${INK};font-family:${FONT};font-size:18px;line-height:24px;color:${INK};text-align:center;">Password: <span style="font-weight:700;">${esc(PASSWORD)}</span></td>
               </tr>
             </table>
           </td>
