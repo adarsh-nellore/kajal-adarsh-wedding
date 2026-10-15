@@ -18,11 +18,12 @@ export type Rsvp = {
   submission_id: string | null;
   submitted_by: string | null;
   phone?: string | null;
-  contact_confirmed?: boolean | null;
+  email_kept?: boolean;
+  phone_kept?: boolean;
 };
 
 export const SITE = "https://adarsh-nellore.github.io/kajal-adarsh-wedding/";
-export const PHOTO = SITE + "email/photo.png";
+export const PHOTO = SITE + "email/photo-v2.png";
 export const NAMES = SITE + "email/names-light.png";
 const TZ = "America/Chicago";
 
@@ -84,7 +85,7 @@ export const link = (href: string, label: string, color = INK) =>
 
 export const photo = (href: string) => `
         <tr>
-          <td class="photo" align="center" style="padding:20px 40px 28px;">
+          <td class="photo" align="center" style="padding:10px 40px 28px;">
             <a href="${esc(href)}" style="display:block;text-decoration:none;border:0;outline:none;"><img src="${PHOTO}" width="560" alt="Kajal and Adarsh walking hand in hand up a green hill" style="display:block;width:560px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;"></a>
           </td>
         </tr>`;
@@ -166,7 +167,7 @@ a img,a:focus,a:active{outline:none !important;}
   .shell{padding:0 !important;}
   .inner{padding:20px 0 12px !important;}
   .side{padding-left:20px !important;padding-right:20px !important;}
-  .photo{padding:12px 20px 22px !important;}
+  .photo{padding:4px 20px 22px !important;}
   .fs-s{font-size:14px !important;}
   .fs-m{font-size:15px !important;}
   .fs-l{font-size:17px !important;}
@@ -255,8 +256,14 @@ export function coupleEmail(rs: Rsvp[]) {
     timeZone: TZ, weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit",
   }).replace(/, (\d+:\d+)/, " at $1");
   const tally = rs.length > 1 ? `${coming} of ${rs.length} coming` : (coming ? "Coming" : "Not coming");
-  const reach = r.contact_confirmed === true ? "Contact info confirmed"
-    : r.contact_confirmed === false ? "New contact info, not in the sheet yet" : "";
+  // kept: left as the guest list had it; new: typed on the form, so not in the sheet yet
+  const fields = [["email", r.email, r.email_kept], ["phone", r.phone, r.phone_kept]] as const;
+  const kept = fields.filter(([, v, k]) => v && k).map(([n]) => n);
+  const fresh = fields.filter(([, v, k]) => v && !k).map(([n]) => n);
+  const reach = [
+    kept.length ? `Confirmed ${kept.join(" and ")}` : "",
+    fresh.length ? `New ${fresh.join(" and ")}, not in the sheet yet` : "",
+  ].filter(Boolean).join(" · ");
   const rows =
     text(`${esc(by)} replied.`, { size: "l", weight: 600, top: 4 }) +
     rule() + names() +

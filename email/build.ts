@@ -14,6 +14,9 @@ const base = {
   party: "12",
   submission_id: "6f1c2a8e-3b7d-4e0a-9c55-2d8f1b7e4a90",
   submitted_by: "Priya Shah",
+  phone: "(415) 555-0142",
+  email_kept: true,
+  phone_kept: false,
 };
 
 const party: Rsvp[] = [
