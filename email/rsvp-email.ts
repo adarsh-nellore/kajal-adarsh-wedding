@@ -217,7 +217,7 @@ function guestBlock(g: Rsvp, contact = false): string {
   const parts = [`<span style="font-weight:700;">${esc(who(g))}</span>`, g.attending ? "Joyfully accepts" : "Regretfully declines"];
   if (g.attending) {
     parts.push(...eventsOf(g).map((e) => esc(e).replace(/ · (.+)$/, ' · <span style="white-space:nowrap;">$1</span>')));
-    if (g.dietary?.trim()) parts.push(`Dietary restrictions or allergies: ${lines(g.dietary)}`);
+    if (g.dietary?.trim()) parts.push(`Dietary preferences: ${lines(g.dietary)}`);
   }
   if (contact) parts.push(...contactOf(g).map((c) => `${link(c.href, c.v, LINK)} (${c.mark})`));
   return text(parts.join("<br>"), { bottom: 20 });
@@ -232,7 +232,7 @@ const plain = (rs: Rsvp[], contact = false) => [
   ...rs.flatMap((g) => [
     ...(g.attending
       ? [who(g), "Joyfully accepts", ...eventsOf(g).map((e) => `  ${e}`),
-        ...(g.dietary?.trim() ? [`  Dietary restrictions or allergies: ${g.dietary.trim()}`] : [])]
+        ...(g.dietary?.trim() ? [`  Dietary preferences: ${g.dietary.trim()}`] : [])]
       : [who(g), "Regretfully declines"]),
     ...(contact ? contactOf(g).map((c) => `  ${c.v} (${c.mark})`) : []),
     "",

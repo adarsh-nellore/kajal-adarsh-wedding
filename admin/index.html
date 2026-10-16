@@ -651,7 +651,7 @@ body.is-dragging #newparty{display:block;}
       exportList.forEach(function(g){ rows.push([g.party, label(g), g.note || '']); });
       fname = 'no-contact-' + stamp + '.csv';
     } else {
-      rows = [['Party', 'First name', 'Last name', 'Plus one', 'Note'].concat(EVENTS.map(function(e){ return e.name + ' (' + e.day + ')'; })).concat(['Email', 'Phone', 'RSVP', 'RSVP name', 'Coming to', 'Dietary'])];
+      rows = [['Party', 'First name', 'Last name', 'Plus one', 'Note'].concat(EVENTS.map(function(e){ return e.name + ' (' + e.day + ')'; })).concat(['Email', 'Phone', 'RSVP', 'RSVP name', 'Coming to', 'Preferences'])];
       guests.forEach(function(g){
         var ev = invited(g), r = replies[g.id];
         rows.push([g.party, g.is_plus_one ? '' : g.first_name, g.is_plus_one ? '' : g.last_name, g.is_plus_one ? 'Yes' : '', g.note || '']
