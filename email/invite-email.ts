@@ -7,8 +7,8 @@ import { BACKDROP, BUTTON, BUTTON_INK, ENTER, FONT, INK, PASSWORD, QUESTIONS, QU
 export const HOME = ENTER;
 
 const SUBJECT = "Kajal & Adarsh · Mexico City · February 2027";
-const JOIN_US = "please join us in celebrating our wedding!";
-const JOIN_US_ALONE = "Please join us in celebrating our wedding!";
+const HEADLINE = "We'd love for you to join us, for the weekend of our dreams!";
+const PREHEADER = "All the wedding details, information, and RSVP inside.";
 const INVITE = "We're getting married in CDMX.";
 const DETAILS = "Visit our wedding website for all the details.";
 const REPLY_BY = "Kindly reply by December 1, 2026.";
@@ -74,8 +74,8 @@ export function dearGreeting(firstNames: string[]): string | undefined {
 function rows(greeting?: string): string {
   const lead = greeting
     ? text(esc(greeting), { size: "l", top: 4, bottom: 8 }) +
-      text(esc(JOIN_US), { size: "l", weight: 600, bottom: 16 })
-    : text(JOIN_US_ALONE, { size: "l", weight: 600, top: 4 });
+      text(esc(HEADLINE), { size: "l", weight: 600, bottom: 16 })
+    : text(esc(HEADLINE), { size: "l", weight: 600, top: 4 });
   return lead +
     rule() + photo(HOME) + rule() + names() + dates() + rule() +
     text(`${esc(INVITE)}<br>Visit our ${link(HOME, "wedding website", "#08040a")} for all the details.`) +
@@ -98,9 +98,10 @@ export function buildInvitationEmail(opts: InvitationOpts = {}) {
   const greeting = dearGreeting(list);
   return {
     subject: SUBJECT,
-    html: page({ title: "Kajal y Adarsh", preheader: INVITE, rows: rows(greeting) }),
+    html: page({ title: "Kajal y Adarsh", preheader: PREHEADER, rows: rows(greeting) }),
     text: [
-      ...(greeting ? [greeting, JOIN_US] : [JOIN_US_ALONE]),
+      ...(greeting ? [greeting] : []),
+      HEADLINE,
       "",
       "Kajal y Adarsh",
       "February 19–21, 2027",
