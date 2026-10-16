@@ -1582,18 +1582,18 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <label>Dietary restrictions or allergies <span class="opt">(optional)</span></label>
 </div>
 </div>
-<!-- contact only after Joyfully accept; prefilled from wedding_party_contacts, veiled until focused -->
+<!-- contact only after Joyfully accept; prefilled from wedding_party_contacts, stay masked (typing replaces) -->
 <div class="guest-reach">
 <div class="box guest-plus" hidden>
 <input type="text" autocomplete="off" autocapitalize="words" maxlength="200" placeholder=" ">
 <label>Name</label>
 </div>
 <div class="box">
-<input type="email" autocomplete="off" maxlength="320" placeholder=" " data-reach="email">
+<input type="text" inputmode="email" autocomplete="off" maxlength="320" placeholder=" " data-reach="email" spellcheck="false">
 <label>Email</label>
 </div>
 <div class="box">
-<input type="tel" autocomplete="off" maxlength="40" placeholder=" " data-reach="phone">
+<input type="text" inputmode="tel" autocomplete="off" maxlength="40" placeholder=" " data-reach="phone">
 <label>Phone</label>
 </div>
 </div>
@@ -2630,6 +2630,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
               i.dataset.full = v;
               i.value = maskReach(i.dataset.reach, v);
               i.classList.add('veiled');
+              i.readOnly = true; /* blocks browser autofill from swapping in the real value on tap */
             }
           });
         });
@@ -2659,14 +2660,25 @@ picture{margin-block:clamp(52px,8vw,104px);}
         var i = b.querySelector('input'), id = 'rsvp-' + i.dataset.reach + '-' + k;
         i.id = id;
         b.querySelector('label').htmlFor = id;
-        /* keep autocomplete off so the browser doesn't paste the real address on focus */
+        /* masked prefills never reveal on click; typing starts a fresh value */
         i.addEventListener('focus', function(){
           if(i.classList.contains('veiled')) i.select();
         });
-        i.addEventListener('input', function(){
+        i.addEventListener('keydown', function(e){
           if(!i.classList.contains('veiled')) return;
+          if(e.key === 'Tab' || e.key === 'Escape' || e.metaKey || e.ctrlKey || e.altKey) return;
+          i.readOnly = false;
           delete i.dataset.full;
           i.classList.remove('veiled');
+          i.value = '';
+          if(e.key === 'Backspace' || e.key === 'Delete') e.preventDefault();
+        });
+        i.addEventListener('paste', function(){
+          if(!i.classList.contains('veiled')) return;
+          i.readOnly = false;
+          delete i.dataset.full;
+          i.classList.remove('veiled');
+          i.value = '';
         });
       });
       var invited = g.events && g.events.length ? g.events : EVENTS;
