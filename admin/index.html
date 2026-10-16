@@ -48,10 +48,19 @@ button{font:inherit;color:inherit;}
 .tools input[type=search]:focus,.tools select:focus{border-color:var(--gold);}
 .tools input[type=search]::placeholder{color:rgba(var(--white-rgb),.45);}
 .tools label{display:flex;gap:8px;align-items:center;cursor:pointer;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.chip{font:inherit;font-size:16px;color:rgba(var(--white-rgb),.75);background:transparent;border:1px solid rgba(var(--gold-rgb),.45);border-radius:2px;padding:7px 12px;cursor:pointer;line-height:1.2;}
+.chip:hover,.chip:focus-visible{border-color:var(--gold);color:var(--gold);outline:none;}
+.chip[aria-pressed=true]{background:rgba(var(--gold-rgb),.16);border-color:var(--gold);color:var(--gold);}
 input[type=checkbox]{accent-color:var(--gold);width:18px;height:18px;margin:0;cursor:pointer;}
 .btn{font-size:17px;color:var(--ground);background:var(--gold);border:0;border-radius:2px;padding:10px 16px;cursor:pointer;}
 .btn:hover{background:#d8b273;}
 .count{font-size:15px;color:rgba(var(--white-rgb),.65);margin:0 0 8px;min-height:1.4em;}
+.em-line{display:flex;align-items:center;gap:6px;min-width:0;}
+.em-line input{flex:1 1 auto;min-width:0;}
+.flag{flex:0 0 auto;font-size:13px;line-height:1;color:rgba(var(--white-rgb),.45);border:1px solid rgba(var(--white-rgb),.22);border-radius:2px;padding:2px 6px;white-space:nowrap;}
+.flag.text{color:rgba(var(--gold-rgb),.8);border-color:rgba(var(--gold-rgb),.4);}
+.flag:empty{display:none;}
 
 table{width:100%;border-collapse:collapse;}
 th,td{text-align:left;padding:5px 6px;vertical-align:middle;}
@@ -190,6 +199,10 @@ body.is-dragging #newparty{display:block;}
     <option value="nope">Not coming</option>
   </select>
   <label><input type="checkbox" id="only-plus"> Only parties with a plus one</label>
+  <div class="chips" role="group" aria-label="Contact shortlists">
+    <button type="button" class="chip" id="needs-text" aria-pressed="false">Needs text</button>
+    <button type="button" class="chip" id="no-contact" aria-pressed="false">No contact</button>
+  </div>
 </div>
 <p class="count" id="count" aria-live="polite"></p>
 
@@ -216,7 +229,7 @@ body.is-dragging #newparty{display:block;}
 <td class="ev e2"><label><input type="checkbox" data-ev="saatak-haldi"><span class="m">Sat</span></label></td>
 <td class="ev e3"><label><input type="checkbox" data-ev="baarat-wedding"><span class="m">Sun</span></label></td>
 <td class="ev e4"><label><input type="checkbox" data-ev="after-party"><span class="m">After</span></label></td>
-<td class="em"><input data-f="email" type="email" placeholder="Email" aria-label="Email" autocomplete="off"></td>
+<td class="em"><div class="em-line"><input data-f="email" type="email" placeholder="Email" aria-label="Email" autocomplete="off"><span class="flag" data-flag></span></div></td>
 <td class="ph"><input data-f="phone" type="tel" placeholder="Phone" aria-label="Phone" autocomplete="off"></td>
 <td class="no"><input data-f="note" placeholder="Note" aria-label="Note" autocomplete="off"></td>
 <td class="rs"></td>
@@ -344,7 +357,23 @@ body.is-dragging #newparty{display:block;}
   var invited = function(g){ return g.events ? g.events : ALL; };
   var label = function(g){ return g.is_plus_one ? 'Plus one' + (g.note ? ' (' + g.note + ')' : '') : (g.display_name || 'Unnamed guest'); };
   var named = function(g){ return !g.is_plus_one && g.display_name; };
+  var hasEmail = function(g){ return !!(g.email && String(g.email).trim()); };
+  var hasPhone = function(g){ return !!(g.phone && String(g.phone).trim()); };
+  var needsText = function(g){ return hasPhone(g) && !hasEmail(g); };
+  var noContact = function(g){ return !hasPhone(g) && !hasEmail(g); };
+  function contactMode(){
+    if($('needs-text').getAttribute('aria-pressed') === 'true') return 'text';
+    if($('no-contact').getAttribute('aria-pressed') === 'true') return 'none';
+    return '';
+  }
   function displayName(g){ return g.is_plus_one ? 'Guest' : (g.first_name.trim() + ' ' + g.last_name.trim()).trim(); }
+  function flagContact(tr, g){
+    var f = tr.querySelector('[data-flag]');
+    if(!f) return;
+    if(needsText(g)){ f.textContent = 'text'; f.className = 'flag text'; }
+    else if(!hasEmail(g)){ f.textContent = 'no email'; f.className = 'flag'; }
+    else { f.textContent = ''; f.className = 'flag'; }
+  }
   function sortGuests(){
     guests.sort(function(a, b){ return a.party - b.party || a.sort_order - b.sort_order || (a.created_at < b.created_at ? -1 : a.created_at > b.created_at ? 1 : 0); });
     byId = {};
@@ -483,6 +512,7 @@ body.is-dragging #newparty{display:block;}
     var ev = invited(g);
     tr.querySelectorAll('[data-ev]').forEach(function(c){ c.checked = ev.indexOf(c.dataset.ev) >= 0; });
     names(tr, g);
+    flagContact(tr, g);
     fillReply(tr.querySelector('td.rs'), g);
     return tr;
   }
@@ -517,6 +547,7 @@ body.is-dragging #newparty{display:block;}
       var g = byId[tr.dataset.id];
       if(!g) return;
       fillReply(tr.querySelector('td.rs'), g);
+      flagContact(tr, g);
       var others = named(g) ? byName[g.display_name.toLowerCase()].filter(function(o){ return o !== g.party; }) : [];
       tr.querySelector('.dupe').textContent = others.length ? 'also in party ' + others.join(', ') : '';
     });
@@ -592,44 +623,118 @@ body.is-dragging #newparty{display:block;}
       ul.appendChild(li);
     });
 
-    var rows = [['Party', 'First name', 'Last name', 'Plus one', 'Note'].concat(EVENTS.map(function(e){ return e.name + ' (' + e.day + ')'; })).concat(['Email', 'Phone', 'RSVP', 'RSVP name', 'Coming to', 'Dietary'])];
-    guests.forEach(function(g){
-      var ev = invited(g), r = replies[g.id];
-      rows.push([g.party, g.is_plus_one ? '' : g.first_name, g.is_plus_one ? '' : g.last_name, g.is_plus_one ? 'Yes' : '', g.note || '']
-        .concat(EVENTS.map(function(e){ return ev.indexOf(e.id) >= 0 ? 'Yes' : ''; }))
-        .concat([g.email || '', g.phone || '', !r ? 'No reply' : r.attending ? 'Coming' : 'Not coming', r ? r.name : '',
-          r && r.attending ? EVENTS.filter(function(e){ return (r.events || []).indexOf(e.id) >= 0; }).map(function(e){ return e.short; }).join(', ') : '',
-          r && r.dietary || '']));
+    var contact = contactMode();
+    var q = $('q').value.trim().toLowerCase(), only = $('only-plus').checked, rf = $('reply-filter').value;
+    var psExport = parties();
+    var exportList = guests.filter(function(g){
+      if(contact === 'text' && !needsText(g)) return false;
+      if(contact === 'none' && !noContact(g)) return false;
+      if(only){
+        var m = psExport.map[g.party] || [];
+        if(!m.some(function(o){ return o.is_plus_one; })) return false;
+      }
+      if(rf && replyOf(g) !== rf) return false;
+      if(q){
+        var hit = String(g.party) === q || [g.display_name, g.email, g.phone, g.note].some(function(v){ return v && String(v).toLowerCase().indexOf(q) >= 0; });
+        if(!hit) return false;
+      }
+      return true;
     });
+    /* when a contact shortlist is on, CSV is slim for texting; otherwise the full sheet (filtered if anything is on) */
+    var rows, stamp = new Date().toISOString().slice(0, 10), fname;
+    if(contact === 'text'){
+      rows = [['Party', 'Name', 'Phone', 'Note']];
+      exportList.forEach(function(g){ rows.push([g.party, label(g), g.phone || '', g.note || '']); });
+      fname = 'needs-text-' + stamp + '.csv';
+    } else if(contact === 'none'){
+      rows = [['Party', 'Name', 'Note']];
+      exportList.forEach(function(g){ rows.push([g.party, label(g), g.note || '']); });
+      fname = 'no-contact-' + stamp + '.csv';
+    } else {
+      rows = [['Party', 'First name', 'Last name', 'Plus one', 'Note'].concat(EVENTS.map(function(e){ return e.name + ' (' + e.day + ')'; })).concat(['Email', 'Phone', 'RSVP', 'RSVP name', 'Coming to', 'Dietary'])];
+      guests.forEach(function(g){
+        var ev = invited(g), r = replies[g.id];
+        rows.push([g.party, g.is_plus_one ? '' : g.first_name, g.is_plus_one ? '' : g.last_name, g.is_plus_one ? 'Yes' : '', g.note || '']
+          .concat(EVENTS.map(function(e){ return ev.indexOf(e.id) >= 0 ? 'Yes' : ''; }))
+          .concat([g.email || '', g.phone || '', !r ? 'No reply' : r.attending ? 'Coming' : 'Not coming', r ? r.name : '',
+            r && r.attending ? EVENTS.filter(function(e){ return (r.events || []).indexOf(e.id) >= 0; }).map(function(e){ return e.short; }).join(', ') : '',
+            r && r.dietary || '']));
+      });
+      fname = 'guest-list-' + stamp + '.csv';
+    }
     var csv = rows.map(function(r){
       return r.map(function(v){ v = String(v); if(/^(=|@|[+\-](?![\d\s(]))/.test(v)) v = "'" + v; return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(',');
     }).join('\r\n');
     var link = $('csv');
     if(link.href.indexOf('blob:') === 0) URL.revokeObjectURL(link.href);
     link.href = URL.createObjectURL(new Blob(['\ufeff' + csv + '\r\n'], {type: 'text/csv;charset=utf-8'}));
-    link.download = 'guest-list-' + new Date().toISOString().slice(0, 10) + '.csv';
+    link.download = fname;
   }
 
   function filter(){
     var q = $('q').value.trim().toLowerCase(), only = $('only-plus').checked, rf = $('reply-filter').value;
+    var contact = contactMode();
     var ps = parties(), shownP = 0, shownG = 0;
+    var textN = guests.filter(needsText).length, noneN = guests.filter(noContact).length;
+    $('needs-text').textContent = 'Needs text (' + textN + ')';
+    $('no-contact').textContent = 'No contact (' + noneN + ')';
     groups.forEach(function(gr){
       var m = ps.map[gr.party] || [];
       var hits = m.filter(function(g){
         if(!q) return false;
         return String(g.party) === q || [g.display_name, g.email, g.phone, g.note].some(function(v){ return v && String(v).toLowerCase().indexOf(q) >= 0; });
       });
-      var show = (!q || hits.length) && (!only || m.some(function(g){ return g.is_plus_one; })) && (!rf || m.some(function(g){ return replyOf(g) === rf; }));
-      gr.el.hidden = !show;
-      gr.el.querySelectorAll('tr.g').forEach(function(tr){ tr.classList.toggle('hit', !!q && hits.indexOf(byId[tr.dataset.id]) >= 0 && String(gr.party) !== q); });
-      if(show){ shownP++; shownG += m.length; }
+      var partyPlus = m.some(function(g){ return g.is_plus_one; });
+      var partyReply = !rf || m.some(function(g){ return replyOf(g) === rf; });
+      var any = false, n = 0;
+      gr.el.querySelectorAll('tr.g').forEach(function(tr){
+        var g = byId[tr.dataset.id];
+        if(!g){ tr.hidden = true; return; }
+        var matchQ = !q || hits.indexOf(g) >= 0;
+        var matchContact = !contact || (contact === 'text' ? needsText(g) : noContact(g));
+        var matchReply = !rf || replyOf(g) === rf;
+        var show;
+        if(contact){
+          show = matchQ && matchContact && matchReply && (!only || partyPlus);
+        } else {
+          show = (!q || hits.length) && (!only || partyPlus) && partyReply;
+        }
+        tr.hidden = contact ? !show : false;
+        tr.classList.toggle('hit', !!q && hits.indexOf(g) >= 0 && String(gr.party) !== q);
+        if(contact ? show : false){ any = true; n++; }
+        else if(!contact && show){ any = true; }
+      });
+      var showParty = contact ? any : ((!q || hits.length) && (!only || partyPlus) && partyReply);
+      gr.el.hidden = !showParty;
+      var sub = gr.el.querySelector('tr.subtotal');
+      if(sub) sub.hidden = !!contact;
+      if(showParty){ shownP++; shownG += contact ? n : m.length; }
     });
-    $('count').textContent = (q || only || rf) ? 'Showing ' + shownP + ' of ' + groups.length + ' parties (' + shownG + ' guests).' : '';
+    var bits = [];
+    if(contact === 'text') bits.push('Needs text');
+    if(contact === 'none') bits.push('No contact');
+    if(q || only || rf || contact){
+      $('count').textContent = 'Showing ' + shownG + ' guest' + (shownG === 1 ? '' : 's') + ' in ' + shownP + ' part' + (shownP === 1 ? 'y' : 'ies')
+        + (bits.length ? ' · ' + bits.join(', ') : '') + '.';
+    } else {
+      $('count').textContent = '';
+    }
     $('empty').hidden = shownP > 0 || !groups.length;
+    /* rebuild the CSV for the current shortlist without waiting on the summary debounce */
+    if(contact) summary();
   }
   $('q').addEventListener('input', filter);
   $('only-plus').addEventListener('change', filter);
   $('reply-filter').addEventListener('change', filter);
+  function toggleChip(el, other){
+    var on = el.getAttribute('aria-pressed') !== 'true';
+    el.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if(on) other.setAttribute('aria-pressed', 'false');
+    filter();
+    summary();
+  }
+  $('needs-text').addEventListener('click', function(){ toggleChip($('needs-text'), $('no-contact')); });
+  $('no-contact').addEventListener('click', function(){ toggleChip($('no-contact'), $('needs-text')); });
 
   /* ---------- editing ---------- */
 
@@ -713,7 +818,12 @@ body.is-dragging #newparty{display:block;}
   function reveal(g, field){
     var tr = table.querySelector('tr.g[data-id="' + g.id + '"]');
     if(!tr) return;
-    if(tr.closest('tbody').hidden){ $('q').value = ''; $('only-plus').checked = false; $('reply-filter').value = ''; filter(); }
+    if(tr.closest('tbody').hidden || tr.hidden){
+      $('q').value = ''; $('only-plus').checked = false; $('reply-filter').value = '';
+      $('needs-text').setAttribute('aria-pressed', 'false');
+      $('no-contact').setAttribute('aria-pressed', 'false');
+      filter();
+    }
     tr.classList.remove('flash'); void tr.offsetWidth; tr.classList.add('flash');
     var r = tr.getBoundingClientRect();
     if(r.top < 60 || r.bottom > window.innerHeight - 80) tr.scrollIntoView({block: 'center', behavior: 'smooth'});
