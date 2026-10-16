@@ -2641,7 +2641,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
       var r = c.querySelector('.choice input:checked');
       return r ? r.value : '';
     }
-    function card(g, k, me){
+    function card(g, k){
       var c = tpl.content.firstElementChild.cloneNode(true);
       c.querySelector('.guest-name').textContent = g.plus ? 'Plus one' : g.name;
       c.setAttribute('aria-describedby', 'rsvp-guest-' + k + '-err');
@@ -2687,7 +2687,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
       note([]);
       party = [g].concat(members(g.party).filter(function(o){ return o !== g; }));
       partyEl.textContent = '';
-      (kept[g.i] || party.map(function(m, k){ return card(m, k, k === 0); })).forEach(function(c){ partyEl.appendChild(c); });
+      (kept[g.i] || party.map(function(m, k){ return card(m, k); })).forEach(function(c){ partyEl.appendChild(c); });
       delete kept[g.i];
       bulk.hidden = party.length < 2;
       groupParty.hidden = false;
