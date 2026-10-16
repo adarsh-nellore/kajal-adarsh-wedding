@@ -74,8 +74,8 @@ export function dearGreeting(firstNames: string[]): string | undefined {
 function rows(greeting?: string): string {
   const lead = greeting
     ? text(esc(greeting), { size: "l", top: 4, bottom: 8 }) +
-      text(esc(HEADLINE), { size: "l", weight: 600, bottom: 16 })
-    : text(esc(HEADLINE), { size: "l", weight: 600, top: 4 });
+      text(esc(HEADLINE), { size: "l", weight: 600, bottom: 0 })
+    : text(esc(HEADLINE), { size: "l", weight: 600, top: 4, bottom: 0 });
   return lead +
     rule() + photo(HOME) + rule() + names() + dates() + rule() +
     text(`${esc(INVITE)}<br>Visit our ${link(HOME, "wedding website", "#08040a")} for all the details.`) +

@@ -77,9 +77,10 @@ export function text(html: string, o: { size?: keyof typeof SIZES; weight?: numb
         </tr>`;
 }
 
-export const rule = (bottom = 16) => `
+/** Hairline with the same space above and below (pass the gap once). */
+export const rule = (gap = 16) => `
         <tr>
-          <td class="side" style="padding:0 32px ${bottom}px;">
+          <td class="side" style="padding:${gap}px 32px ${gap}px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td class="rule" height="1" style="height:1px;line-height:1px;font-size:0;background-color:${INK};">&nbsp;</td></tr></table>
           </td>
         </tr>`;
@@ -89,7 +90,7 @@ export const link = (href: string, label: string, color = INK) =>
 
 export const photo = (href: string) => `
         <tr>
-          <td class="photo" align="center" style="padding:10px 40px 28px;">
+          <td class="photo" align="center" style="padding:0 40px;">
             <a href="${esc(href)}" style="display:block;text-decoration:none;border:0;outline:none;"><img src="${PHOTO}" width="560" alt="Kajal and Adarsh walking hand in hand up a green hill" style="display:block;width:560px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;"></a>
           </td>
         </tr>`;
@@ -101,12 +102,12 @@ export const names = () => `
         </tr>`;
 
 export const dates = () =>
-  text(`<span style="font-weight:700;">February 19–21, 2027</span><br>Mexico City, Mexico`, { size: "l" });
+  text(`<span style="font-weight:700;">February 19–21, 2027</span><br>Mexico City, Mexico`, { size: "l", bottom: 0 });
 
 // The design's button: beige fill, thin black rule, square corners.
 export const button = (href: string, label: string, width?: number) => `
         <tr>
-          <td class="side" align="center" style="padding:4px 32px 18px;">
+          <td class="side" align="center" style="padding:4px 32px 0;">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
               <tr>
                 <td class="btn-bg" bgcolor="${BUTTON}"${width ? ` width="${width}"` : ""} style="${width ? `width:${width}px;` : ""}background-color:${BUTTON};border:1px solid ${INK};">
@@ -117,16 +118,16 @@ export const button = (href: string, label: string, width?: number) => `
           </td>
         </tr>`;
 
-export const signoff = () => text("With love,<br>Kajal &amp; Adarsh");
+export const signoff = () => text("With love,<br>Kajal &amp; Adarsh", { bottom: 0 });
 
 // HTTPS stubs (not sms:) — Gmail strips custom schemes and leaves the numbers unlinked.
 export const TEXT_KAJAL = SITE + "text/kajal";
 export const TEXT_ADARSH = SITE + "text/adarsh";
 
-/* no hairline rules — Gmail treats a rule + our names as a signature and collapses the footer */
+/* gap above comes from the preceding rule — keep phones snug under the Questions line */
 export const QUESTIONS =
-  text("Questions? Message us anytime.", { size: "s", top: 16, bottom: 8 }) +
-  text(`Kajal · ${link(TEXT_KAJAL, "949-293-1051", LINK)}<br>Adarsh · ${link(TEXT_ADARSH, "408-752-1100", LINK)}`, { size: "s", bottom: 28 });
+  text("Questions? Message us anytime.", { size: "s", top: 0, bottom: 8 }) +
+  text(`Kajal · ${link(TEXT_KAJAL, "949-293-1051", LINK)}<br>Adarsh · ${link(TEXT_ADARSH, "408-752-1100", LINK)}`, { size: "s", bottom: 0 });
 
 export const QUESTIONS_TEXT = [
   "Questions? Message us anytime.",
@@ -247,8 +248,8 @@ export function guestEmail(rs: Rsvp[]) {
     ? "Your reply is in."
     : "We’ll miss you, and we’ll be thinking of you from Mexico City.";
   const rows =
-    text(`Thank you, ${esc(by)}.`, { size: "l", weight: 600, top: 4 }) +
-    rule() + photo(ENTER) + rule() + names() + dates() + rule(20) +
+    text(`Thank you, ${esc(by)}.`, { size: "l", weight: 600, top: 4, bottom: 0 }) +
+    rule() + photo(ENTER) + rule() + names() + dates() + rule() +
     text(esc(line), { bottom: 20 }) +
     rs.map((g) => guestBlock(g)).join("") + note(rs) +
     button(ENTER + "#rsvp", "Change your reply") +
@@ -284,12 +285,12 @@ export function coupleEmail(rs: Rsvp[]) {
   const tally = rs.length > 1 ? `${coming} of ${rs.length} coming` : (coming ? "Coming" : "Not coming");
   const fresh = rs.some((g) => contactOf(g).some((c) => c.mark === "new")) ? "Anything marked new isn’t in the sheet yet" : "";
   const rows =
-    text(`${esc(by)} replied.`, { size: "l", weight: 600, top: 4 }) +
+    text(`${esc(by)} replied.`, { size: "l", weight: 600, top: 4, bottom: 0 }) +
     rule() + names() +
-    text(`<span style="font-weight:700;">${esc(tally)}${r.party ? ` · Party ${esc(r.party)}` : ""}</span><br>${esc(when)}${fresh ? `<br>${fresh}` : ""}`, { size: "s" }) +
-    rule(20) +
+    text(`<span style="font-weight:700;">${esc(tally)}${r.party ? ` · Party ${esc(r.party)}` : ""}</span><br>${esc(when)}${fresh ? `<br>${fresh}` : ""}`, { size: "s", bottom: 0 }) +
+    rule() +
     rs.map((g) => guestBlock(g, true)).join("") + note(rs) +
-    rule(24);
+    rule();
   return {
     subject: r.submission_id
       ? `RSVP: ${by}${r.party ? ` (party ${r.party})` : ""}, ${coming} of ${rs.length} coming`
