@@ -8,9 +8,9 @@ export const HOME = ENTER;
 
 const SUBJECT = "Kajal & Adarsh · Mexico City · February 2027";
 const HEADLINE = "We'd love for you to join us, for the weekend of our dreams!";
-const PREHEADER = "All the wedding details, information, and RSVP inside.";
+const PREHEADER = "We'd love for you to join us, February 19–21 in Mexico City.";
 const INVITE = "We're getting married in CDMX.";
-const DETAILS = "Visit our wedding website for all the details.";
+const DETAILS = "The weekend is on our wedding website.";
 const REPLY_BY = "Kindly reply by December 1, 2026.";
 const CANT_WAIT = "We can't wait to celebrate with you!";
 
@@ -77,8 +77,8 @@ function rows(greeting?: string): string {
       text(esc(HEADLINE), { size: "l", weight: 600, bottom: 0 })
     : text(esc(HEADLINE), { size: "l", weight: 600, top: 4, bottom: 0 });
   return lead +
-    rule() + photo(HOME) + rule() + names() + dates() + rule() +
-    text(`${esc(INVITE)}<br>Visit our ${link(HOME, "wedding website", "#08040a")} for all the details.`) +
+    rule() + photo() + rule() + names() + dates() + rule() +
+    text(`${esc(INVITE)}<br>The weekend is on our ${link(HOME, "wedding website", "#08040a")}.`) +
     rsvpButton(HOME) +
     text(`${esc(REPLY_BY)}<br>${esc(CANT_WAIT)}`) +
     signoff() + rule() + QUESTIONS;

@@ -22,9 +22,9 @@ import { coupleEmail, guestEmail, type Rsvp } from "../../../email/rsvp-email.ts
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") || "";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-// onboarding@resend.dev only delivers to the Resend account's own address.
-// Set RESEND_FROM to an address on a verified domain to reach everyone.
-const FROM = Deno.env.get("RESEND_FROM") || "K + A RSVPs <onboarding@resend.dev>";
+// Must be an address on the verified domain. onboarding@resend.dev only delivers
+// to the Resend account's own address and is not aligned for guests.
+const FROM = Deno.env.get("RESEND_FROM") || "Kajal & Adarsh <k+a@kajal-adarsh.club>";
 const TO = ["adarsh.nellore@gmail.com", "949kjp@gmail.com"];
 
 const CORS = {

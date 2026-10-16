@@ -88,12 +88,20 @@ export const rule = (gap = 16) => `
 export const link = (href: string, label: string, color = INK) =>
   `<a href="${esc(href)}" class="ink" style="color:${color};text-decoration:underline;">${esc(label)}</a>`;
 
-export const photo = (href: string) => `
+// href is optional. A linked hero image reads as a marketing banner; the invitation
+// shows the photo without that extra link and keeps the RSVP button as the action.
+export const photo = (href?: string) => {
+  const img = `<img src="${PHOTO}" width="560" alt="Kajal and Adarsh walking hand in hand up a green hill" style="display:block;width:560px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;">`;
+  const inner = href
+    ? `<a href="${esc(href)}" style="display:block;text-decoration:none;border:0;outline:none;">${img}</a>`
+    : img;
+  return `
         <tr>
           <td class="photo" align="center" style="padding:0 40px;">
-            <a href="${esc(href)}" style="display:block;text-decoration:none;border:0;outline:none;"><img src="${PHOTO}" width="560" alt="Kajal and Adarsh walking hand in hand up a green hill" style="display:block;width:560px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;"></a>
+            ${inner}
           </td>
         </tr>`;
+};
 
 export const names = () => `
         <tr>
