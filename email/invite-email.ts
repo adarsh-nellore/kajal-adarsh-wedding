@@ -8,11 +8,15 @@ export const HOME = ENTER;
 
 const SUBJECT = "Kajal & Adarsh · Mexico City · February 2027";
 const HEADLINE = "We'd love for you to join us, for the weekend of our dreams!";
-const PREHEADER = "We'd love for you to join us, February 19–21 in Mexico City.";
+// Inbox snippet: personal note, not a promo teaser.
+const PREHEADER = "A note from us — February 19–21 in Mexico City.";
 const INVITE = "We're getting married in CDMX.";
-const DETAILS = "The weekend is on our wedding website.";
-const REPLY_BY = "Kindly reply by December 1, 2026.";
+const DETAILS = "Dates, hotels, and everything else live on our site.";
+const DETAILS_BEFORE_LINK = "Dates, hotels, and everything else live on our";
+const REPLY_BY = "Please let us know by December 1, 2026.";
 const CANT_WAIT = "We can't wait to celebrate with you!";
+/** Personal Gmails for reply_to — guests reply to real inboxes, not k+a@. */
+export const REPLY_TO = ["adarsh.nellore@gmail.com", "949kjp@gmail.com"] as const;
 
 // The RSVP button with the site's password on a lighter stub just beneath it.
 const rsvpButton = (href: string) => `
@@ -78,7 +82,7 @@ function rows(greeting?: string): string {
     : text(esc(HEADLINE), { size: "l", weight: 600, top: 4, bottom: 0 });
   return lead +
     rule() + photo() + rule() + names() + dates() + rule() +
-    text(`${esc(INVITE)}<br>The weekend is on our ${link(HOME, "wedding website", "#08040a")}.`) +
+    text(`${esc(INVITE)}<br>${esc(DETAILS_BEFORE_LINK)} ${link(HOME, "site", "#08040a")}.`) +
     rsvpButton(HOME) +
     text(`${esc(REPLY_BY)}<br>${esc(CANT_WAIT)}`) +
     signoff() + rule() + QUESTIONS;
@@ -99,18 +103,20 @@ export function buildInvitationEmail(opts: InvitationOpts = {}) {
   return {
     subject: SUBJECT,
     html: page({ title: "Kajal y Adarsh", preheader: PREHEADER, rows: rows(greeting) }),
+    // Strong plain-text part: reads as a short letter (helps multipart ratio vs image HTML).
     text: [
-      ...(greeting ? [greeting] : []),
+      ...(greeting ? [greeting, ""] : []),
       HEADLINE,
       "",
       "Kajal y Adarsh",
-      "February 19–21, 2027",
-      "Mexico City, Mexico",
+      "February 19–21, 2027 · Mexico City, Mexico",
       "",
       INVITE,
-      `${DETAILS} ${HOME}`,
+      DETAILS,
+      `Our site: ${HOME}`,
       `Password: ${PASSWORD}`,
       "",
+      "When you have a moment, tap RSVP on the site and tell us if you can make it.",
       REPLY_BY,
       CANT_WAIT,
       "",
