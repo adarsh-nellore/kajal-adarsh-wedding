@@ -1007,6 +1007,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .rsvp .box > :focus + label{color:var(--gold);}
 .rsvp input::placeholder,.rsvp textarea::placeholder{color:transparent;}
 .rsvp textarea{min-height:120px;resize:none;overflow:hidden;field-sizing:content;}
+/* the note stays one quiet line — not a tall box */
+.rsvp #rsvp-note{min-height:0;height:auto;padding:25px 15px 8px;resize:none;overflow:hidden;field-sizing:fixed;white-space:nowrap;}
 .rsvp input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
 .box-num{max-width:18rem;}
 .rsvp input[type="number"]::-webkit-inner-spin-button,.rsvp input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
@@ -1025,6 +1027,11 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .choice:hover .tab{color:rgba(var(--gold-rgb),.8);}
 .choice input:checked + .tab{color:var(--gold);}
 .choice input:focus-visible + .tab{outline:1px solid var(--gold);outline-offset:6px;border-radius:2px;}
+/* accept / decline carry the card — larger and quieter when not chosen */
+.guest .choices{margin-top:10px;gap:8px clamp(24px,3vw,40px);}
+.guest .tab{font-size:clamp(24px,2.8vw,30px);line-height:1.25;color:rgba(234,227,214,.48);}
+.guest .choice:hover .tab{color:rgba(var(--gold-rgb),.85);}
+.guest .choice input:checked + .tab{color:var(--gold);}
 
 /* events: a small diamond, the nav's bead, lights up when chosen */
 .checks{display:grid;gap:2px;margin-top:6px;}
@@ -1106,8 +1113,21 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .guest .check[hidden]{display:none;}
 .same-events{margin-top:10px;font-size:16px;line-height:26px;}
 .guest .guest-diet{margin-top:16px;}
-.guest-reach{display:grid;gap:12px;margin-top:16px;}
+/* contact sits under accept — a quiet underline, not a second set of boxes */
+.guest-reach{display:grid;gap:10px 28px;margin-top:18px;}
 @media (min-width:600px){ .guest-reach{grid-template-columns:1fr 1fr;} .guest-reach .guest-plus{grid-column:1 / -1;} }
+.guest-reach .box:not(.guest-plus) input{
+  border:0;border-bottom:1px solid rgba(var(--gold-rgb),.28);border-radius:0;
+  background:transparent;padding:22px 0 6px;
+}
+.guest-reach .box:not(.guest-plus) > label{left:0;right:0;}
+.guest-reach .box:not(.guest-plus) > :focus + label,
+.guest-reach .box:not(.guest-plus) > :not(:placeholder-shown) + label{top:4px;}
+.guest-reach .box:not(.guest-plus) input:hover{border-color:rgba(var(--gold-rgb),.5);background:transparent;}
+.guest-reach .box:not(.guest-plus) input:focus{border-color:var(--gold);box-shadow:none;background:transparent;}
+.guest-reach .box:not(.guest-plus) > [aria-invalid="true"]{border-color:var(--gold);background:transparent;}
+/* prefilled contact stays veiled until they focus to change it */
+.guest-reach input.veiled:not(:focus){-webkit-text-security:disc;text-security:disc;}
 .guest .err{margin-top:8px;}
 /* fingers: every choice, event and link in the party is at least 44px tall */
 @media (pointer:coarse){
@@ -1560,9 +1580,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <label>Dietary restrictions or allergies <span class="opt">(optional)</span></label>
 </div>
 </div>
-</div>
-<!-- prefilled with what the guest list has for this guest (wedding_party_contacts in Supabase);
-     a plus one also gets a name, which becomes the card's heading -->
+<!-- contact only after Joyfully accept; prefilled from wedding_party_contacts, veiled until focused -->
 <div class="guest-reach">
 <div class="box guest-plus" hidden>
 <input type="text" autocomplete="off" autocapitalize="words" maxlength="200" placeholder=" ">
@@ -1575,6 +1593,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="box">
 <input type="tel" autocomplete="off" maxlength="40" placeholder=" " data-reach="phone">
 <label>Phone</label>
+</div>
 </div>
 </div>
 <p class="err guest-err"></p>
@@ -2426,12 +2445,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
       matches: document.getElementById('rsvp-matches'),
       findNote: document.getElementById('rsvp-find-note')
     };
-    if (!CSS.supports('field-sizing', 'content')) {
-      f.note.addEventListener('input', function () {
-        f.note.style.height = 'auto';
-        f.note.style.height = f.note.scrollHeight + 'px';
-      });
-    }
     var tried = false;
     var picked = null, party = [], shown = [], active = -1, kept = {};
 
@@ -2587,7 +2600,10 @@ picture{margin-block:clamp(52px,8vw,104px);}
           if(!on) return;
           c.querySelectorAll('[data-reach]').forEach(function(i){
             var v = on[i.dataset.reach];
-            if(v && !i.value.trim()) i.value = v;
+            if(v && !i.value.trim()){
+              i.value = v;
+              i.classList.add('veiled');
+            }
           });
         });
       }).catch(function(){});
@@ -2617,6 +2633,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
         i.id = id;
         b.querySelector('label').htmlFor = id;
         if(me) i.autocomplete = i.dataset.reach === 'email' ? 'email' : 'tel';
+        i.addEventListener('focus', function(){ i.classList.remove('veiled'); });
+        i.addEventListener('input', function(){ i.classList.remove('veiled'); });
       });
       var invited = g.events && g.events.length ? g.events : EVENTS;
       c.querySelectorAll('.check').forEach(function(l){
@@ -2699,10 +2717,11 @@ picture{margin-block:clamp(52px,8vw,104px);}
           if(!a) msg = party.length > 1 ? 'Please let us know whether ' + (k === 0 ? 'you' : party[k].plus ? 'your guest' : firstName(party[k])) + ' can join us.' : 'Please let us know whether you can join us.';
           else if(a === 'yes' && plus && !plus.value.trim()) msg = 'Please tell us your guest’s name.';
           else if(a === 'yes' && !c.querySelector('.check input:checked')) msg = 'Please choose at least one event.';
-          /* everyone's email and phone are optional, except the email of the person replying */
+          /* contact only appears after accept; the replier's email is required then (or if they want a copy) */
           var em = c.querySelector('[data-reach="email"]'), ph = c.querySelector('[data-reach="phone"]');
           var ev = em.value.trim(), pv = ph.value.trim();
-          var badE = ev ? !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ev) : k === 0;
+          var needEmail = k === 0 && (a === 'yes' || f.copy.checked);
+          var badE = ev ? !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ev) : needEmail;
           var badP = !!pv && pv.replace(/\D/g, '').length < 7;
           if(!msg && badE) msg = !ev ? 'Please enter your email.' : k === 0 ? 'Please check your email address.' : 'Please check this email address.';
           else if(!msg && badP) msg = k === 0 ? 'Please check your phone number.' : 'Please check this phone number.';
@@ -2727,6 +2746,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
       if(t === f.name) return;
       if(t.closest('.guest-plus')) t.closest('.guest').querySelector('.guest-name').textContent = t.value.trim() || 'Plus one';
       if(t.closest('.guest')){ update(); if(tried) rules.attending(); }
+      else if(t === f.copy && tried) rules.attending();
     }
     form.addEventListener('change', onEdit);
     form.addEventListener('input', onEdit);
