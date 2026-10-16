@@ -119,12 +119,20 @@ export const button = (href: string, label: string, width?: number) => `
 
 export const signoff = () => text("With love,<br>Kajal &amp; Adarsh");
 
+// HTTPS stubs (not sms:) — Gmail strips custom schemes and leaves the numbers unlinked.
+export const TEXT_KAJAL = SITE + "text/kajal";
+export const TEXT_ADARSH = SITE + "text/adarsh";
+
 export const QUESTIONS = rule() +
   text("Questions? Reach out to us anytime.", { size: "s", bottom: 8 }) +
-  text(`Kajal · ${link("sms:+19492931051", "949-293-1051", LINK)}<br>Adarsh · ${link("sms:+14087521100", "408-752-1100", LINK)}`, { size: "s" }) +
+  text(`Kajal · ${link(TEXT_KAJAL, "949-293-1051", LINK)}<br>Adarsh · ${link(TEXT_ADARSH, "408-752-1100", LINK)}`, { size: "s" }) +
   rule(24);
 
-export const QUESTIONS_TEXT = ["Questions? Reach out to us anytime.", "Kajal · 949-293-1051", "Adarsh · 408-752-1100"];
+export const QUESTIONS_TEXT = [
+  "Questions? Reach out to us anytime.",
+  `Kajal · 949-293-1051 · ${TEXT_KAJAL}`,
+  `Adarsh · 408-752-1100 · ${TEXT_ADARSH}`,
+];
 
 // A lighter tan from edge to edge, with the rows on a centred 640px tan card.
 export function card(rows: string): string {

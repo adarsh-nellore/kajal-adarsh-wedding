@@ -13,6 +13,13 @@ const YEAR = 60 * 60 * 24 * 365;
 
 const PUBLIC = [/^\/savethedate(\/|$)/, /^\/email\/[^/]+\.(png|jpe?g|gif|webp)$/, /^\/favicon\.ico$/];
 
+// HTTPS stubs for the email footer's phone links — Gmail strips sms: hrefs, so the
+// mail points here and this page opens Messages (with a tappable fallback).
+const TEXT = {
+  '/text/kajal': { sms: 'sms:+19492931051', who: 'Kajal', display: '949-293-1051' },
+  '/text/adarsh': { sms: 'sms:+14087521100', who: 'Adarsh', display: '408-752-1100' },
+};
+
 async function token(pw) {
   const bytes = new TextEncoder().encode('kajal-adarsh:' + pw);
   const hash = await crypto.subtle.digest('SHA-256', bytes);
@@ -41,6 +48,8 @@ export default async function middleware(request) {
   if (url.hostname === 'kajal-adarsh-wedding.vercel.app') {
     return Response.redirect('https://kajal-adarsh.club' + url.pathname + url.search, 308);
   }
+  const text = TEXT[url.pathname.replace(/\/$/, '') || '/'];
+  if (text) return textPage(text);
   if (PUBLIC.some((re) => re.test(url.pathname))) return;
 
   if (url.searchParams.has('pw')) {
@@ -65,6 +74,27 @@ export default async function middleware(request) {
 }
 
 const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function textPage(t) {
+  const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="0;url=${esc(t.sms)}">
+<title>Text ${esc(t.who)}</title>
+<script>location.replace(${JSON.stringify(t.sms)})</script>
+</head>
+<body style="margin:0;background:#121212;color:#EAE3D6;font:18px/1.5 Georgia,serif;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;text-align:center;">
+<p style="margin:0;">Opening Messages…<br><a href="${esc(t.sms)}" style="color:#CDA45E;">Text ${esc(t.who)} · ${esc(t.display)}</a></p>
+</body>
+</html>`;
+  return new Response(html, {
+    status: 200,
+    headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=86400' },
+  });
+}
 
 function page(next, wrong) {
   const html = `<!doctype html>
