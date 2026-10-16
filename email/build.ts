@@ -2,7 +2,7 @@
 //   node --experimental-strip-types email/build.ts
 import { writeFileSync } from "node:fs";
 import { coupleEmail, esc, guestEmail, SITE, type Rsvp } from "./rsvp-email.ts";
-import { buildInvitationEmail, pasteable } from "./invite-email.ts";
+import { buildInvitationEmail, dearGreeting, pasteable } from "./invite-email.ts";
 
 const base = {
   created_at: "2026-10-12T16:40:00Z",
@@ -31,14 +31,19 @@ const local = (html: string) => html.replaceAll(SITE + "email/", "");
 for (const [file, mail] of [
   ["rsvp-confirmation", guestEmail(party)],
   ["rsvp-notification", coupleEmail(party)],
-  ["invitation", buildInvitationEmail()],
+  ["invitation", buildInvitationEmail({ firstNames: ["Priya", "Rohan", "Meera", "Jane"] })],
 ] as const) {
   writeFileSync(new URL(file + ".html", dir), local(mail.html));
   writeFileSync(new URL(file + ".txt", dir), `Subject: ${mail.subject}\n\n${mail.text}\n`);
 }
 
 // A page to copy the invitation from and paste into Gmail compose.
-const versions = { plain: pasteable(), merge: pasteable("Dear {{First Name}},") };
+const sampleGreeting = dearGreeting(["Priya", "Rohan", "Meera"])!;
+const versions = {
+  plain: pasteable(),
+  party: pasteable(sampleGreeting),
+  merge: pasteable("Dear {{First Name}},"),
+};
 writeFileSync(new URL("invitation-gmail.html", dir), `<!doctype html>
 <html lang="en">
 <head>
@@ -69,6 +74,7 @@ body{margin:0;background:#f0f1f5;color:#2a2722;font:15px/1.5 -apple-system,Blink
 <p>For one email per guest with their name, use the mail-merge greeting with an add-on like YAMM or GMass: paste it into a Gmail draft and they fill in <code>{{First Name}}</code> from your sheet. Both also accept <code>invitation.html</code> directly.</p>
 <div class="bar">
 <button type="button" data-v="plain" class="on">No greeting</button>
+<button type="button" data-v="party">“Dear Priya, Rohan, and Meera,”</button>
 <button type="button" data-v="merge">“Dear {{First Name}},”</button>
 <button type="button" id="copy">Copy email</button>
 <span id="said" aria-live="polite"></span>

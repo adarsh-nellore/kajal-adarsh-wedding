@@ -7,8 +7,10 @@ import { BACKDROP, BUTTON, BUTTON_INK, ENTER, FONT, INK, PASSWORD, QUESTIONS, QU
 export const HOME = ENTER;
 
 const SUBJECT = "Kajal & Adarsh · Mexico City · February 2027";
-const HEADLINE = "Please join us in celebrating our wedding!";
-const INVITE = "We're getting married in CDMX, and we'd love to celebrate with you!";
+const JOIN_US = "please join us in celebrating our wedding!";
+const JOIN_US_ALONE = "Please join us in celebrating our wedding!";
+const INVITE = "We're getting married in CDMX.";
+const DETAILS = "Visit our wedding website for all the details.";
 const REPLY_BY = "Kindly reply by December 1, 2026.";
 const CANT_WAIT = "We can't wait to celebrate with you!";
 
@@ -32,33 +34,80 @@ const rsvpButton = (href: string) => `
           </td>
         </tr>`;
 
+/** Skip blanks, "Guest", "Guest of …", and other placeholders without a real first name. */
+function isRealFirstName(name: string): boolean {
+  const n = name.trim();
+  if (!n) return false;
+  if (/^guest(\s+of\b.*)?$/i.test(n)) return false;
+  if (/^(plus\s*one|baby|tbd|n\/?a)$/i.test(n)) return false;
+  return true;
+}
+
+/** First token of a name ("Priya Shah" → "Priya"), if it looks real. */
+export function firstNameOf(name: string): string | undefined {
+  const first = name.trim().split(/\s+/)[0] ?? "";
+  return isRealFirstName(first) ? first : undefined;
+}
+
+/**
+ * "Dear Priya," / "Dear Priya and Rohan," / "Dear Priya, Rohan, and Meera,"
+ * Pass first names (or full names — first token is used). Empty / Guest skipped.
+ */
+export function dearGreeting(firstNames: string[]): string | undefined {
+  const names = firstNames
+    .map((n) => firstNameOf(n) ?? (isRealFirstName(n) ? n.trim() : undefined))
+    .filter((n): n is string => !!n);
+  // Dedupe while keeping order (same first name twice in a party is rare; keep both only if distinct entries were intentional — collapse exact dupes)
+  const seen = new Set<string>();
+  const unique = names.filter((n) => {
+    const k = n.toLowerCase();
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  if (!unique.length) return undefined;
+  if (unique.length === 1) return `Dear ${unique[0]},`;
+  if (unique.length === 2) return `Dear ${unique[0]} and ${unique[1]},`;
+  return `Dear ${unique.slice(0, -1).join(", ")}, and ${unique[unique.length - 1]},`;
+}
+
 function rows(greeting?: string): string {
-  return text(HEADLINE, { size: "l", weight: 600, top: 4 }) +
+  const lead = greeting
+    ? text(esc(greeting), { size: "l", top: 4, bottom: 8 }) +
+      text(esc(JOIN_US), { size: "l", weight: 600, bottom: 16 })
+    : text(JOIN_US_ALONE, { size: "l", weight: 600, top: 4 });
+  return lead +
     rule() + photo(HOME) + rule() + names() + dates() + rule() +
-    (greeting ? text(esc(greeting)) : "") +
-    text(`${esc(INVITE)}<br>Visit our ${link(HOME, "wedding website", "#08040a")} for all the details and to RSVP.`) +
+    text(`${esc(INVITE)}<br>Visit our ${link(HOME, "wedding website", "#08040a")} for all the details.`) +
     rsvpButton(HOME) +
     text(`${esc(REPLY_BY)}<br>${esc(CANT_WAIT)}`) +
     signoff() + QUESTIONS;
 }
 
-const greet = (firstName?: string) => (firstName?.trim() ? `Dear ${firstName.trim()},` : undefined);
+export type InvitationOpts = {
+  /** One guest — same as firstNames: [firstName]. Kept for mail-merge / old callers. */
+  firstName?: string;
+  /** Party first names for "Dear X, Y, and Z," */
+  firstNames?: string[];
+};
 
-export function buildInvitationEmail({ firstName }: { firstName?: string } = {}) {
-  const greeting = greet(firstName);
+export function buildInvitationEmail(opts: InvitationOpts = {}) {
+  const list = opts.firstNames?.length
+    ? opts.firstNames
+    : (opts.firstName?.trim() ? [opts.firstName.trim()] : []);
+  const greeting = dearGreeting(list);
   return {
     subject: SUBJECT,
     html: page({ title: "Kajal y Adarsh", preheader: INVITE, rows: rows(greeting) }),
     text: [
-      HEADLINE,
+      ...(greeting ? [greeting, JOIN_US] : [JOIN_US_ALONE]),
       "",
       "Kajal y Adarsh",
       "February 19–21, 2027",
       "Mexico City, Mexico",
       "",
-      ...(greeting ? [greeting] : []),
       INVITE,
-      `Visit our wedding website for all the details and to RSVP: ${HOME}`,
+      `${DETAILS} ${HOME}`,
       `Password: ${PASSWORD}`,
       "",
       REPLY_BY,
