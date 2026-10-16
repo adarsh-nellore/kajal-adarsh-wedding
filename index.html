@@ -403,9 +403,10 @@ a:focus-visible{outline:none;}
 .stamp{position:relative;}
 /* Events stickers sit in the margin right of their card's text; phones don't have the room */
 .leg:has(.stk){position:relative;}
-.stk-mendhi,.stk-haldi,.stk-martini{top:calc(.5 * var(--swing));left:calc(100% + var(--stk-gap));}
+.stk-mendhi,.stk-haldi,.stk-swing,.stk-martini{top:calc(.5 * var(--swing));left:calc(100% + var(--stk-gap));}
 .stk-mendhi{--h:calc(1.3 * var(--stk-lg));--d:-3s;}
 .stk-haldi{--h:var(--stk-lg);--tilt:calc(-1 * var(--stk-tilt));--d:-1.7s;}
+.stk-swing{--h:calc(1.3 * var(--stk-lg));--d:-4.2s;}
 .stk-martini{--h:calc(1.3 * var(--stk-lg));--tilt:calc(-1 * var(--stk-tilt));--d:-2.6s;}
 /* second stickers tuck into the empty column under the date (whose visible foot is ~.65 of its font-size up);
    their cards grow so the rail doesn't clip them */
@@ -424,7 +425,7 @@ a:focus-visible{outline:none;}
   .journey[data-pin] .leg:has(.stk){grid-template-rows:auto 1fr;}
   .journey[data-pin] .leg .day{grid-area:1/1;}
   .journey[data-pin] .leg:has(.stk) .leg-body{grid-area:1/2/3/3;}
-  .stk-mendhi,.stk-haldi,.stk-martini{
+  .stk-mendhi,.stk-haldi,.stk-swing,.stk-martini{
     --h:120px;
     position:relative;top:auto;left:auto;
     grid-area:2/1;justify-self:center;width:0;
@@ -442,7 +443,7 @@ a:focus-visible{outline:none;}
   .journey[data-pin] .leg:has(.stk) .day{grid-area:1/1;align-self:start;}
   .journey[data-pin] .leg:has(.stk) .event>*{grid-column:1/-1;justify-self:stretch;margin-inline:0;max-width:none;}
   .journey[data-pin] .leg:has(.stk) .event>h3{grid-area:2/1;align-self:end;margin-top:4px;}
-  .stk-mendhi,.stk-haldi,.stk-martini{
+  .stk-mendhi,.stk-haldi,.stk-swing,.stk-martini{
     --h:96px;
     grid-area:1/2/3/3;align-self:end;justify-self:end;width:auto;
     margin:calc(.14 * var(--h)) 0 4px;
@@ -1292,6 +1293,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p>Having our family and friends with us for this moment means so much to us. We look forward to celebrating together at the Baarat, wedding ceremony, and celebration that follows.</p>
 <p>Shuttles depart the hotel at 9:30 AM, with return transportation at approximately 3:30 PM.</p></div>
 </div>
+<picture class="stk stk-swing" data-px="-0.035" aria-hidden="true"><source type="image/webp" srcset="img/sticker-swing-sm.webp 440w, img/sticker-swing.webp 680w" sizes="150px"><img src="img/sticker-swing.png" width="680" height="680" alt="" loading="lazy" decoding="async"></picture>
 </article>
 <article class="leg" data-tab="Sunday Evening">
 <div class="day"><b>2.21</b></div>
