@@ -2589,7 +2589,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
     f.name.addEventListener('blur', function(){ setTimeout(function(){ if(document.activeElement !== f.name) closeList(); }, 150); });
 
     /* contact info, per guest: prefilled from the guest list, which stays in Supabase and is read one party
-       at a time (never in the guest list above); show first/last letters until they focus */
+       at a time (never in the guest list above); stay masked — typing replaces, never reveals the prefill */
     function maskReach(kind, v){
       v = String(v || '').trim();
       if(!v) return '';
@@ -2613,12 +2613,6 @@ picture{margin-block:clamp(52px,8vw,104px);}
       if(!i) return '';
       if(i.classList.contains('veiled') && i.dataset.full) return i.dataset.full.trim();
       return i.value.trim();
-    }
-    function unveil(i){
-      if(!i.classList.contains('veiled')) return;
-      i.value = i.dataset.full || i.value;
-      delete i.dataset.full;
-      i.classList.remove('veiled');
     }
     function lookUp(g){
       fetch(SUPABASE_URL + '/rest/v1/rpc/wedding_party_contacts', {
@@ -2665,9 +2659,15 @@ picture{margin-block:clamp(52px,8vw,104px);}
         var i = b.querySelector('input'), id = 'rsvp-' + i.dataset.reach + '-' + k;
         i.id = id;
         b.querySelector('label').htmlFor = id;
-        if(me) i.autocomplete = i.dataset.reach === 'email' ? 'email' : 'tel';
-        i.addEventListener('focus', function(){ unveil(i); });
-        i.addEventListener('input', function(){ unveil(i); });
+        /* keep autocomplete off so the browser doesn't paste the real address on focus */
+        i.addEventListener('focus', function(){
+          if(i.classList.contains('veiled')) i.select();
+        });
+        i.addEventListener('input', function(){
+          if(!i.classList.contains('veiled')) return;
+          delete i.dataset.full;
+          i.classList.remove('veiled');
+        });
       });
       var invited = g.events && g.events.length ? g.events : EVENTS;
       c.querySelectorAll('.check').forEach(function(l){
