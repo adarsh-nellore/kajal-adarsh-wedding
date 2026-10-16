@@ -11,7 +11,14 @@ const ok = (pw) => String(pw ?? '').trim().toLowerCase() === PASSWORD;
 const COOKIE = 'ka_pass';
 const YEAR = 60 * 60 * 24 * 365;
 
-const PUBLIC = [/^\/savethedate(\/|$)/, /^\/email\/[^/]+\.(png|jpe?g|gif|webp)$/, /^\/img\/og\.jpe?g$/, /^\/favicon\.(ico|png)$/, /^\/apple-touch-icon\.png$/];
+const PUBLIC = [
+  /^\/savethedate(\/|$)/,
+  /^\/email\/unsubscribe\/?$/,
+  /^\/email\/[^/]+\.(png|jpe?g|gif|webp)$/,
+  /^\/img\/og\.jpe?g$/,
+  /^\/favicon\.(ico|png)$/,
+  /^\/apple-touch-icon\.png$/,
+];
 
 // HTTPS stubs for the email footer's phone links — Gmail strips sms: hrefs, so the
 // mail points here and this page opens Messages (with a tappable fallback).
@@ -48,7 +55,10 @@ export default async function middleware(request) {
   if (url.hostname === 'kajal-adarsh-wedding.vercel.app') {
     return Response.redirect('https://kajal-adarsh.club' + url.pathname + url.search, 308);
   }
-  const text = TEXT[url.pathname.replace(/\/$/, '') || '/'];
+  const path = url.pathname.replace(/\/$/, '') || '/';
+  // RFC 8058 one-click + mailto fallback target for List-Unsubscribe headers.
+  if (path === '/email/unsubscribe') return unsubscribe(request);
+  const text = TEXT[path];
   if (text) return textPage(text);
   if (PUBLIC.some((re) => re.test(url.pathname))) return;
 
@@ -74,6 +84,35 @@ export default async function middleware(request) {
 }
 
 const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// One-click POST must return 200 with no body (RFC 8058). GET is for humans.
+function unsubscribe(request) {
+  if (request.method === 'POST') {
+    return new Response(null, {
+      status: 200,
+      headers: { 'cache-control': 'no-store' },
+    });
+  }
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return new Response('Method not allowed', { status: 405 });
+  }
+  const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Kajal &amp; Adarsh</title>
+</head>
+<body style="margin:0;background:#e9dbc0;color:#141414;font:18px/1.5 Georgia,serif;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;text-align:center;">
+<p style="margin:0;max-width:28em;">Got it — we won’t email this address again about the wedding.<br><span style="font-size:15px;opacity:.8;">If that was a mistake, just reply to Kajal or Adarsh.</span></p>
+</body>
+</html>`;
+  return new Response(html, {
+    status: 200,
+    headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
+  });
+}
 
 function textPage(t) {
   const html = `<!doctype html>

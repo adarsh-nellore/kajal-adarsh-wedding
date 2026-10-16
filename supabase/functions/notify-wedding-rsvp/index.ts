@@ -18,6 +18,7 @@
 // Deploy with: supabase functions deploy notify-wedding-rsvp --no-verify-jwt
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { coupleEmail, guestEmail, type Rsvp } from "../../../email/rsvp-email.ts";
+import { rsvpDeliveryHeaders } from "../../../email/resend-headers.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") || "";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
@@ -33,11 +34,27 @@ const CORS = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-async function send(to: string[], subject: string, body: { text: string; html: string }, replyTo?: string) {
+async function send(
+  to: string[],
+  subject: string,
+  body: { text: string; html: string },
+  opts: { replyTo?: string | string[]; guestFacing?: boolean; entityRef?: string } = {},
+) {
+  const payload: Record<string, unknown> = {
+    from: FROM,
+    to,
+    subject,
+    ...body,
+  };
+  if (opts.replyTo) payload.reply_to = opts.replyTo;
+  // Couple-facing alerts stay private; guest-facing confirmations get List-Unsubscribe.
+  if (opts.guestFacing) {
+    payload.headers = rsvpDeliveryHeaders({ entityRef: opts.entityRef });
+  }
   const resp = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { "Authorization": `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: FROM, to, subject, ...body, ...(replyTo ? { reply_to: replyTo } : {}) }),
+    body: JSON.stringify(payload),
   });
   return { ok: resp.ok, status: resp.status, resend: (await resp.text()).slice(0, 500) };
 }
@@ -94,7 +111,12 @@ Deno.serve(async (req: Request) => {
   // onboarding@resend.dev) doesn't block the other.
   const { subject, ...body } = coupleEmail(rs);
   const couple: Record<string, Awaited<ReturnType<typeof send>>> = {};
-  for (const to of TO) couple[to] = await send([to], subject, body, email || undefined);
+  for (const to of TO) {
+    couple[to] = await send([to], subject, body, {
+      replyTo: email || undefined,
+      entityRef: `rsvp-couple-${r.id}-${to}`,
+    });
+  }
   const anyOk = Object.values(couple).some((c) => c.ok);
 
   if (!anyOk) {
@@ -108,7 +130,11 @@ Deno.serve(async (req: Request) => {
   let guest = null;
   if (rs[0].send_copy && email) {
     const { subject: guestSubject, ...copy } = guestEmail(rs);
-    guest = await send([email], guestSubject, copy, TO[0]);
+    guest = await send([email], guestSubject, copy, {
+      replyTo: TO,
+      guestFacing: true,
+      entityRef: `rsvp-guest-${r.id}`,
+    });
   }
 
   return json({ ok: anyOk, couple, guest }, anyOk ? 200 : 502);

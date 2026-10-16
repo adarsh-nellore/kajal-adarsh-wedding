@@ -178,7 +178,7 @@ export function page(o: { title: string; preheader: string; rows: string }): str
 <noscript><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
 <style>td,div,a,span{font-family:Georgia,serif !important;}</style>
 <![endif]-->
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- No remote webfont fetch — third-party CSS can look like tracking to inbox filters. -->
 <style>
 :root{color-scheme:light only;supported-color-schemes:light;}
 body{margin:0;padding:0;width:100% !important;background-color:${BACKDROP};-webkit-text-size-adjust:100%;text-size-adjust:100%;}
@@ -255,9 +255,10 @@ export function guestEmail(rs: Rsvp[]) {
   const line = going
     ? "Your reply is in."
     : "We’ll miss you, and we’ll be thinking of you from Mexico City.";
+  // Photo is not linked — a linked hero reads as a marketing banner in Gmail.
   const rows =
     text(`Thank you, ${esc(by)}.`, { size: "l", weight: 600, top: 4, bottom: 0 }) +
-    rule() + photo(ENTER) + rule() + names() + dates() + rule() +
+    rule() + photo() + rule() + names() + dates() + rule() +
     text(esc(line), { bottom: 20 }) +
     rs.map((g) => guestBlock(g)).join("") + note(rs) +
     button(ENTER + "#rsvp", "Change your reply") +

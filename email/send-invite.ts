@@ -5,7 +5,8 @@
  * Future guest sends should use this helper so we keep:
  *   - HTML + strong plain-text multipart
  *   - one message per unique address (deduped within a party)
- *   - reply_to → personal Gmails (not marketing List-* / Precedence: bulk)
+ *   - reply_to → personal Gmails
+ *   - List-Unsubscribe + one-click (no Precedence: bulk / List-Id)
  *   - open/click tracking OFF on the domain (set in Resend dashboard; leave it)
  *
  * Usage:
@@ -20,6 +21,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { buildInvitationEmail, REPLY_TO } from "./invite-email.ts";
+import { inviteDeliveryHeaders } from "./resend-headers.ts";
 
 const FROM_DEFAULT = "Kajal & Adarsh <k+a@kajal-adarsh.club>";
 
@@ -84,7 +86,7 @@ export type SendInviteOpts = {
   firstName?: string;
   from?: string;
   replyTo?: string | string[];
-  /** Extra Resend headers — never set List-* or Precedence: bulk. */
+  /** Merged on top of inviteDeliveryHeaders (Precedence: bulk / List-Id still stripped). */
   headers?: Record<string, string>;
 };
 
@@ -112,11 +114,11 @@ export async function sendInvitation(opts: SendInviteOpts): Promise<{
   });
 
   const replyTo = opts.replyTo ?? [...REPLY_TO];
-  const headers = { ...(opts.headers ?? {}) };
-  // Strip bulk/marketing signals if a caller accidentally passes them.
-  for (const k of Object.keys(headers)) {
-    if (/^list-/i.test(k) || /^precedence$/i.test(k)) delete headers[k];
-  }
+  const entityRef = `invite-${Date.now().toString(36)}-${to[0].toLowerCase()}`;
+  const headers = inviteDeliveryHeaders({
+    entityRef,
+    extra: opts.headers,
+  });
 
   const body: Record<string, unknown> = {
     from: opts.from ?? FROM_DEFAULT,
@@ -125,8 +127,8 @@ export async function sendInvitation(opts: SendInviteOpts): Promise<{
     html: mail.html,
     text: mail.text,
     reply_to: replyTo,
+    headers,
   };
-  if (Object.keys(headers).length) body.headers = headers;
 
   const resp = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -161,11 +163,15 @@ async function main() {
   }
   const to = dedupeEmails(args.to);
   const mail = buildInvitationEmail({ firstNames: args.names });
+  const headers = inviteDeliveryHeaders({
+    entityRef: `invite-dry-${Date.now().toString(36)}`,
+  });
   const payload = {
     from: args.from,
     to,
     subject: mail.subject,
     reply_to: [...REPLY_TO],
+    headers,
     textBytes: mail.text.length,
     htmlBytes: mail.html.length,
   };
