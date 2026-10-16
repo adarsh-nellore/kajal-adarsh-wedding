@@ -81,7 +81,7 @@ function rows(greeting?: string): string {
     text(`${esc(INVITE)}<br>Visit our ${link(HOME, "wedding website", "#08040a")} for all the details.`) +
     rsvpButton(HOME) +
     text(`${esc(REPLY_BY)}<br>${esc(CANT_WAIT)}`) +
-    signoff() + QUESTIONS;
+    signoff() + rule() + QUESTIONS;
 }
 
 export type InvitationOpts = {
