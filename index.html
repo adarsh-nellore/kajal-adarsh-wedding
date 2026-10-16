@@ -459,7 +459,7 @@ a:focus-visible{outline:none;}
     margin:calc(.14 * var(--h)) 0 4px;
   }
   .journey[data-pin] .leg .stk img{translate:none;}
-  .stk-haldi{--h:74px;}
+  .stk-haldi{--h:56px;}
   .journey.index .leg:has(.stk) .event>*{opacity:0;transform:translateX(28px);}
   .journey.index .leg.on:has(.stk) .event>*{opacity:1;transform:none;transition:opacity .6s cubic-bezier(.2,.7,.3,1),transform .6s cubic-bezier(.2,.7,.3,1);}
 }
@@ -468,7 +468,7 @@ a:focus-visible{outline:none;}
    just above the title. Its negative bottom margin keeps the date's row (and so the date-to-title gap) as on the other days */
 @media (max-width:560px){
   .journey[data-pin] .leg:has(.stk-haldi) .event>h3{grid-column:1/-1;margin-top:24px;}
-  .journey[data-pin] .leg .stk-haldi{--h:72px;grid-area:1/2/2/3;align-self:start;margin:calc(.14 * var(--h)) 0 -28px;}
+  .journey[data-pin] .leg .stk-haldi{--h:56px;grid-area:1/2/2/3;align-self:start;margin:calc(.14 * var(--h)) 0 -28px 14px;}
 }
 
 .cover-cta{margin-top:clamp(28px,3.4vw,44px);}
