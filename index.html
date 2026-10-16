@@ -403,28 +403,28 @@ a:focus-visible{outline:none;}
 .stamp{position:relative;}
 /* Events stickers sit in the margin right of their card's text; phones don't have the room */
 .leg:has(.stk){position:relative;}
-.stk-mendhi,.stk-haldi,.stk-ganesh,.stk-martini{top:calc(.5 * var(--swing));left:calc(100% + var(--stk-gap));}
+.stk-mendhi,.stk-haldi,.stk-martini{top:calc(.5 * var(--swing));left:calc(100% + var(--stk-gap));}
 .stk-mendhi{--h:calc(1.3 * var(--stk-lg));--d:-3s;}
 .stk-haldi{--h:var(--stk-lg);--tilt:calc(-1 * var(--stk-tilt));--d:-1.7s;}
-.stk-ganesh{--h:calc(1.3 * var(--stk-lg));--d:-4.2s;}
 .stk-martini{--h:calc(1.3 * var(--stk-lg));--tilt:calc(-1 * var(--stk-tilt));--d:-2.6s;}
 /* second stickers tuck into the empty column under the date (whose visible foot is ~.65 of its font-size up);
    their cards grow so the rail doesn't clip them */
-.stk-samosa,.stk-cake{--h:var(--stk);top:calc(.65 * clamp(64px,8vw,120px) + 1.6 * var(--stk-gap));left:calc(.2 * var(--stk-gap));}
+.stk-samosa,.stk-churro{--h:var(--stk);top:calc(.65 * clamp(64px,8vw,120px) + 1.6 * var(--stk-gap));left:calc(.2 * var(--stk-gap));}
 .stk-samosa{--d:-3.6s;}
-.stk-cake{--d:-.8s;--tilt:calc(-1 * var(--stk-tilt));}
+.stk-churro{--h:calc(1.65 * var(--stk));--d:-.8s;--tilt:calc(-1 * var(--stk-tilt));}
 @media (min-width:1000px){
-  .leg:has(.stk-samosa),.leg:has(.stk-cake){min-height:calc(.65 * clamp(64px,8vw,120px) + 1.6 * var(--stk-gap) + 1.3 * var(--stk));}
+  .leg:has(.stk-samosa){min-height:calc(.65 * clamp(64px,8vw,120px) + 1.6 * var(--stk-gap) + 1.3 * var(--stk));}
+  .leg:has(.stk-churro){min-height:calc(.65 * clamp(64px,8vw,120px) + 1.6 * var(--stk-gap) + 2.1 * var(--stk));}
   .light-events .tabs{margin-bottom:calc(.6 * var(--inner) - 8px);}
 }
 /* below the desktop margin each card keeps just its first sticker, laid out in the card's grid so the rail measures it:
    tablets put it under the date, phones beside it. The top margin clears the tilt, rock and shadow from the rail's clip */
 @media (max-width:999px){
-  .stk-cake,.stk-samosa{display:none;}
+  .stk-churro,.stk-samosa{display:none;}
   .journey[data-pin] .leg:has(.stk){grid-template-rows:auto 1fr;}
   .journey[data-pin] .leg .day{grid-area:1/1;}
   .journey[data-pin] .leg:has(.stk) .leg-body{grid-area:1/2/3/3;}
-  .stk-mendhi,.stk-haldi,.stk-ganesh,.stk-martini{
+  .stk-mendhi,.stk-haldi,.stk-martini{
     --h:120px;
     position:relative;top:auto;left:auto;
     grid-area:2/1;justify-self:center;width:0;
@@ -442,7 +442,7 @@ a:focus-visible{outline:none;}
   .journey[data-pin] .leg:has(.stk) .day{grid-area:1/1;align-self:start;}
   .journey[data-pin] .leg:has(.stk) .event>*{grid-column:1/-1;justify-self:stretch;margin-inline:0;max-width:none;}
   .journey[data-pin] .leg:has(.stk) .event>h3{grid-area:2/1;align-self:end;margin-top:4px;}
-  .stk-mendhi,.stk-haldi,.stk-ganesh,.stk-martini{
+  .stk-mendhi,.stk-haldi,.stk-martini{
     --h:96px;
     grid-area:1/2/3/3;align-self:end;justify-self:end;width:auto;
     margin:calc(.14 * var(--h)) 0 4px;
@@ -1266,7 +1266,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="event">
 <h3>Welcome Party</h3>
 <p class="when">5 to 9 PM · Indoor/outdoor</p>
-<p>Join us for a warm welcome to Mexico City, with mendhi artists on hand for anyone who would like henna.</p>
+<p>We’re looking forward to kicking off the weekend together in Mexico City. Mendhi artists will be on hand for anyone who would like henna.</p>
 <p>The venue is approximately a 10-minute walk from the hotel. Shuttles will be available for older guests.</p></div>
 </div>
 <picture class="stk stk-mendhi" data-px="-0.035" aria-hidden="true"><source type="image/webp" srcset="img/sticker-mendhi-sm.webp 220w, img/sticker-mendhi.webp 340w" sizes="150px"><img src="img/sticker-mendhi.png" width="340" height="469" alt="" loading="lazy" decoding="async"></picture>
@@ -1277,8 +1277,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="event">
 <h3>Ganesh Pooja, Grah Shanti &amp; Haldi</h3>
 <p class="when">10 AM to 4 PM · Outdoor</p>
-<p>We’ll begin in the morning with a Ganesh Pooja and Grah Shanti to bless the start of the wedding, followed by the Haldi in the afternoon, with food and plenty of color.</p>
-<p>Shuttles leave the hotel at 9 AM and we’ll return to the hotel by 5 PM.</p></div>
+<p>We’ll begin the day with Ganesh Pooja and Grah Shanti to bless the start of our wedding, followed by the Haldi in the afternoon, with food and plenty of color.</p>
+<p>Shuttles depart the hotel at 9 AM, with return transportation by approximately 5:30 PM.</p></div>
 </div>
 <picture class="stk stk-haldi" data-px="-0.03" aria-hidden="true"><source type="image/webp" srcset="img/sticker-haldi-sm.webp 220w, img/sticker-haldi.webp 340w" sizes="200px"><img src="img/sticker-haldi.png" width="340" height="270" alt="" loading="lazy" decoding="async"></picture>
 <picture class="stk stk-samosa" data-px="-0.05" aria-hidden="true"><source type="image/webp" srcset="img/sticker-samosa-sm.webp 220w, img/sticker-samosa.webp 340w" sizes="160px"><img src="img/sticker-samosa.png" width="340" height="257" alt="" loading="lazy" decoding="async"></picture>
@@ -1288,11 +1288,10 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="leg-body">
 <div class="event">
 <h3>Baarat &amp; Wedding</h3>
-<p class="when">10 AM to 2:30 PM · Indoor</p>
-<p>We want all of our loved ones there with us for this important moment in our lives. Join us for the Baarat, the wedding ceremony, and the celebration that follows.</p>
-<p>Shuttles leave the hotel at 9:30 AM and return approximately 3 PM.</p></div>
+<p class="when">10 AM to 3 PM · Indoor</p>
+<p>Having our family and friends with us for this moment means so much to us. We look forward to celebrating together at the Baarat, wedding ceremony, and celebration that follows.</p>
+<p>Shuttles depart the hotel at 9:30 AM, with return transportation at approximately 3:30 PM.</p></div>
 </div>
-<picture class="stk stk-ganesh" data-px="-0.035" aria-hidden="true"><source type="image/webp" srcset="img/sticker-ganesh-sm.webp 220w, img/sticker-ganesh.webp 340w" sizes="150px"><img src="img/sticker-ganesh.png" width="340" height="496" alt="" loading="lazy" decoding="async"></picture>
 </article>
 <article class="leg" data-tab="Sunday Evening">
 <div class="day"><b>2.21</b></div>
@@ -1300,11 +1299,11 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="event">
 <h3>After Party</h3>
 <p class="when">7 PM to late · Indoor</p>
-<p>An elegant evening of music and dancing to close out the weekend in style.</p>
-<p>Shuttles leave the hotel at 6:30 PM.</p></div>
+<p>We’ll close the weekend in style with an evening of excellent music, dancing, and food!</p>
+<p>Shuttles depart the hotel at 6:30 PM.</p></div>
 </div>
 <picture class="stk stk-martini" data-px="-0.03" aria-hidden="true"><source type="image/webp" srcset="img/sticker-martini-sm.webp 220w, img/sticker-martini.webp 340w" sizes="130px"><img src="img/sticker-martini.png" width="340" height="550" alt="" loading="lazy" decoding="async"></picture>
-<picture class="stk stk-cake" data-px="-0.05" aria-hidden="true"><source type="image/webp" srcset="img/sticker-cake-sm.webp 220w, img/sticker-cake.webp 340w" sizes="140px"><img src="img/sticker-cake.png" width="340" height="281" alt="" loading="lazy" decoding="async"></picture>
+<picture class="stk stk-churro" data-px="-0.05" aria-hidden="true"><source type="image/webp" srcset="img/sticker-churro-sm.webp 440w, img/sticker-churro.webp 680w" sizes="140px"><img src="img/sticker-churro.png" width="680" height="1191" alt="" loading="lazy" decoding="async"></picture>
 </article>
 </div>
 </div>
@@ -1317,6 +1316,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <section class="journey light-stay" aria-label="Travel">
 <div class="journey-pin">
 <h2 id="stay">Travel</h2>
+<p class="lede">We know traveling for a wedding is a commitment, and we’re so grateful to everyone making the journey. We hope you’ll use the opportunity to experience a little of the city, too.</p>
 <div class="journey-rail">
 <article class="leg" data-tab="Hotel">
 <div class="leg-body">
@@ -1332,7 +1332,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <article class="leg" data-tab="Flying">
 <div class="leg-body">
 <p><strong class="lead">Airport:</strong> Please fly into MEX (Mexico City International Airport). MEX is approximately 20–45 minutes from the hotel, depending on traffic. Please keep in mind that the Welcome Event begins at 5 p.m. on Friday.</p>
-<p><strong class="lead">From SoCal:</strong> You may also consider flying from Tijuana (TIJ). Just keep in mind that crossing the border incurs some extra fees but is a great option.</p>
+<p><strong class="lead">From SoCal:</strong> You may consider flying from Tijuana (TIJ). Just keep in mind that the border crossing incurs a fee but is a great option.</p>
 <p><strong class="lead">Passports:</strong> Make sure your passport is valid for at least six months after your trip. International guests should check Mexico’s current entry and visa requirements for their nationality before booking.</p>
 </div>
 </article>
@@ -1340,7 +1340,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="leg-body">
 <p><strong class="lead">Arriving:</strong> When you arrive, Uber is the easiest and most cost effective way to get to the hotel. If you prefer, we can help arrange private transportation to the airport.</p>
 <p><strong class="lead">Wedding Shuttles:</strong> All wedding shuttles leave from Andaz Condesa. If you stay elsewhere, please be within easy walking distance.</p>
-<p><strong class="lead">Getting Around:</strong> When you’re not at a wedding event, we highly recommend walking! Condesa, Roma, and many of our favorite spots are best explored on foot.</p>
+<p><strong class="lead">Getting Around:</strong> When you have some free time, we highly recommend walking around! Condesa and Roma — the quaint neighborhoods around the hotel — are best explored by walking.</p>
 </div>
 </article>
 </div>
@@ -1359,7 +1359,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="leg-body">
 <picture><source srcset="img/look-welcome-sm.webp 900w, img/look-welcome.webp 1800w" sizes="(max-width:760px) 100vw, 44rem" type="image/webp"><img src="img/look-welcome.png" width="900" height="508" decoding="async" alt="Six guests in light, effortless evening wear: cocktail dresses, a skirt and blouse, a saree, and button-downs with trousers."></picture>
 <p class="when">Semi-Formal Western or Indian</p>
-<ul class="gems"><li>Cocktail dresses, skirts, anarkalis, button-downs &amp; trousers.</li><li>Whatever colors you want!</li><li>Evening vacation outfit, slightly elevated!</li></ul>
+<ul class="gems"><li>Cocktail dresses, skirts, anarkalis, button-downs &amp; light jackets.</li><li>Whatever colors you want!</li><li>Evening vacation outfit, slightly elevated! Avoid pointy heels.</li></ul>
 <p class="ps">P.S. Images are for inspiration purposes. We want you to wear something that fits your personal style, you feel comfortable in, and might already be in your closet!</p>
 </div>
 </article>
@@ -1368,7 +1368,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <picture><source srcset="img/look-haldi-sm.webp?v=5 900w, img/look-haldi.webp?v=5 1826w" sizes="(max-width:760px) 100vw, 44rem" type="image/webp"><img src="img/look-haldi.png?v=5" width="900" height="547" decoding="async" alt="Six guests in playful Indo-western outfits in bright, solid colors."></picture>
 <ul class="swatches" aria-label="Suggested colors"><li style="--c:#D94678"></li><li style="--c:#F46860"></li><li style="--c:#F57E59"></li><li style="--c:#DFAA50"></li><li style="--c:#D8D086"></li><li style="--c:#B4EF90"></li><li style="--c:#75D9DF"></li><li style="--c:#4981FD"></li></ul>
 <p class="when">Semi-Formal Western or Indian</p>
-<ul class="gems"><li>Playful Indo-western outfits.</li><li>Bright, solid colors encouraged.</li><li>Dress for sunshine! Wear shoes you feel comfy walking in. Avoid stiletto heels.</li></ul>
+<ul class="gems"><li>Light sarees, dresses, kurtas, button-downs, or fusion wear.</li><li>Bright, solid colors encouraged.</li><li>We’ll be outdoors and walking between spaces, so comfortable shoes suited for grass are encouraged.</li></ul>
 <p class="ps">P.S. Images are for inspiration purposes. We want you to wear something that fits your personal style, you feel comfortable in, and might already be in your closet!</p>
 </div>
 </article>
@@ -1377,7 +1377,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <picture><source srcset="img/look-wedding-sm.webp 900w, img/look-wedding.webp 1800w" sizes="(max-width:760px) 100vw, 44rem" type="image/webp"><img src="img/look-wedding.png" width="900" height="515" decoding="async" alt="Six guests in Indian formal wear in earthy and pastel tones: lehengas, sarees, sherwanis and suits."></picture>
 <ul class="swatches" aria-label="Suggested colors"><li style="--c:#D0A2A2"></li><li style="--c:#C26B64"></li><li style="--c:#B06133"></li><li style="--c:#DEA581"></li><li style="--c:#C6B88B"></li><li style="--c:#A6A783"></li><li style="--c:#AFC1A2"></li><li style="--c:#98AAA3"></li></ul>
 <p class="when">Formal Indian</p>
-<ul class="gems"><li>Lehengas, sarees, sherwanis &amp; suits.</li><li>Earthy &amp; pastel tones. Florals encouraged!</li><li>We will be indoors.</li></ul>
+<ul class="gems"><li>Lehengas, sarees, sherwanis &amp; suits.</li><li>Earthy &amp; pastel tones. Avoid cream, gold, and red.</li><li>We will be indoors.</li></ul>
 <p class="ps">P.S. Images are for inspiration purposes. We want you to wear something that fits your personal style, you feel comfortable in, and might already be in your closet!</p>
 </div>
 </article>
@@ -1386,7 +1386,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <picture><source srcset="img/look-reception-sm.webp 900w, img/look-reception.webp 1800w" sizes="(max-width:760px) 100vw, 44rem" type="image/webp"><img src="img/look-reception.png" width="900" height="521" decoding="async" alt="Six guests in black tie optional wear in jewel tones and dark colors: gowns, sarees, tuxedos and dark suits."></picture>
 <ul class="swatches" aria-label="Suggested colors"><li style="--c:#000000"></li><li style="--c:#0A2782"></li><li style="--c:#611228"></li><li style="--c:#7D4B7D"></li><li style="--c:#2E473A"></li><li style="--c:#205960"></li><li style="--c:#3A2419"></li><li style="--c:#2B2D33"></li></ul>
 <p class="when">Formal Black Tie Optional</p>
-<ul class="gems"><li>Gowns, sarees, tuxedos &amp; dark suits.</li><li>Jewel tones and dark colors.</li><li>Think classic &amp; glamorous.</li></ul>
+<ul class="gems"><li>Gowns, sarees, dark suits &amp; tuxedos.</li><li>Jewel tones and dark colors.</li><li>Think classic &amp; glamorous.</li></ul>
 <p class="ps">P.S. Images are for inspiration purposes. We want you to wear something that fits your personal style, you feel comfortable in, and might already be in your closet!</p>
 </div>
 </article>
@@ -1433,18 +1433,11 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p>We want to surprise everyone with the venues - trust us on this journey! The venues will be between a 20 - 40 minute drive from the hotel.</p>
 </div>
 </article>
-<article class="leg" data-tab="Attire">
-<div class="leg-body">
-<h3>What should I wear to each event?</h3>
-<p>Please use the attire guidance listed for each event as inspiration! We’d love for you to wear something that feels like you, fits your personal style, and that you feel comfortable in.</p>
-<p>The images are simply here for inspiration, so please don’t feel like you need to recreate a particular look. If you have any questions related to attire, please reach out to us.</p>
-</div>
-</article>
 <article class="leg" data-tab="Room Capacity">
 <div class="leg-body">
 <h3>How many people can stay in each room?</h3>
 <p>King rooms and suites accommodate 2 guests, while double rooms accommodate up to 3 guests. A rollaway bed may be available upon request.</p>
-<p>Additional guests can be accommodated for $30 per additional person per room per night, with a maximum of 3 adults or 2 adults + 2 children in double rooms.</p>
+<p>Additional guests can be accommodated for $30 per additional person per room per night, with a maximum of 3 adults in King rooms, and 3 adults or 2 adults + 2 children in double rooms.</p>
 </div>
 </article>
 <article class="leg" data-tab="Staying Elsewhere">
@@ -1454,26 +1447,25 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <p>Also, be sure to confirm that your accommodation has air conditioning. Many Mexico City accommodations do not have A/C.</p>
 </div>
 </article>
+<article class="leg" data-tab="Getting Ready">
+<div class="leg-body">
+<h3>What amenities are available at the hotel to help me get ready?</h3>
+<p>Steamers can be requested through the front desk. Before the wedding events, we’ll also have drapists available at the hotel to help anyone who needs a hand draping or pinning their saree or lehenga.</p>
+</div>
+</article>
 <article class="leg" data-tab="Extending">
 <div class="leg-body">
 <h3>How many extra days should I stay in Mexico City?</h3>
-<p>We recommend staying for at least three extra days if you’d like to explore the city and surrounding areas. And if you have a week, you definitely won’t run out of things to do.</p>
-<p>Some popular spots include:</p>
-<ul>
-<li>Chapultepec Park: Museums, gardens, and a fortress</li>
-<li>Coyoacán: Vibrant neighborhood that includes the Frida Kahlo Museum</li>
-<li>Zócalo &amp; Centro Histórico: Historic center, with tons of activity</li>
-<li>Xochimilco: Colorful boats and canals</li>
-<li>Teotihuacán: Aztec pyramids just outside Mexico City. Hot air balloons are popular!</li>
-</ul>
-<p>Our favorite way to spend time in Mexico City is wandering around neighborhoods. Roma, Condesa, and Polanco are full of great restaurants, coffee shops, boutiques, galleries, and bars.</p>
-<p>We’ll add some of our favorite spots to the website as we get closer to the wedding!</p>
+<p>We recommend staying for at least three extra days if you’d like to explore the city and surrounding areas. And if you have a week, you definitely won’t run out of things to do!</p>
+<p>Here is <a href="https://www.bontraveler.com/mexico-city-itinerary/" target="_blank" rel="noopener">one Mexico City guide</a> that might help you get started with planning an itinerary.</p>
+<p>Our favorite way to spend time in Mexico City is wandering around neighborhoods. Roma and Condesa, which neighbor the hotel, are full of great restaurants, coffee shops, boutiques, galleries, and bars.</p>
+<p>We’ll share some of our personal favorites for places to visit as we get closer to the wedding!</p>
 </div>
 </article>
 <article class="leg" data-tab="Taxi">
 <div class="leg-body">
 <h3>How should I get from the airport to the hotel?</h3>
-<p>We recommend using Uber to get from the airport to Andaz. The app DiDi is another popular option.</p>
+<p>We recommend using Uber to get from the airport to Andaz, and selecting Uber Black for more comfort (it is very affordable in CDMX).</p>
 <p>If you’re not comfortable using a rideshare app, please let us know and we’ll be happy to help arrange transportation.</p>
 </div>
 </article>
@@ -1486,23 +1478,27 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <article class="leg" data-tab="Weather">
 <div class="leg-body">
 <h3>What will the weather be like?</h3>
-<p>February is typically dry and comfortable in Mexico City, with warm days and cooler evenings. Expect daytime temperatures around 75°F and evenings around 60°F.</p>
+<p>February is dry and comfortable in Mexico City. Daytime temperatures are typically around 75°F and evenings around 60°F.</p>
 <p>Mexico City is also at a high elevation, so you may notice the altitude when you first arrive. Take it easy on your first day, stay hydrated, and wear sunscreen.</p>
 </div>
 </article>
 <article class="leg" data-tab="Safety">
 <div class="leg-body">
 <h3>What should I know about safety in Mexico City?</h3>
-<p>Mexico City is vibrant and welcoming, but like any major city, a little awareness goes a long way. Use Uber or authorized taxis rather than hailing cars on the street. Keep your belongings secure and in sight.</p>
-<p>For street food, look for busy stands with freshly prepared items, and hydrate with bottled water and electrolyte water, easily found in convenience stores.</p>
+<p>Mexico City is a major city, similar to New York or Los Angeles. We’ll be sticking to its safest neighborhoods. A few simple tips will help you feel comfortable during your stay:</p>
+<ul>
+<li><strong>Exploring:</strong> Use Uber and keep your belongings secure and within sight. Walking around the neighborhoods near the hotel is very safe.</li>
+<li><strong>Food and water:</strong> Use your judgment with street food, as everyone’s stomach is different. Look for busy stands serving freshly cooked, hot food. Stay hydrated with bottled water — don’t drink from the tap!</li>
+<li><strong>Language:</strong> Download Google Translate to make communicating in Spanish easy.</li>
+<li><strong>Hotel:</strong> The hotel has staff and security on-site around the clock, so there’s always someone available to help.</li>
+</ul>
 </div>
 </article>
 <article class="leg" data-tab="Free Time">
 <div class="leg-body">
 <h3>Will there be downtime over the weekend?</h3>
-<p>Yes! There will be no wedding event Saturday night.</p>
-<p>We’ll be back at the hotel around 4:00 p.m. after the daytime events, so the evening is yours. Rest, explore, grab a margarita, or make a dinner reservation with your group. Do whatever sounds most fun!</p>
-<p>If you don’t have plans, we’ll be hosting anyone who’d like to join us at our favorite taco place near the hotel.</p>
+<p>Yes! Saturday evening is free of scheduled wedding events, so feel free to rest, explore the city, or make a dinner reservation at one of the many great spots nearby.</p>
+<p>We’ll be gathering at a local taco spot near the hotel for anyone who’d like to join. It’s completely optional and an easy, casual dinner option!</p>
 </div>
 </article>
 <article class="leg" data-tab="WhatsApp">
@@ -1514,14 +1510,13 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <article class="leg" data-tab="Gifts">
 <div class="leg-body">
 <h3>Are you accepting gifts?</h3>
-<p>We do not want gifts for the wedding. Your presence is truly the best gift we could ask for!</p>
-<p>If you would like to give us something, we’ll share a newlywed cash fund link closer to the wedding.</p>
+<p>Your presence is the greatest gift, and we kindly ask for no gifts. If you’d like to give us something, we’ll share a newlywed cash fund closer to the wedding. For those who prefer to give a physical gift, please reach out to us about arranging delivery in California rather than bringing it to Mexico City.</p>
 </div>
 </article>
 <article class="leg" data-tab="Contact">
 <div class="leg-body">
 <h3>Who can we contact with questions?</h3>
-<p>Feel free to reach out to either of us on WhatsApp.</p>
+<p>Feel free to reach out to either of us via text or WhatsApp.</p>
 <p>Kajal · <a href="https://wa.me/19492931051" target="_blank" rel="noopener">949-293-1051</a><br>Adarsh · <a href="https://wa.me/14087521100" target="_blank" rel="noopener">408-752-1100</a></p>
 </div>
 </article>
