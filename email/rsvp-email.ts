@@ -143,7 +143,7 @@ export function card(rows: string): string {
       <!--[if mso]><table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->
       <table role="presentation" align="center" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${CARD}" class="card" style="width:100%;max-width:640px;margin:0 auto;background-color:${CARD};border-collapse:collapse;">
         <tr>
-          <td class="inner" style="padding:28px 0 32px;">
+          <td class="inner" style="padding:28px 0 16px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">${rows}
             </table>
           </td>
@@ -178,7 +178,7 @@ a[x-apple-data-detectors]{color:inherit !important;text-decoration:inherit !impo
 a img,a:focus,a:active{outline:none !important;}
 @media (max-width:620px){
   .shell{padding:0 !important;}
-  .inner{padding:20px 0 24px !important;}
+  .inner{padding:20px 0 14px !important;}
   .side{padding-left:20px !important;padding-right:20px !important;}
   .photo{padding:4px 20px 22px !important;}
   .fs-s{font-size:14px !important;}
