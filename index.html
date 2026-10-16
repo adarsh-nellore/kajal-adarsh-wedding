@@ -1092,6 +1092,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .find-note a{color:var(--gold);}
 /* the party: one quiet card per guest, the person replying first */
 .bulk{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 16px;margin-bottom:14px;font-size:17px;line-height:28px;color:rgba(234,227,214,.74);}
+.bulk[hidden]{display:none;}
 /* small text actions, in the links' manner: inline, a hairline just under the letters, solid once hovered or applied */
 .bulk .rsvp-again,.same-events .rsvp-again,.find-note .rsvp-again{
   display:inline;padding:0 0 1px;line-height:inherit;color:var(--gold);
@@ -1126,8 +1127,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 .guest-reach .box:not(.guest-plus) input:hover{border-color:rgba(var(--gold-rgb),.5);background:transparent;}
 .guest-reach .box:not(.guest-plus) input:focus{border-color:var(--gold);box-shadow:none;background:transparent;}
 .guest-reach .box:not(.guest-plus) > [aria-invalid="true"]{border-color:var(--gold);background:transparent;}
-/* prefilled contact stays veiled until they focus to change it */
-.guest-reach input.veiled:not(:focus){-webkit-text-security:disc;text-security:disc;}
+/* prefilled contact shows a few letters; full value on focus */
+.guest-reach input.veiled:not(:focus){color:rgba(234,227,214,.55);letter-spacing:.02em;}
 .guest .err{margin-top:8px;}
 /* fingers: every choice, event and link in the party is at least 44px tall */
 @media (pointer:coarse){
@@ -2587,7 +2588,37 @@ picture{margin-block:clamp(52px,8vw,104px);}
     f.name.addEventListener('blur', function(){ setTimeout(function(){ if(document.activeElement !== f.name) closeList(); }, 150); });
 
     /* contact info, per guest: prefilled from the guest list, which stays in Supabase and is read one party
-       at a time (never in the guest list above); the database marks what's unchanged */
+       at a time (never in the guest list above); show first/last letters until they focus */
+    function maskReach(kind, v){
+      v = String(v || '').trim();
+      if(!v) return '';
+      if(kind === 'email'){
+        var at = v.indexOf('@');
+        if(at < 1) return v.slice(0, 1) + '••••' + v.slice(-1);
+        var local = v.slice(0, at), domain = v.slice(at + 1);
+        var head = local.slice(0, Math.min(2, local.length));
+        var tail = local.length > 4 ? local.slice(-2) : (local.length > 2 ? local.slice(-1) : '');
+        var dot = domain.lastIndexOf('.');
+        var dHead = domain.slice(0, Math.min(1, domain.length));
+        var dTail = dot > 0 ? domain.slice(dot) : domain.slice(-Math.min(3, domain.length));
+        return head + '••••' + tail + '@' + dHead + '••••' + dTail;
+      }
+      var digits = v.replace(/\D/g, '');
+      if(digits.length >= 7) return digits.slice(0, 3) + '••••' + digits.slice(-3);
+      if(v.length < 4) return v.slice(0, 1) + '••';
+      return v.slice(0, 2) + '••••' + v.slice(-2);
+    }
+    function reachValue(i){
+      if(!i) return '';
+      if(i.classList.contains('veiled') && i.dataset.full) return i.dataset.full.trim();
+      return i.value.trim();
+    }
+    function unveil(i){
+      if(!i.classList.contains('veiled')) return;
+      i.value = i.dataset.full || i.value;
+      delete i.dataset.full;
+      i.classList.remove('veiled');
+    }
     function lookUp(g){
       fetch(SUPABASE_URL + '/rest/v1/rpc/wedding_party_contacts', {
         method: 'POST',
@@ -2600,8 +2631,9 @@ picture{margin-block:clamp(52px,8vw,104px);}
           if(!on) return;
           c.querySelectorAll('[data-reach]').forEach(function(i){
             var v = on[i.dataset.reach];
-            if(v && !i.value.trim()){
-              i.value = v;
+            if(v && !reachValue(i)){
+              i.dataset.full = v;
+              i.value = maskReach(i.dataset.reach, v);
               i.classList.add('veiled');
             }
           });
@@ -2633,8 +2665,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
         i.id = id;
         b.querySelector('label').htmlFor = id;
         if(me) i.autocomplete = i.dataset.reach === 'email' ? 'email' : 'tel';
-        i.addEventListener('focus', function(){ i.classList.remove('veiled'); });
-        i.addEventListener('input', function(){ i.classList.remove('veiled'); });
+        i.addEventListener('focus', function(){ unveil(i); });
+        i.addEventListener('input', function(){ unveil(i); });
       });
       var invited = g.events && g.events.length ? g.events : EVENTS;
       c.querySelectorAll('.check').forEach(function(l){
@@ -2719,7 +2751,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
           else if(a === 'yes' && !c.querySelector('.check input:checked')) msg = 'Please choose at least one event.';
           /* contact only appears after accept; the replier's email is required then (or if they want a copy) */
           var em = c.querySelector('[data-reach="email"]'), ph = c.querySelector('[data-reach="phone"]');
-          var ev = em.value.trim(), pv = ph.value.trim();
+          var ev = reachValue(em), pv = reachValue(ph);
           var needEmail = k === 0 && (a === 'yes' || f.copy.checked);
           var badE = ev ? !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ev) : needEmail;
           var badP = !!pv && pv.replace(/\D/g, '').length < 7;
@@ -2768,8 +2800,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
         return {
           id: uuid(),
           name: g.plus ? (plus.value.trim() || 'Guest of ' + by) : g.name,
-          email: c.querySelector('[data-reach="email"]').value.trim() || null,
-          phone: c.querySelector('[data-reach="phone"]').value.trim() || null,
+          email: reachValue(c.querySelector('[data-reach="email"]')) || null,
+          phone: reachValue(c.querySelector('[data-reach="phone"]')) || null,
           attending: on,
           guests: on ? 1 : 0,
           events: on ? Array.prototype.filter.call(c.querySelectorAll('.check:not([hidden]) input'), function(i){ return i.checked; }).map(function(i){ return i.value; }) : [],
