@@ -11,7 +11,7 @@ const ok = (pw) => String(pw ?? '').trim().toLowerCase() === PASSWORD;
 const COOKIE = 'ka_pass';
 const YEAR = 60 * 60 * 24 * 365;
 
-const PUBLIC = [/^\/savethedate(\/|$)/, /^\/email\/[^/]+\.(png|jpe?g|gif|webp)$/, /^\/img\/og\.jpe?g$/, /^\/favicon\.ico$/];
+const PUBLIC = [/^\/savethedate(\/|$)/, /^\/email\/[^/]+\.(png|jpe?g|gif|webp)$/, /^\/img\/og\.jpe?g$/, /^\/favicon\.(ico|png)$/, /^\/apple-touch-icon\.png$/];
 
 // HTTPS stubs for the email footer's phone links — Gmail strips sms: hrefs, so the
 // mail points here and this page opens Messages (with a tappable fallback).
@@ -105,6 +105,8 @@ function page(next, wrong) {
 <meta name="theme-color" content="#121212">
 <meta name="robots" content="noindex">
 <title>Kajal &amp; Adarsh</title>
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:title" content="Kajal &amp; Adarsh">
 <meta property="og:description" content="Mexico City · February 19–21, 2027">
 <meta property="og:image" content="https://kajal-adarsh.club/img/og.jpg">
