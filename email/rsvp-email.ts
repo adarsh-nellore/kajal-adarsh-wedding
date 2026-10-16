@@ -252,7 +252,7 @@ export function guestEmail(rs: Rsvp[]) {
     text(esc(line), { bottom: 20 }) +
     rs.map((g) => guestBlock(g)).join("") + note(rs) +
     button(ENTER + "#rsvp", "Change your reply") +
-    QUESTIONS;
+    rule() + QUESTIONS;
   return {
     subject: "Your RSVP for Kajal & Adarsh’s wedding",
     html: page({ title: "Kajal y Adarsh", preheader: line, rows }),
