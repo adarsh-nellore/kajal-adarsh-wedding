@@ -124,12 +124,12 @@ export const TEXT_KAJAL = SITE + "text/kajal";
 export const TEXT_ADARSH = SITE + "text/adarsh";
 
 export const QUESTIONS = rule() +
-  text("Questions? Reach out to us anytime.", { size: "s", bottom: 8 }) +
+  text("Questions? Message us anytime.", { size: "s", bottom: 8 }) +
   text(`Kajal · ${link(TEXT_KAJAL, "949-293-1051", LINK)}<br>Adarsh · ${link(TEXT_ADARSH, "408-752-1100", LINK)}`, { size: "s" }) +
   rule(24);
 
 export const QUESTIONS_TEXT = [
-  "Questions? Reach out to us anytime.",
+  "Questions? Message us anytime.",
   `Kajal · 949-293-1051 · ${TEXT_KAJAL}`,
   `Adarsh · 408-752-1100 · ${TEXT_ADARSH}`,
 ];
@@ -244,7 +244,7 @@ export function guestEmail(rs: Rsvp[]) {
   const by = rs[0].submitted_by || rs[0].name;
   const going = rs.some((g) => g.attending);
   const line = going
-    ? "Your reply is in. We can’t wait to celebrate with you in Mexico City."
+    ? "Your reply is in."
     : "We’ll miss you, and we’ll be thinking of you from Mexico City.";
   const rows =
     text(`Thank you, ${esc(by)}.`, { size: "l", weight: 600, top: 4 }) +
@@ -252,7 +252,7 @@ export function guestEmail(rs: Rsvp[]) {
     text(esc(line), { bottom: 20 }) +
     rs.map((g) => guestBlock(g)).join("") + note(rs) +
     button(ENTER + "#rsvp", "Change your reply") +
-    signoff() + QUESTIONS;
+    QUESTIONS;
   return {
     subject: "Your RSVP for Kajal & Adarsh’s wedding",
     html: page({ title: "Kajal y Adarsh", preheader: line, rows }),
@@ -267,9 +267,6 @@ export function guestEmail(rs: Rsvp[]) {
       "",
       ...plain(rs),
       `Change your reply: ${ENTER}#rsvp`,
-      "",
-      "With love,",
-      "Kajal & Adarsh",
       "",
       ...QUESTIONS_TEXT,
     ].join("\n"),
