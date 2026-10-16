@@ -1061,7 +1061,7 @@
     if (pwForm && pwInput) {
       pwForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        if (pwInput.value.trim().toLowerCase() === '2027') {
+        if (pwInput.value.trim().toLowerCase() === 'churro') {
           pwForm.classList.add('is-out');
           if (playGroup) playGroup.classList.remove('is-hidden');
           playBtn.focus();

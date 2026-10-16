@@ -4,11 +4,10 @@
 // The project's vercel.app address forwards to the domain.
 
 const PASSWORD = 'churro';
-// 2027 was the first password: its links still work, and cookies are still sealed
-// with it so guests who unlocked before the change stay unlocked.
-const ACCEPTED = [PASSWORD, '2027'];
+// Cookie is sealed with a fixed string (not the live password), so guests who
+// already unlocked keep access when the password changes.
 const SEAL = '2027';
-const ok = (pw) => ACCEPTED.includes(String(pw ?? '').trim().toLowerCase());
+const ok = (pw) => String(pw ?? '').trim().toLowerCase() === PASSWORD;
 const COOKIE = 'ka_pass';
 const YEAR = 60 * 60 * 24 * 365;
 
