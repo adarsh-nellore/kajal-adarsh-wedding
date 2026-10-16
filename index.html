@@ -8,7 +8,7 @@
 <meta name="description" content="Kajal &amp; Adarsh are getting married in Mexico City, 19–21 February 2027.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jaini&family=EB+Garamond:wght@400;500&family=Gochi+Hand&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jaini&family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
   --ground:#121212;
@@ -235,12 +235,13 @@ a:focus-visible{outline:none;}
 .teaser video{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#121212;cursor:pointer;}
 .teaser button{appearance:none;border:0;margin:0;padding:0;background:none;cursor:pointer;}
 .teaser button:focus-visible{outline:1px solid var(--gold);outline-offset:2px;}
-/* the strip: the two of us at the left, the city at the right, in marker (the one place the site writes by hand) */
+/* the strip: the two of us at the left, the city at the right, in marker (scanned handwriting) */
 .teaser-strip{height:var(--s);display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.teaser-strip p{
-  margin:0;padding-bottom:.06em;
-  font-family:'Gochi Hand',cursive;font-weight:400;font-size:clamp(19px,calc(var(--s) * .56),32px);line-height:1;
-  color:var(--ink);white-space:nowrap;
+.teaser-strip img{
+  display:block;width:auto;height:clamp(18px,calc(var(--s) * .55),30px);
+  object-fit:contain;object-position:center;flex:none;
+  /* Mexico City's y descender is in the asset; keep the body optically on the strip midline */
+  transform:translateY(1px);
 }
 /* on the film: a round play button in the middle that fades away while it plays; the speaker and full screen sit in the
    corner once it has started */
@@ -1210,8 +1211,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <button class="teaser-full" type="button" aria-label="Full screen"><svg class="ico-grow" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><svg class="ico-shrink" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5"/></svg></button>
 </div>
 <div class="teaser-strip">
-<p>K+A</p>
-<p>Mexico City</p>
+<img src="img/hand/ka.png?v=1" width="203" height="108" alt="K+A" decoding="async">
+<img src="img/hand/mexico-city.png?v=1" width="412" height="108" alt="Mexico City" decoding="async">
 </div>
 </figure>
 </header>
@@ -1296,7 +1297,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <div class="journey-rail">
 <article class="leg" data-tab="Hotel">
 <div class="leg-body">
-<a class="snapshot-link postcard" href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener" aria-label="Book at Andaz Mexico City Condesa"><img class="snapshot" src="img/andaz.webp" width="1024" height="683" alt="Lounge at Andaz Mexico City Condesa" loading="lazy" decoding="async"><div class="teaser-strip"><p>Andaz CDMX</p><p>condesa</p></div></a>
+<a class="snapshot-link postcard" href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener" aria-label="Book at Andaz Mexico City Condesa"><img class="snapshot" src="img/andaz.webp" width="1024" height="683" alt="Lounge at Andaz Mexico City Condesa" loading="lazy" decoding="async"><div class="teaser-strip"><img src="img/hand/andaz-cdmx.png?v=1" width="560" height="108" alt="Andaz CDMX" decoding="async"><img src="img/hand/condesa.png?v=1" width="401" height="108" alt="Condesa" decoding="async"></div></a>
 <div class="callout">
 <p><strong class="lead">Room Block:</strong> We’ve arranged a hotel block at Andaz Mexico City Condesa, a Hyatt hotel. The special rate is available Tuesday, Feb. 16 – Wednesday, Feb. 24.</p>
 <div class="ctas"><a class="book primary" href="https://www.hyatt.com/events/en-US/group-booking/MEXAZ/G-A618" target="_blank" rel="noopener">Booking Link</a><a class="book" href="https://maps.app.goo.gl/VpuFjPGXvN67A7yP8" target="_blank" rel="noopener">Directions</a></div>
