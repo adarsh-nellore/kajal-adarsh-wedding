@@ -972,7 +972,8 @@ picture{margin-block:clamp(52px,8vw,104px);}
 @keyframes else-in{from{opacity:0;}}
 /* floated so the legend lays out like a normal block heading inside its fieldset */
 .rsvp .group-h{float:left;width:100%;display:flex;align-items:baseline;gap:14px;margin-bottom:clamp(14px,1.8vw,18px);font-family:var(--body);font-weight:500;font-size:clamp(22px,2.6vw,27px);line-height:1.3;color:var(--gold);}
-.group-h + *{clear:both;}
+/* every sibling clears — not only the next one (a hidden .bulk would otherwise leave .party beside the float) */
+.group-h ~ *{clear:both;}
 .field + .field{margin-top:clamp(24px,2.8vw,32px);}
 .pair{display:grid;gap:clamp(24px,2.8vw,32px) clamp(28px,3.4vw,44px);}
 .pair > .field + .field{margin-top:0;}
