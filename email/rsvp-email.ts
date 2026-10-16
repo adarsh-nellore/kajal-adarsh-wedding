@@ -123,10 +123,10 @@ export const signoff = () => text("With love,<br>Kajal &amp; Adarsh");
 export const TEXT_KAJAL = SITE + "text/kajal";
 export const TEXT_ADARSH = SITE + "text/adarsh";
 
-export const QUESTIONS = rule() +
-  text("Questions? Message us anytime.", { size: "s", bottom: 8 }) +
-  text(`Kajal · ${link(TEXT_KAJAL, "949-293-1051", LINK)}<br>Adarsh · ${link(TEXT_ADARSH, "408-752-1100", LINK)}`, { size: "s" }) +
-  rule(24);
+/* no hairline rules — Gmail treats a rule + our names as a signature and collapses the footer */
+export const QUESTIONS =
+  text("Questions? Message us anytime.", { size: "s", top: 16, bottom: 8 }) +
+  text(`Kajal · ${link(TEXT_KAJAL, "949-293-1051", LINK)}<br>Adarsh · ${link(TEXT_ADARSH, "408-752-1100", LINK)}`, { size: "s", bottom: 28 });
 
 export const QUESTIONS_TEXT = [
   "Questions? Message us anytime.",
@@ -142,7 +142,7 @@ export function card(rows: string): string {
       <!--[if mso]><table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->
       <table role="presentation" align="center" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${CARD}" class="card" style="width:100%;max-width:640px;margin:0 auto;background-color:${CARD};border-collapse:collapse;">
         <tr>
-          <td class="inner" style="padding:28px 0 20px;">
+          <td class="inner" style="padding:28px 0 32px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">${rows}
             </table>
           </td>
@@ -177,7 +177,7 @@ a[x-apple-data-detectors]{color:inherit !important;text-decoration:inherit !impo
 a img,a:focus,a:active{outline:none !important;}
 @media (max-width:620px){
   .shell{padding:0 !important;}
-  .inner{padding:20px 0 12px !important;}
+  .inner{padding:20px 0 24px !important;}
   .side{padding-left:20px !important;padding-right:20px !important;}
   .photo{padding:4px 20px 22px !important;}
   .fs-s{font-size:14px !important;}
