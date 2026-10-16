@@ -2,12 +2,13 @@
 // session cookie (checked here as well as in the middleware); writes go to
 // Supabase with the service role key, which never leaves the server.
 //
-//   GET                         guests (all columns) and the RSVP replies
+//   GET                         guests, RSVP replies, and invitation status from Resend
 //   POST    {row} | {rows}      add guests (rows with an id re-add a deleted guest: Undo)
 //   POST    {place: {party, ids}}  put these guests in this party, in this order
 //   PATCH   ?id=  {changes}     edit one guest
 //   DELETE  ?id=                delete one guest; returns it, for Undo
 
+import { inviteStatus } from '../lib/invites.js';
 import { authed } from '../lib/session.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://zfhhknasebbhaifabszd.supabase.co';
@@ -101,11 +102,12 @@ async function run(fn) {
 
 export async function GET(request) {
   return (await guard(request, false)) || run(async () => {
-    const [guests, rsvps] = await Promise.all([
+    const [guests, rsvps, invites] = await Promise.all([
       db(`wedding_guests?select=${COLS}&order=party,sort_order,created_at,id`),
       db('wedding_rsvps?select=id,created_at,name,party,attending,events,dietary,plus_one,submission_id,submitted_by&order=created_at.desc'),
+      inviteStatus(),
     ]);
-    return json({ guests, rsvps });
+    return json({ guests, rsvps, invites });
   });
 }
 

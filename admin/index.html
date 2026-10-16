@@ -30,6 +30,8 @@ button{font:inherit;color:inherit;}
 .sub{margin:0 0 24px;color:rgba(var(--white-rgb),.7);display:flex;flex-wrap:wrap;gap:4px 18px;align-items:baseline;}
 .sub .grow{flex:1 1 auto;}
 #status{font-size:15px;color:rgba(var(--white-rgb),.55);transition:color .3s;}
+#invite-note{margin-top:-12px;font-size:15px;color:rgba(var(--white-rgb),.6);}
+#invite-note[hidden]{display:none;}
 #status.busy{color:rgba(var(--white-rgb),.75);}
 #status.err{color:#e59a8a;}
 .linkish{background:none;border:0;padding:0;color:var(--gold);text-decoration:underline;cursor:pointer;}
@@ -74,6 +76,7 @@ tr.phead{display:none;}
 td.h{width:28px;padding-left:0;padding-right:0;}
 td.party{width:64px;}
 td.em{width:220px;}
+td.iv{width:108px;font-size:15px;line-height:1.25;white-space:nowrap;}
 td.ph{width:150px;}
 td.no{width:170px;}
 td.rs{width:170px;font-size:15px;line-height:1.25;}
@@ -110,6 +113,11 @@ label .m{display:none;}
 .reply.yes{color:var(--gold);}
 .reply.nope{color:rgba(var(--white-rgb),.8);}
 .reply.none{color:rgba(var(--white-rgb),.3);}
+.invite{display:block;}
+.invite.opened{color:var(--gold);}
+.invite.sent,.invite.delivered{color:rgba(var(--white-rgb),.8);}
+.invite.none,.invite.noemail{color:rgba(var(--white-rgb),.3);}
+.invite.bad{color:#e59a8a;}
 td.rs small{display:block;font-size:13px;color:rgba(var(--white-rgb),.6);}
 
 tr.subtotal td{font-size:15px;color:rgba(var(--white-rgb),.6);padding-top:2px;padding-bottom:12px;}
@@ -150,6 +158,7 @@ body.is-dragging #newparty{display:block;}
     "h pa pa n n n n n n n n x"
     "h pl pl pl e1 e1 e2 e2 e3 e3 e4 e4"
     "h em em em em em em ph ph ph ph ."
+    "h iv iv iv iv iv iv iv iv iv iv ."
     "h no no no no no no no no no no ."
     "h rs rs rs rs rs rs rs rs rs rs .";
     column-gap:6px;padding:8px 0;border-top:1px solid rgba(var(--white-rgb),.08);}
@@ -159,7 +168,7 @@ body.is-dragging #newparty{display:block;}
   td.name{grid-area:n;}
   td.pl{grid-area:pl;text-align:left;}
   td.e1{grid-area:e1;} td.e2{grid-area:e2;} td.e3{grid-area:e3;} td.e4{grid-area:e4;}
-  td.em{grid-area:em;} td.ph{grid-area:ph;} td.no{grid-area:no;} td.rs{grid-area:rs;padding-left:3px;}
+  td.em{grid-area:em;} td.iv{grid-area:iv;padding-left:3px;} td.ph{grid-area:ph;} td.no{grid-area:no;} td.rs{grid-area:rs;padding-left:3px;}
   td.x{grid-area:x;}
   td.h .grip{height:100%;min-height:44px;}
   td.ev,td.pl{text-align:left;}
@@ -187,6 +196,7 @@ body.is-dragging #newparty{display:block;}
   <a id="csv" href="#" download="guest-list.csv">Download CSV</a>
   <a href="/?logout">Log out</a>
 </p>
+<p class="sub" id="invite-note" hidden></p>
 
 <div class="totals" id="totals"></div>
 
@@ -230,6 +240,7 @@ body.is-dragging #newparty{display:block;}
 <td class="ev e3"><label><input type="checkbox" data-ev="baarat-wedding"><span class="m">Sun</span></label></td>
 <td class="ev e4"><label><input type="checkbox" data-ev="after-party"><span class="m">After</span></label></td>
 <td class="em"><div class="em-line"><input data-f="email" type="email" placeholder="Email" aria-label="Email" autocomplete="off"><span class="flag" data-flag></span></div></td>
+<td class="iv"></td>
 <td class="ph"><input data-f="phone" type="tel" placeholder="Phone" aria-label="Phone" autocomplete="off"></td>
 <td class="no"><input data-f="note" placeholder="Note" aria-label="Note" autocomplete="off"></td>
 <td class="rs"></td>
@@ -248,7 +259,7 @@ body.is-dragging #newparty{display:block;}
   var ALL = EVENTS.map(function(e){ return e.id; });
   var $ = function(id){ return document.getElementById(id); };
   var table = $('sheet'), tpl = $('row');
-  var guests = [], rsvps = [], byId = {}, replies = null;
+  var guests = [], rsvps = [], byId = {}, replies = null, invites = { unavailable: true, openTracking: false, byEmail: {} };
 
   ['Fri', 'Sat', 'Sun', 'After'].forEach(function(_, i){
     var e = EVENTS[i], th = document.createElement('th');
@@ -259,7 +270,7 @@ body.is-dragging #newparty{display:block;}
     th.lastChild.textContent = e.day;
     $('head').appendChild(th);
   });
-  ['Email', 'Phone', 'Note', 'RSVP', ''].forEach(function(t){
+  ['Email', 'Invite', 'Phone', 'Note', 'RSVP', ''].forEach(function(t){
     var th = document.createElement('th');
     th.textContent = t;
     $('head').appendChild(th);
@@ -304,7 +315,7 @@ body.is-dragging #newparty{display:block;}
 
   function load(){
     return api('GET', '/api/guests').then(function(d){
-      guests = d.guests; rsvps = d.rsvps;
+      guests = d.guests; rsvps = d.rsvps; invites = d.invites || { unavailable: true, openTracking: false, byEmail: {} };
       $('loading').hidden = true;
       render();
     }, function(err){
@@ -426,6 +437,28 @@ body.is-dragging #newparty{display:block;}
     return out;
   }
   function replyOf(g){ var r = replies && replies[g.id]; return r ? (r.attending ? 'yes' : 'nope') : 'none'; }
+  function inviteOf(g){
+    if(!hasEmail(g)) return {label: 'No email', kind: 'noemail', title: ''};
+    if(!invites || invites.unavailable) return {label: '—', kind: 'none', title: (invites && invites.reason) || 'Invite status unavailable'};
+    var hit = invites.byEmail[String(g.email).trim().toLowerCase()];
+    if(!hit) return {label: 'Not sent', kind: 'none', title: ''};
+    var bad = {Bounced: 1, Failed: 1, Complained: 1, Suppressed: 1, Delayed: 1};
+    var kind = hit.label === 'Opened' ? 'opened' : bad[hit.label] ? 'bad' : (hit.label === 'Delivered' || hit.label === 'Sent' ? hit.label.toLowerCase() : 'sent');
+    var title = hit.at ? 'Sent ' + new Date(hit.at).toLocaleString() : '';
+    if(hit.event && hit.event !== hit.label.toLowerCase()) title = (title ? title + ' · ' : '') + hit.event;
+    if(invites.openTracking === false && (hit.label === 'Delivered' || hit.label === 'Sent')) title = (title ? title + '. ' : '') + 'Opens aren’t recorded for this send.';
+    return {label: hit.label, kind: kind, title: title};
+  }
+  function fillInvite(td, g){
+    if(!td) return;
+    var s = inviteOf(g);
+    td.textContent = '';
+    var el = document.createElement('span');
+    el.className = 'invite ' + s.kind;
+    el.textContent = s.label;
+    td.appendChild(el);
+    if(s.title) td.title = s.title; else td.removeAttribute('title');
+  }
   function fillReply(td, g){
     var r = replies[g.id];
     td.textContent = '';
@@ -468,7 +501,7 @@ body.is-dragging #newparty{display:block;}
       tb.dataset.party = p;
       var ph = document.createElement('tr');
       ph.className = 'phead';
-      ph.innerHTML = '<td colspan="13"></td>';
+      ph.innerHTML = '<td colspan="14"></td>';
       ph.firstChild.textContent = 'Party ' + p;
       tb.appendChild(ph);
       ps.map[p].forEach(function(g, k){ tb.appendChild(row(g, k === 0)); });
@@ -513,6 +546,7 @@ body.is-dragging #newparty{display:block;}
     tr.querySelectorAll('[data-ev]').forEach(function(c){ c.checked = ev.indexOf(c.dataset.ev) >= 0; });
     names(tr, g);
     flagContact(tr, g);
+    fillInvite(tr.querySelector('td.iv'), g);
     fillReply(tr.querySelector('td.rs'), g);
     return tr;
   }
@@ -547,6 +581,7 @@ body.is-dragging #newparty{display:block;}
       var g = byId[tr.dataset.id];
       if(!g) return;
       fillReply(tr.querySelector('td.rs'), g);
+      fillInvite(tr.querySelector('td.iv'), g);
       flagContact(tr, g);
       var others = named(g) ? byName[g.display_name.toLowerCase()].filter(function(o){ return o !== g.party; }) : [];
       tr.querySelector('.dupe').textContent = others.length ? 'also in party ' + others.join(', ') : '';
@@ -612,6 +647,17 @@ body.is-dragging #newparty{display:block;}
     var nums = ps.order.map(Number), missing = [];
     for(var n = 1; n <= Math.max.apply(null, nums.concat([0])); n++) if(nums.indexOf(n) < 0) missing.push(n);
     if(missing.length) notes.push('No party numbered ' + missing.join(', ') + '.');
+    var note = $('invite-note');
+    if(invites && invites.unavailable){
+      note.hidden = false;
+      note.textContent = 'Invite status isn’t available' + (invites.reason ? ' (' + invites.reason + ')' : '') + '. Set RESEND_API_KEY on the admin site.';
+    } else if(invites && invites.openTracking === false){
+      note.hidden = false;
+      note.textContent = 'Opens aren’t recorded. Open tracking is off for kajal-adarsh.club, so Delivered means the mail server accepted the invite.';
+    } else {
+      note.hidden = true;
+      note.textContent = '';
+    }
     replies.unmatched.forEach(function(r){
       notes.push('A reply from ' + r.name + ' (party ' + r.party + ') doesn’t match anyone on the list now.');
     });
@@ -651,12 +697,12 @@ body.is-dragging #newparty{display:block;}
       exportList.forEach(function(g){ rows.push([g.party, label(g), g.note || '']); });
       fname = 'no-contact-' + stamp + '.csv';
     } else {
-      rows = [['Party', 'First name', 'Last name', 'Plus one', 'Note'].concat(EVENTS.map(function(e){ return e.name + ' (' + e.day + ')'; })).concat(['Email', 'Phone', 'RSVP', 'RSVP name', 'Coming to', 'Preferences'])];
+      rows = [['Party', 'First name', 'Last name', 'Plus one', 'Note'].concat(EVENTS.map(function(e){ return e.name + ' (' + e.day + ')'; })).concat(['Email', 'Invite', 'Phone', 'RSVP', 'RSVP name', 'Coming to', 'Preferences'])];
       guests.forEach(function(g){
         var ev = invited(g), r = replies[g.id];
         rows.push([g.party, g.is_plus_one ? '' : g.first_name, g.is_plus_one ? '' : g.last_name, g.is_plus_one ? 'Yes' : '', g.note || '']
           .concat(EVENTS.map(function(e){ return ev.indexOf(e.id) >= 0 ? 'Yes' : ''; }))
-          .concat([g.email || '', g.phone || '', !r ? 'No reply' : r.attending ? 'Coming' : 'Not coming', r ? r.name : '',
+          .concat([g.email || '', inviteOf(g).label, g.phone || '', !r ? 'No reply' : r.attending ? 'Coming' : 'Not coming', r ? r.name : '',
             r && r.attending ? EVENTS.filter(function(e){ return (r.events || []).indexOf(e.id) >= 0; }).map(function(e){ return e.short; }).join(', ') : '',
             r && r.dietary || '']));
       });
