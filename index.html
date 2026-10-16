@@ -243,6 +243,8 @@ a:focus-visible{outline:none;}
   /* Mexico City's y descender is in the asset; keep the body optically on the strip midline */
   transform:translateY(1px);
 }
+/* teaser K+A only: denser ink fills its box, so it reads larger than Mexico City at the same height */
+.teaser > .teaser-strip img.hand-ka{height:clamp(14px,calc(var(--s) * .40),22px);}
 /* on the film: a round play button in the middle that fades away while it plays; the speaker and full screen sit in the
    corner once it has started */
 .teaser .teaser-play{
@@ -1211,7 +1213,7 @@ picture{margin-block:clamp(52px,8vw,104px);}
 <button class="teaser-full" type="button" aria-label="Full screen"><svg class="ico-grow" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><svg class="ico-shrink" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5"/></svg></button>
 </div>
 <div class="teaser-strip">
-<img src="img/hand/ka.png?v=1" width="203" height="108" alt="K+A" decoding="async">
+<img class="hand-ka" src="img/hand/ka.png?v=1" width="203" height="108" alt="K+A" decoding="async">
 <img src="img/hand/mexico-city.png?v=1" width="412" height="108" alt="Mexico City" decoding="async">
 </div>
 </figure>
