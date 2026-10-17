@@ -76,9 +76,9 @@ tr.phead{display:none;}
 td.h{width:28px;padding-left:0;padding-right:0;}
 td.party{width:64px;}
 td.em{width:220px;}
-td.iv{width:108px;font-size:15px;line-height:1.25;white-space:nowrap;}
 td.ph{width:150px;}
 td.no{width:170px;}
+th.iv,td.iv{width:108px;font-size:15px;line-height:1.25;white-space:nowrap;}
 td.rs{width:170px;font-size:15px;line-height:1.25;}
 td.x{width:36px;padding-right:0;text-align:right;}
 
@@ -158,8 +158,8 @@ body.is-dragging #newparty{display:block;}
     "h pa pa n n n n n n n n x"
     "h pl pl pl e1 e1 e2 e2 e3 e3 e4 e4"
     "h em em em em em em ph ph ph ph ."
-    "h iv iv iv iv iv iv iv iv iv iv ."
     "h no no no no no no no no no no ."
+    "h iv iv iv iv iv iv iv iv iv iv ."
     "h rs rs rs rs rs rs rs rs rs rs .";
     column-gap:6px;padding:8px 0;border-top:1px solid rgba(var(--white-rgb),.08);}
   tr.g td{display:block;width:auto;padding:2px 0;}
@@ -168,7 +168,7 @@ body.is-dragging #newparty{display:block;}
   td.name{grid-area:n;}
   td.pl{grid-area:pl;text-align:left;}
   td.e1{grid-area:e1;} td.e2{grid-area:e2;} td.e3{grid-area:e3;} td.e4{grid-area:e4;}
-  td.em{grid-area:em;} td.iv{grid-area:iv;padding-left:3px;} td.ph{grid-area:ph;} td.no{grid-area:no;} td.rs{grid-area:rs;padding-left:3px;}
+  td.em{grid-area:em;} td.ph{grid-area:ph;} td.no{grid-area:no;} td.iv{grid-area:iv;padding-left:3px;} td.rs{grid-area:rs;padding-left:3px;}
   td.x{grid-area:x;}
   td.h .grip{height:100%;min-height:44px;}
   td.ev,td.pl{text-align:left;}
@@ -240,9 +240,9 @@ body.is-dragging #newparty{display:block;}
 <td class="ev e3"><label><input type="checkbox" data-ev="baarat-wedding"><span class="m">Sun</span></label></td>
 <td class="ev e4"><label><input type="checkbox" data-ev="after-party"><span class="m">After</span></label></td>
 <td class="em"><div class="em-line"><input data-f="email" type="email" placeholder="Email" aria-label="Email" autocomplete="off"><span class="flag" data-flag></span></div></td>
-<td class="iv"></td>
 <td class="ph"><input data-f="phone" type="tel" placeholder="Phone" aria-label="Phone" autocomplete="off"></td>
 <td class="no"><input data-f="note" placeholder="Note" aria-label="Note" autocomplete="off"></td>
+<td class="iv"></td>
 <td class="rs"></td>
 <td class="x"><button type="button" class="del" aria-label="Delete">×</button></td>
 </tr>
@@ -270,9 +270,10 @@ body.is-dragging #newparty{display:block;}
     th.lastChild.textContent = e.day;
     $('head').appendChild(th);
   });
-  ['Email', 'Invite', 'Phone', 'Note', 'RSVP', ''].forEach(function(t){
+  ['Email', 'Phone', 'Note', 'Invite', 'RSVP', ''].forEach(function(t){
     var th = document.createElement('th');
     th.textContent = t;
+    if(t === 'Invite') th.className = 'iv';
     $('head').appendChild(th);
   });
 
@@ -441,16 +442,17 @@ body.is-dragging #newparty{display:block;}
     if(!hasEmail(g)) return {label: 'No email', kind: 'noemail', title: ''};
     if(!invites || invites.unavailable) return {label: '—', kind: 'none', title: (invites && invites.reason) || 'Invite status unavailable'};
     var hit = invites.byEmail[String(g.email).trim().toLowerCase()];
-    if(!hit) return {label: 'Not sent', kind: 'none', title: ''};
+    if(!hit) return {label: 'Not sent', kind: 'none', title: 'No invitation found in Resend for this email'};
     var bad = {Bounced: 1, Failed: 1, Complained: 1, Suppressed: 1, Delayed: 1};
-    var kind = hit.label === 'Opened' ? 'opened' : bad[hit.label] ? 'bad' : (hit.label === 'Delivered' || hit.label === 'Sent' ? hit.label.toLowerCase() : 'sent');
+    var label = hit.label === 'Delivered' ? 'Sent' : hit.label;
+    var kind = label === 'Opened' ? 'opened' : bad[label] ? 'bad' : (label === 'Sent' ? 'sent' : 'sent');
     var title = hit.at ? 'Sent ' + new Date(hit.at).toLocaleString() : '';
-    if(hit.label === 'Opened') title = (title ? title + ' · ' : '') + (hit.event === 'clicked' ? 'Clicked in Resend' : 'Opened in Resend');
-    else if(hit.event && hit.event !== hit.label.toLowerCase()) title = (title ? title + ' · ' : '') + hit.event;
-    else if(invites.openTracking === false && (hit.label === 'Delivered' || hit.label === 'Sent')) {
-      title = (title ? title + '. ' : '') + 'No open event in Resend for this send (open tracking is currently off).';
+    if(label === 'Opened') title = (title ? title + ' · ' : '') + (hit.event === 'clicked' ? 'Clicked in Resend' : 'Opened in Resend');
+    else if(hit.event && hit.event !== 'delivered' && hit.event !== 'sent' && hit.event !== label.toLowerCase()) title = (title ? title + ' · ' : '') + hit.event;
+    else if(invites.openTracking === false && label === 'Sent') {
+      title = (title ? title + '. ' : '') + 'Delivered in Resend; open tracking is off, so Opened only appears if Resend already recorded an open or click.';
     }
-    return {label: hit.label, kind: kind, title: title};
+    return {label: label, kind: kind, title: title};
   }
   function fillInvite(td, g){
     if(!td) return;
@@ -656,7 +658,7 @@ body.is-dragging #newparty{display:block;}
       note.textContent = 'Invite status isn’t available' + (invites.reason ? ' (' + invites.reason + ')' : '') + '. Set RESEND_API_KEY on the admin site.';
     } else if(invites && invites.openTracking === false){
       note.hidden = false;
-      note.textContent = 'Invite column uses Resend’s last event (Delivered, Opened, Bounced, …). Open tracking is off for kajal-adarsh.club, so new sends usually stay at Delivered; Opened appears when Resend has an open or click on that invite.';
+      note.textContent = 'Invite shows No email / Not sent / Sent / Opened / Bounced from Resend. Open tracking is off for kajal-adarsh.club, so most sent invites stay at Sent; Opened appears when Resend has an open or click.';
     } else {
       note.hidden = true;
       note.textContent = '';
@@ -700,12 +702,12 @@ body.is-dragging #newparty{display:block;}
       exportList.forEach(function(g){ rows.push([g.party, label(g), g.note || '']); });
       fname = 'no-contact-' + stamp + '.csv';
     } else {
-      rows = [['Party', 'First name', 'Last name', 'Plus one', 'Note'].concat(EVENTS.map(function(e){ return e.name + ' (' + e.day + ')'; })).concat(['Email', 'Invite', 'Phone', 'RSVP', 'RSVP name', 'Coming to', 'Preferences'])];
+      rows = [['Party', 'First name', 'Last name', 'Plus one', 'Note'].concat(EVENTS.map(function(e){ return e.name + ' (' + e.day + ')'; })).concat(['Email', 'Phone', 'Invite', 'RSVP', 'RSVP name', 'Coming to', 'Preferences'])];
       guests.forEach(function(g){
         var ev = invited(g), r = replies[g.id];
         rows.push([g.party, g.is_plus_one ? '' : g.first_name, g.is_plus_one ? '' : g.last_name, g.is_plus_one ? 'Yes' : '', g.note || '']
           .concat(EVENTS.map(function(e){ return ev.indexOf(e.id) >= 0 ? 'Yes' : ''; }))
-          .concat([g.email || '', inviteOf(g).label, g.phone || '', !r ? 'No reply' : r.attending ? 'Coming' : 'Not coming', r ? r.name : '',
+          .concat([g.email || '', g.phone || '', inviteOf(g).label, !r ? 'No reply' : r.attending ? 'Coming' : 'Not coming', r ? r.name : '',
             r && r.attending ? EVENTS.filter(function(e){ return (r.events || []).indexOf(e.id) >= 0; }).map(function(e){ return e.short; }).join(', ') : '',
             r && r.dietary || '']));
       });

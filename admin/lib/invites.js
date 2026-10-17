@@ -18,10 +18,12 @@ const PAGE = 100;
 const MAX_PAGES = 30;
 const TTL = 60_000;
 
+// Guest-facing status for the admin Invite column. "Delivered" from Resend
+// shows as "Sent" so the sheet reads: No email / Not sent / Sent / Opened / Bounced.
 const LABELS = {
   opened: 'Opened',
   clicked: 'Opened',
-  delivered: 'Delivered',
+  delivered: 'Sent',
   sent: 'Sent',
   delivery_delayed: 'Delayed',
   bounced: 'Bounced',
