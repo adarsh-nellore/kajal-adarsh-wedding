@@ -18,6 +18,7 @@
  *
  * Optional: --from 'Kajal & Adarsh <k+a@kajal-adarsh.club>'
  *           --dry-run   (print payload, do not send)
+ *           --no-cc     (omit INVITE_CC; guest To: only — saves quota; re-enable later)
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -44,15 +45,23 @@ function loadEnvLocal(): void {
 }
 
 function parseArgs(argv: string[]) {
-  const out: { to: string[]; names: string[]; from: string; dryRun: boolean } = {
+  const out: {
+    to: string[];
+    names: string[];
+    from: string;
+    dryRun: boolean;
+    noCc: boolean;
+  } = {
     to: [],
     names: [],
     from: FROM_DEFAULT,
     dryRun: false,
+    noCc: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--dry-run") out.dryRun = true;
+    else if (a === "--no-cc") out.noCc = true;
     else if (a === "--to") out.to = splitList(argv[++i] ?? "");
     else if (a === "--names") out.names = splitList(argv[++i] ?? "");
     else if (a === "--from") out.from = argv[++i] ?? FROM_DEFAULT;
@@ -245,7 +254,9 @@ async function main() {
   loadEnvLocal();
   const args = parseArgs(process.argv.slice(2));
   if (!args.to.length) {
-    console.error("Usage: node --experimental-strip-types email/send-invite.ts --to a@x.com,b@y.com [--names A,B] [--dry-run]");
+    console.error(
+      "Usage: node --experimental-strip-types email/send-invite.ts --to a@x.com,b@y.com [--names A,B] [--dry-run] [--no-cc]",
+    );
     process.exit(1);
   }
   const to = dedupeEmails(args.to);
@@ -253,13 +264,15 @@ async function main() {
   const headers = inviteDeliveryHeaders({
     entityRef: `invite-dry-${Date.now().toString(36)}`,
   });
+  const cc = args.noCc ? [] : [...INVITE_CC];
   const payload = {
     from: args.from,
     to,
     oneMessagePerRecipient: true,
     subject: mail.subject,
     reply_to: [...REPLY_TO],
-    cc: [...INVITE_CC],
+    cc,
+    noCc: args.noCc,
     headers,
     textBytes: mail.text.length,
     htmlBytes: mail.html.length,
@@ -274,6 +287,7 @@ async function main() {
     to,
     firstNames: args.names.length ? args.names : undefined,
     from: args.from,
+    cc,
   });
   console.log(JSON.stringify(result, null, 2));
   if (!result.ok) process.exit(1);
