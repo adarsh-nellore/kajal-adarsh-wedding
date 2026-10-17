@@ -2,7 +2,22 @@
 // buildInvitationEmail() gives { subject, html, text } for Resend or any sender;
 // pasteable() gives the same email as one self-contained table to paste into Gmail.
 
-import { ENTER, PASSWORD, QUESTIONS, QUESTIONS_TEXT, card, dates, esc, link, page, photo, rule, signoff, text } from "./rsvp-email.ts";
+import {
+  ENTER,
+  LINK,
+  PASSWORD,
+  TEXT_ADARSH,
+  TEXT_KAJAL,
+  card,
+  dates,
+  esc,
+  link,
+  page,
+  photo,
+  rule,
+  signoff,
+  text,
+} from "./rsvp-email.ts";
 
 export const HOME = ENTER;
 
@@ -10,11 +25,12 @@ const SUBJECT = "Invitation from Kajal and Adarsh · February 2027";
 const HEADLINE = "We'd love for you to join us, for the weekend of our dreams!";
 // Inbox snippet shown after the subject in Gmail/Apple Mail.
 const PREHEADER = "Invite for wedding inside - Feb. 19-21, 2027. RSVP link and more info.";
-const INVITE = "We're getting married in CDMX.";
-const DETAILS = "Dates, hotels, and everything else live on our site.";
-const DETAILS_BEFORE_LINK = "Dates, hotels, and everything else live on our";
+const OPENING =
+  "We're getting married in CDMX, and we can't wait to celebrate with our favorite people!";
+const DETAILS_BEFORE =
+  "We've put together everything you need to know about the weekend, including events, hotel block, and dress guidance on our";
 const REPLY_BY = "Please let us know by December 1, 2026.";
-const CANT_WAIT = "We can't wait to celebrate with you!";
+const HOPE = "We hope you can join us!";
 /** Personal Gmails for reply_to — guests reply to real inboxes, not k+a@. */
 export const REPLY_TO = ["adarsh.nellore@gmail.com", "949kjp@gmail.com"] as const;
 /** Always CC us on invite sends (recipient is omitted from CC if they are one of us). */
@@ -27,6 +43,19 @@ const rsvpCta = (href: string) =>
     `${link(href, "RSVP on our site", "#08040a")}. Password: <span style="font-weight:700;">${esc(PASSWORD)}</span>`,
     { size: "m", bottom: 16 },
   );
+
+const inviteQuestions =
+  text("Questions? We're happy to help!", { size: "s", top: 0, bottom: 8 }) +
+  text(
+    `Kajal · ${link(TEXT_KAJAL, "949-293-1051", LINK)}<br>Adarsh · ${link(TEXT_ADARSH, "408-752-1100", LINK)}`,
+    { size: "s", bottom: 0 },
+  );
+
+const inviteQuestionsText = [
+  "Questions? We're happy to help!",
+  `Kajal · 949-293-1051 · ${TEXT_KAJAL}`,
+  `Adarsh · 408-752-1100 · ${TEXT_ADARSH}`,
+];
 
 /** Wordmark as type, not a remote PNG — one fewer image fetch for inbox filters. */
 const titles = () =>
@@ -76,10 +105,12 @@ function rows(greeting?: string): string {
     : text(esc(HEADLINE), { size: "l", weight: 600, top: 4, bottom: 0 });
   return lead +
     rule() + photo() + rule() + titles() + dates() + rule() +
-    text(`${esc(INVITE)}<br>${esc(DETAILS_BEFORE_LINK)} ${link(HOME, "site", "#08040a")}.`) +
+    text(
+      `${esc(OPENING)} ${esc(DETAILS_BEFORE)} ${link(HOME, "wedding website", "#08040a")}.`,
+    ) +
     rsvpCta(HOME) +
-    text(`${esc(REPLY_BY)}<br>${esc(CANT_WAIT)}`) +
-    signoff() + rule() + QUESTIONS;
+    text(`${esc(REPLY_BY)}<br>${esc(HOPE)}`) +
+    signoff() + rule() + inviteQuestions;
 }
 
 export type InvitationOpts = {
@@ -105,19 +136,18 @@ export function buildInvitationEmail(opts: InvitationOpts = {}) {
       "Kajal y Adarsh",
       "February 19–21, 2027 · Mexico City, Mexico",
       "",
-      INVITE,
-      DETAILS,
-      `Our site: ${HOME}`,
+      `${OPENING} ${DETAILS_BEFORE} wedding website.`,
+      `Wedding website: ${HOME}`,
+      `RSVP on our site: ${HOME}`,
       `Password: ${PASSWORD}`,
       "",
-      "When you have a moment, tap RSVP on the site and tell us if you can make it.",
       REPLY_BY,
-      CANT_WAIT,
+      HOPE,
       "",
       "With love,",
       "Kajal & Adarsh",
       "",
-      ...QUESTIONS_TEXT,
+      ...inviteQuestionsText,
     ].join("\n"),
   };
 }
