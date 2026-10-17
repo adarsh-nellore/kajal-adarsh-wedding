@@ -8,8 +8,8 @@ export const HOME = ENTER;
 
 const SUBJECT = "Kajal & Adarsh · Mexico City · February 2027";
 const HEADLINE = "We'd love for you to join us, for the weekend of our dreams!";
-// Inbox snippet: personal note, not a promo teaser.
-const PREHEADER = "A note from us — February 19–21 in Mexico City.";
+// Inbox snippet shown after the subject in Gmail/Apple Mail.
+const PREHEADER = "Invite for wedding inside - Feb. 19-21, 2027. RSVP link and more info.";
 const INVITE = "We're getting married in CDMX.";
 const DETAILS = "Dates, hotels, and everything else live on our site.";
 const DETAILS_BEFORE_LINK = "Dates, hotels, and everything else live on our";
