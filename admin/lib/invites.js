@@ -3,10 +3,15 @@
 //
 // Open and click tracking are domain settings, not part of the send payload, and
 // they only apply to mail sent after a tracking subdomain is verified. Mail sent
-// while tracking is off never grows an "opened" event. Subjects that start with
+// while tracking is off never grows an "opened" event — but if Resend already has
+// opened/clicked on a message, we surface that. Subjects that start with
 // "[test]" (any case) are probes, not invitations.
 
-const SUBJECT = 'Kajal & Adarsh · Mexico City · February 2027';
+// Current + previous invite subjects (exact match). Keep both so older sends still resolve.
+const SUBJECTS = [
+  'Invitation from Kajal and Adarsh · February 2027',
+  'Kajal & Adarsh · Mexico City · February 2027',
+];
 const FROM = 'k+a@kajal-adarsh.club';
 const DOMAIN = 'kajal-adarsh.club';
 const PAGE = 100;
@@ -43,7 +48,7 @@ export function addressOf(raw) {
 
 export function isInvite(email) {
   const subject = String(email?.subject || '').trim();
-  if (!subject || isTestSubject(subject) || subject !== SUBJECT) return false;
+  if (!subject || isTestSubject(subject) || !SUBJECTS.includes(subject)) return false;
   return String(email.from || '').toLowerCase().includes(FROM);
 }
 
@@ -52,14 +57,14 @@ export function labelFor(event) {
   return LABELS[event] || String(event);
 }
 
-// messages are newest first, as Resend returns them. The first real invite for
-// an address wins, so a later page cannot overwrite a newer send.
+// messages are newest first, as Resend returns them. Index To: only (not CC/BCC)
+// so a guest's status is their invite, not a message that merely copied them.
+// The first real invite for an address wins, so a later page cannot overwrite a newer send.
 export function indexInvites(messages) {
   const byEmail = {};
   for (const message of messages || []) {
     if (!isInvite(message)) continue;
-    const addrs = [].concat(message.to || [], message.cc || [], message.bcc || []);
-    for (const raw of addrs) {
+    for (const raw of [].concat(message.to || [])) {
       const email = addressOf(raw);
       if (!email || byEmail[email]) continue;
       byEmail[email] = {
@@ -118,7 +123,8 @@ export async function inviteStatus() {
   if (cache && cache.until > Date.now()) return cache.value;
   try {
     const [messages, tracking] = await Promise.all([listEmails(key), openTracking(key)]);
-    const value = { unavailable: false, openTracking: tracking, byEmail: indexInvites(messages) };
+    const byEmail = indexInvites(messages);
+    const value = { unavailable: false, openTracking: tracking, byEmail };
     cache = { until: Date.now() + TTL, value };
     return value;
   } catch (error) {

@@ -445,8 +445,11 @@ body.is-dragging #newparty{display:block;}
     var bad = {Bounced: 1, Failed: 1, Complained: 1, Suppressed: 1, Delayed: 1};
     var kind = hit.label === 'Opened' ? 'opened' : bad[hit.label] ? 'bad' : (hit.label === 'Delivered' || hit.label === 'Sent' ? hit.label.toLowerCase() : 'sent');
     var title = hit.at ? 'Sent ' + new Date(hit.at).toLocaleString() : '';
-    if(hit.event && hit.event !== hit.label.toLowerCase()) title = (title ? title + ' · ' : '') + hit.event;
-    if(invites.openTracking === false && (hit.label === 'Delivered' || hit.label === 'Sent')) title = (title ? title + '. ' : '') + 'Opens aren’t recorded for this send.';
+    if(hit.label === 'Opened') title = (title ? title + ' · ' : '') + (hit.event === 'clicked' ? 'Clicked in Resend' : 'Opened in Resend');
+    else if(hit.event && hit.event !== hit.label.toLowerCase()) title = (title ? title + ' · ' : '') + hit.event;
+    else if(invites.openTracking === false && (hit.label === 'Delivered' || hit.label === 'Sent')) {
+      title = (title ? title + '. ' : '') + 'No open event in Resend for this send (open tracking is currently off).';
+    }
     return {label: hit.label, kind: kind, title: title};
   }
   function fillInvite(td, g){
@@ -653,7 +656,7 @@ body.is-dragging #newparty{display:block;}
       note.textContent = 'Invite status isn’t available' + (invites.reason ? ' (' + invites.reason + ')' : '') + '. Set RESEND_API_KEY on the admin site.';
     } else if(invites && invites.openTracking === false){
       note.hidden = false;
-      note.textContent = 'Opens aren’t recorded. Open tracking is off for kajal-adarsh.club, so Delivered means the mail server accepted the invite.';
+      note.textContent = 'Invite column uses Resend’s last event (Delivered, Opened, Bounced, …). Open tracking is off for kajal-adarsh.club, so new sends usually stay at Delivered; Opened appears when Resend has an open or click on that invite.';
     } else {
       note.hidden = true;
       note.textContent = '';
