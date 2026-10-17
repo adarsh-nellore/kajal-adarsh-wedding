@@ -19,6 +19,8 @@ import {
   text,
 } from "./rsvp-email.ts";
 
+export { COUPLE_INBOXES, INVITE_CC, REPLY_TO } from "./couple-addresses.ts";
+
 export const HOME = ENTER;
 
 const SUBJECT = "Invitation from Kajal and Adarsh · February 2027";
@@ -31,11 +33,6 @@ const DETAILS_BEFORE =
   "We've put together everything you need to know about the weekend, including events, hotel block, and dress guidance on our";
 const REPLY_BY = "Please let us know by December 1, 2026.";
 const HOPE = "We hope you can join us!";
-/** Personal Gmails for reply_to — guests reply to real inboxes, not k+a@. */
-export const REPLY_TO = ["adarsh.nellore@gmail.com", "949kjp@gmail.com"] as const;
-/** Always CC us on invite sends (recipient is omitted from CC if they are one of us). */
-export const INVITE_CC = ["949kjp@gmail.com", "adarsh.nellore@gmail.com"] as const;
-
 // Quiet CTA: underlined text + password in prose (no filled button / dashed promo box —
 // those read as marketing to Gmail's Promotions classifier).
 const rsvpCta = (href: string) =>

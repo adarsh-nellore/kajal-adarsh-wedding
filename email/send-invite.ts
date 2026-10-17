@@ -5,7 +5,8 @@
  * Future guest sends should use this helper so we keep:
  *   - HTML + strong plain-text multipart
  *   - one Resend message per unique address (never multi-To; that looks bulk)
- *   - reply_to + cc → personal Gmails (cc omitted when the recipient is us)
+ *   - reply_to → k+a@ (inbound forward fans replies to both Gmails; see invite-email.ts)
+ *   - cc → personal Gmails (cc omitted when the recipient is us)
  *   - List-Unsubscribe + one-click (no Precedence: bulk / List-Id)
  *   - open/click tracking OFF on the domain (set in Resend dashboard; leave it)
  *
@@ -20,7 +21,8 @@
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { buildInvitationEmail, INVITE_CC, REPLY_TO } from "./invite-email.ts";
+import { INVITE_CC, REPLY_TO } from "./couple-addresses.ts";
+import { buildInvitationEmail } from "./invite-email.ts";
 import { inviteDeliveryHeaders } from "./resend-headers.ts";
 
 const FROM_DEFAULT = "Kajal & Adarsh <k+a@kajal-adarsh.club>";
@@ -108,11 +110,27 @@ function ccForRecipient(to: string, cc: string[]): string[] {
   return dedupeEmails(cc).filter((addr) => addr.toLowerCase() !== toKey);
 }
 
+/** Flatten reply_to / cc opts into a deduped string list (Resend accepts string | string[]). */
+function normalizeAddressList(raw: string | string[]): string[] {
+  const parts = Array.isArray(raw) ? raw : [raw];
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const part of parts) {
+    for (const addr of splitList(String(part))) {
+      const key = addr.toLowerCase().replace(/^.*<([^>]+)>.*$/, "$1").trim();
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      out.push(addr);
+    }
+  }
+  return out;
+}
+
 async function postOneInvite(opts: {
   key: string;
   to: string;
   from: string;
-  replyTo: string | string[];
+  replyTo: string[];
   cc: string[];
   mail: ReturnType<typeof buildInvitationEmail>;
   headers?: Record<string, string>;
@@ -123,13 +141,14 @@ async function postOneInvite(opts: {
     extra: opts.headers,
   });
   const cc = ccForRecipient(opts.to, opts.cc);
+  // One-element arrays stay arrays; Resend serializes them as a single Reply-To.
   const body: Record<string, unknown> = {
     from: opts.from,
     to: [opts.to],
     subject: opts.mail.subject,
     html: opts.mail.html,
     text: opts.mail.text,
-    reply_to: opts.replyTo,
+    reply_to: opts.replyTo.length === 1 ? opts.replyTo[0] : opts.replyTo,
     headers,
   };
   if (cc.length) body.cc = cc;
@@ -174,7 +193,8 @@ export async function sendInvitation(opts: SendInviteOpts): Promise<SendInviteRe
     firstNames: opts.firstNames,
     firstName: opts.firstName,
   });
-  const replyTo = opts.replyTo ?? [...REPLY_TO];
+  // Always a string[] for Resend. Prefer one address: clients reply to the first only.
+  const replyTo = normalizeAddressList(opts.replyTo ?? [...REPLY_TO]);
   const cc = dedupeEmails(
     opts.cc === undefined
       ? [...INVITE_CC]

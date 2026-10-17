@@ -19,6 +19,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { coupleEmail, guestEmail, type Rsvp } from "../../../email/rsvp-email.ts";
 import { rsvpDeliveryHeaders } from "../../../email/resend-headers.ts";
+import { COUPLE_INBOXES, REPLY_TO } from "../../../email/couple-addresses.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") || "";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
@@ -26,7 +27,7 @@ const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 // Must be an address on the verified domain. onboarding@resend.dev only delivers
 // to the Resend account's own address and is not aligned for guests.
 const FROM = Deno.env.get("RESEND_FROM") || "Kajal & Adarsh <k+a@kajal-adarsh.club>";
-const TO = ["adarsh.nellore@gmail.com", "949kjp@gmail.com"];
+const TO = [...COUPLE_INBOXES];
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -131,7 +132,8 @@ Deno.serve(async (req: Request) => {
   if (rs[0].send_copy && email) {
     const { subject: guestSubject, ...copy } = guestEmail(rs);
     guest = await send([email], guestSubject, copy, {
-      replyTo: TO,
+      // Single domain Reply-To; inbound forward delivers guest replies to both of us.
+      replyTo: [...REPLY_TO],
       guestFacing: true,
       entityRef: `rsvp-guest-${r.id}`,
     });
