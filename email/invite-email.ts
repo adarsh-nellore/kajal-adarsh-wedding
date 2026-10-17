@@ -106,7 +106,7 @@ function rows(greeting?: string): string {
   return lead +
     rule() + photo() + rule() + titles() + dates() + rule() +
     text(
-      `${esc(OPENING)} ${esc(DETAILS_BEFORE)} ${link(HOME, "wedding website", "#08040a")}.`,
+      `${esc(OPENING)}<br>${esc(DETAILS_BEFORE)} ${link(HOME, "wedding website", "#08040a")}.`,
     ) +
     rsvpCta(HOME) +
     text(`${esc(REPLY_BY)}<br>${esc(HOPE)}`) +
@@ -136,7 +136,8 @@ export function buildInvitationEmail(opts: InvitationOpts = {}) {
       "Kajal y Adarsh",
       "February 19–21, 2027 · Mexico City, Mexico",
       "",
-      `${OPENING} ${DETAILS_BEFORE} wedding website.`,
+      OPENING,
+      `${DETAILS_BEFORE} wedding website.`,
       `Wedding website: ${HOME}`,
       `RSVP on our site: ${HOME}`,
       `Password: ${PASSWORD}`,
