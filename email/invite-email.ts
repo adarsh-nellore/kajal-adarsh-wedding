@@ -6,7 +6,7 @@ import { ENTER, PASSWORD, QUESTIONS, QUESTIONS_TEXT, card, dates, esc, link, pag
 
 export const HOME = ENTER;
 
-const SUBJECT = "Kajal & Adarsh · Mexico City · February 2027";
+const SUBJECT = "Invitation from Kajal and Adarsh · February 2027";
 const HEADLINE = "We'd love for you to join us, for the weekend of our dreams!";
 // Inbox snippet shown after the subject in Gmail/Apple Mail.
 const PREHEADER = "Invite for wedding inside - Feb. 19-21, 2027. RSVP link and more info.";
@@ -17,6 +17,8 @@ const REPLY_BY = "Please let us know by December 1, 2026.";
 const CANT_WAIT = "We can't wait to celebrate with you!";
 /** Personal Gmails for reply_to — guests reply to real inboxes, not k+a@. */
 export const REPLY_TO = ["adarsh.nellore@gmail.com", "949kjp@gmail.com"] as const;
+/** Always CC us on invite sends (recipient is omitted from CC if they are one of us). */
+export const INVITE_CC = ["949kjp@gmail.com", "adarsh.nellore@gmail.com"] as const;
 
 // Quiet CTA: underlined text + password in prose (no filled button / dashed promo box —
 // those read as marketing to Gmail's Promotions classifier).

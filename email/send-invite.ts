@@ -5,7 +5,7 @@
  * Future guest sends should use this helper so we keep:
  *   - HTML + strong plain-text multipart
  *   - one Resend message per unique address (never multi-To; that looks bulk)
- *   - reply_to → personal Gmails
+ *   - reply_to + cc → personal Gmails (cc omitted when the recipient is us)
  *   - List-Unsubscribe + one-click (no Precedence: bulk / List-Id)
  *   - open/click tracking OFF on the domain (set in Resend dashboard; leave it)
  *
@@ -20,7 +20,7 @@
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { buildInvitationEmail, REPLY_TO } from "./invite-email.ts";
+import { buildInvitationEmail, INVITE_CC, REPLY_TO } from "./invite-email.ts";
 import { inviteDeliveryHeaders } from "./resend-headers.ts";
 
 const FROM_DEFAULT = "Kajal & Adarsh <k+a@kajal-adarsh.club>";
@@ -86,6 +86,8 @@ export type SendInviteOpts = {
   firstName?: string;
   from?: string;
   replyTo?: string | string[];
+  /** Defaults to INVITE_CC; recipient is never also CCed. */
+  cc?: string | string[];
   /** Merged on top of inviteDeliveryHeaders (Precedence: bulk / List-Id still stripped). */
   headers?: Record<string, string>;
 };
@@ -100,11 +102,18 @@ export type SendInviteResult = {
   results?: SendInviteResult[];
 };
 
+/** CC list minus the To: address (Resend/Gmail get confused if both match). */
+function ccForRecipient(to: string, cc: string[]): string[] {
+  const toKey = to.trim().toLowerCase();
+  return dedupeEmails(cc).filter((addr) => addr.toLowerCase() !== toKey);
+}
+
 async function postOneInvite(opts: {
   key: string;
   to: string;
   from: string;
   replyTo: string | string[];
+  cc: string[];
   mail: ReturnType<typeof buildInvitationEmail>;
   headers?: Record<string, string>;
 }): Promise<SendInviteResult> {
@@ -113,6 +122,7 @@ async function postOneInvite(opts: {
     entityRef,
     extra: opts.headers,
   });
+  const cc = ccForRecipient(opts.to, opts.cc);
   const body: Record<string, unknown> = {
     from: opts.from,
     to: [opts.to],
@@ -122,6 +132,7 @@ async function postOneInvite(opts: {
     reply_to: opts.replyTo,
     headers,
   };
+  if (cc.length) body.cc = cc;
 
   const resp = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -164,6 +175,13 @@ export async function sendInvitation(opts: SendInviteOpts): Promise<SendInviteRe
     firstName: opts.firstName,
   });
   const replyTo = opts.replyTo ?? [...REPLY_TO];
+  const cc = dedupeEmails(
+    opts.cc === undefined
+      ? [...INVITE_CC]
+      : Array.isArray(opts.cc)
+        ? opts.cc
+        : [opts.cc],
+  );
   const from = opts.from ?? FROM_DEFAULT;
 
   if (to.length === 1) {
@@ -172,6 +190,7 @@ export async function sendInvitation(opts: SendInviteOpts): Promise<SendInviteRe
       to: to[0],
       from,
       replyTo,
+      cc,
       mail,
       headers: opts.headers,
     });
@@ -185,6 +204,7 @@ export async function sendInvitation(opts: SendInviteOpts): Promise<SendInviteRe
         to: addr,
         from,
         replyTo,
+        cc,
         mail,
         headers: opts.headers,
       }),
@@ -219,6 +239,7 @@ async function main() {
     oneMessagePerRecipient: true,
     subject: mail.subject,
     reply_to: [...REPLY_TO],
+    cc: [...INVITE_CC],
     headers,
     textBytes: mail.text.length,
     htmlBytes: mail.html.length,
