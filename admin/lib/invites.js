@@ -114,8 +114,15 @@ async function openTracking(key) {
   const found = (list.data || []).find((domain) => domain.name === DOMAIN);
   if (!found) return false;
   const domain = await resend(key, `/domains/${found.id}`);
-  // Both are required. A flag with no verified tracking subdomain does not insert a pixel.
-  return Boolean(domain.open_tracking) && Boolean(domain.tracking_subdomain);
+  // Flag + subdomain + verified Tracking CNAME are all required to insert a pixel.
+  const trackingVerified = (domain.records || []).some(
+    (record) => record.record === 'Tracking' && record.status === 'verified',
+  );
+  return (
+    Boolean(domain.open_tracking) &&
+    Boolean(domain.tracking_subdomain) &&
+    trackingVerified
+  );
 }
 
 export async function inviteStatus() {

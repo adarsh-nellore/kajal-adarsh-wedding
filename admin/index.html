@@ -464,7 +464,7 @@ body.is-dragging #newparty{display:block;}
     var title = hit.at ? 'Sent ' + new Date(hit.at).toLocaleString() : '';
     if(hit.event && hit.event !== 'delivered' && hit.event !== 'sent' && hit.event !== label.toLowerCase()) title = (title ? title + ' · ' : '') + hit.event;
     else if(invites.openTracking === false && label === 'Sent') {
-      title = (title ? title + '. ' : '') + 'Delivered in Resend; open tracking is off. Opened also appears when the party has an RSVP on file.';
+      title = (title ? title + '. ' : '') + 'Delivered in Resend; open tracking isn’t active yet. Opened also appears when the party has an RSVP on file.';
     }
     return {label: label, kind: kind, title: title};
   }
@@ -672,10 +672,10 @@ body.is-dragging #newparty{display:block;}
       note.textContent = 'Invite status isn’t available' + (invites.reason ? ' (' + invites.reason + ')' : '') + '. Set RESEND_API_KEY on the admin site.';
     } else if(invites && invites.openTracking === false){
       note.hidden = false;
-      note.textContent = 'Invite shows No email / Not sent / Sent / Opened / Bounced. Open tracking is off for kajal-adarsh.club, so Resend often stays at Sent; Opened also appears when Resend has an open/click or the party has an RSVP on file.';
+      note.textContent = 'Invite shows No email / Not sent / Sent / Opened / Bounced. Open tracking isn’t active yet for kajal-adarsh.club (flag off or tracking DNS not verified), so Resend often stays at Sent; Opened also appears when Resend has an open/click or the party has an RSVP on file.';
     } else {
-      note.hidden = true;
-      note.textContent = '';
+      note.hidden = false;
+      note.textContent = 'Open tracking is on for kajal-adarsh.club (click tracking off). Resend only records opens on future sends — past invites won’t retroactively show as Opened; RSVP on file still counts as Opened.';
     }
     replies.unmatched.forEach(function(r){
       notes.push('A reply from ' + r.name + ' (party ' + r.party + ') doesn’t match anyone on the list now.');
