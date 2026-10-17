@@ -8,7 +8,7 @@
 //   PATCH   ?id=  {changes}     edit one guest
 //   DELETE  ?id=                delete one guest; returns it, for Undo
 
-import { inviteStatus } from '../lib/invites.js';
+import { enrichWithRsvps, inviteStatus } from '../lib/invites.js';
 import { authed } from '../lib/session.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://zfhhknasebbhaifabszd.supabase.co';
@@ -102,11 +102,13 @@ async function run(fn) {
 
 export async function GET(request) {
   return (await guard(request, false)) || run(async () => {
-    const [guests, rsvps, invites] = await Promise.all([
+    const [guests, rsvps, invitesRaw] = await Promise.all([
       db(`wedding_guests?select=${COLS}&order=party,sort_order,created_at,id`),
       db('wedding_rsvps?select=id,created_at,name,party,attending,events,dietary,plus_one,submission_id,submitted_by&order=created_at.desc'),
       inviteStatus(),
     ]);
+    // RSVP on file (same party) counts as Opened alongside Resend opened/clicked.
+    const invites = enrichWithRsvps(invitesRaw, guests, rsvps);
     return json({ guests, rsvps, invites });
   });
 }

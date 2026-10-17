@@ -438,19 +438,33 @@ body.is-dragging #newparty{display:block;}
     return out;
   }
   function replyOf(g){ var r = replies && replies[g.id]; return r ? (r.attending ? 'yes' : 'nope') : 'none'; }
+  function partyHasReply(party){
+    if(!replies) return false;
+    return guests.some(function(g){ return g.party === party && replies[g.id]; });
+  }
   function inviteOf(g){
+    var hit = (hasEmail(g) && invites && invites.byEmail)
+      ? invites.byEmail[String(g.email).trim().toLowerCase()]
+      : null;
+    var viaRsvp = !!(replies && (replies[g.id] || partyHasReply(g.party)));
+    var openedResend = hit && (hit.label === 'Opened' || hit.event === 'opened' || hit.event === 'clicked');
+    var openedRsvp = viaRsvp || (hit && hit.event === 'rsvp');
+    if(openedResend || openedRsvp){
+      var title = hit && hit.at ? 'Sent ' + new Date(hit.at).toLocaleString() : '';
+      if(openedResend) title = (title ? title + ' · ' : '') + (hit.event === 'clicked' ? 'Clicked in Resend' : 'Opened in Resend');
+      else if(openedRsvp) title = (title ? title + ' · ' : '') + 'RSVP on file (counts as opened)';
+      return {label: 'Opened', kind: 'opened', title: title};
+    }
     if(!hasEmail(g)) return {label: 'No email', kind: 'noemail', title: ''};
     if(!invites || invites.unavailable) return {label: '—', kind: 'none', title: (invites && invites.reason) || 'Invite status unavailable'};
-    var hit = invites.byEmail[String(g.email).trim().toLowerCase()];
     if(!hit) return {label: 'Not sent', kind: 'none', title: 'No invitation found in Resend for this email'};
     var bad = {Bounced: 1, Failed: 1, Complained: 1, Suppressed: 1, Delayed: 1};
     var label = hit.label === 'Delivered' ? 'Sent' : hit.label;
-    var kind = label === 'Opened' ? 'opened' : bad[label] ? 'bad' : (label === 'Sent' ? 'sent' : 'sent');
+    var kind = bad[label] ? 'bad' : 'sent';
     var title = hit.at ? 'Sent ' + new Date(hit.at).toLocaleString() : '';
-    if(label === 'Opened') title = (title ? title + ' · ' : '') + (hit.event === 'clicked' ? 'Clicked in Resend' : 'Opened in Resend');
-    else if(hit.event && hit.event !== 'delivered' && hit.event !== 'sent' && hit.event !== label.toLowerCase()) title = (title ? title + ' · ' : '') + hit.event;
+    if(hit.event && hit.event !== 'delivered' && hit.event !== 'sent' && hit.event !== label.toLowerCase()) title = (title ? title + ' · ' : '') + hit.event;
     else if(invites.openTracking === false && label === 'Sent') {
-      title = (title ? title + '. ' : '') + 'Delivered in Resend; open tracking is off, so Opened only appears if Resend already recorded an open or click.';
+      title = (title ? title + '. ' : '') + 'Delivered in Resend; open tracking is off. Opened also appears when the party has an RSVP on file.';
     }
     return {label: label, kind: kind, title: title};
   }
@@ -658,7 +672,7 @@ body.is-dragging #newparty{display:block;}
       note.textContent = 'Invite status isn’t available' + (invites.reason ? ' (' + invites.reason + ')' : '') + '. Set RESEND_API_KEY on the admin site.';
     } else if(invites && invites.openTracking === false){
       note.hidden = false;
-      note.textContent = 'Invite shows No email / Not sent / Sent / Opened / Bounced from Resend. Open tracking is off for kajal-adarsh.club, so most sent invites stay at Sent; Opened appears when Resend has an open or click.';
+      note.textContent = 'Invite shows No email / Not sent / Sent / Opened / Bounced. Open tracking is off for kajal-adarsh.club, so Resend often stays at Sent; Opened also appears when Resend has an open/click or the party has an RSVP on file.';
     } else {
       note.hidden = true;
       note.textContent = '';

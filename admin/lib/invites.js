@@ -4,8 +4,9 @@
 // Open and click tracking are domain settings, not part of the send payload, and
 // they only apply to mail sent after a tracking subdomain is verified. Mail sent
 // while tracking is off never grows an "opened" event — but if Resend already has
-// opened/clicked on a message, we surface that. Subjects that start with
-// "[test]" (any case) are probes, not invitations.
+// opened/clicked on a message, we surface that. An RSVP on file for the guest's
+// party also counts as Opened (they clearly got the invite). Subjects that start
+// with "[test]" (any case) are probes, not invitations.
 
 // Current + previous invite subjects (exact match). Keep both so older sends still resolve.
 const SUBJECTS = [
@@ -132,4 +133,38 @@ export async function inviteStatus() {
   } catch (error) {
     return { unavailable: true, openTracking: false, byEmail: {}, reason: error.message || 'Resend request failed' };
   }
+}
+
+// Parties with any wedding_rsvps row have opened the invite (even when Resend
+// only shows delivered/sent, or open tracking was off). Upgrade those guests'
+// Resend status to Opened; keep bounce/complaint labels only when there is no RSVP.
+export function enrichWithRsvps(invites, guests, rsvps) {
+  const base = invites && typeof invites === 'object'
+    ? invites
+    : { unavailable: true, openTracking: false, byEmail: {} };
+  const byEmail = { ...(base.byEmail || {}) };
+  const parties = new Set();
+  for (const r of rsvps || []) {
+    const party = Number(r?.party);
+    if (Number.isInteger(party) && party > 0) parties.add(party);
+  }
+  if (!parties.size) return { ...base, byEmail };
+
+  for (const g of guests || []) {
+    if (!parties.has(Number(g.party))) continue;
+    const email = addressOf(g.email);
+    if (!email) continue;
+    const hit = byEmail[email];
+    if (!hit) {
+      byEmail[email] = { label: 'Opened', event: 'rsvp', at: null };
+      continue;
+    }
+    if (hit.label === 'Opened' || hit.event === 'opened' || hit.event === 'clicked') continue;
+    byEmail[email] = {
+      ...hit,
+      label: 'Opened',
+      event: 'rsvp',
+    };
+  }
+  return { ...base, byEmail };
 }
