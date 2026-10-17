@@ -105,8 +105,9 @@ function rows(greeting?: string): string {
     : text(esc(HEADLINE), { size: "l", weight: 600, top: 4, bottom: 0 });
   return lead +
     rule() + photo() + rule() + titles() + dates() + rule() +
+    text(`${esc(OPENING)}`) +
     text(
-      `${esc(OPENING)}<br>${esc(DETAILS_BEFORE)} ${link(HOME, "wedding website", "#08040a")}.`,
+      `${esc(DETAILS_BEFORE)} ${link(HOME, "wedding website", "#08040a")}.`,
     ) +
     rsvpCta(HOME) +
     text(`${esc(REPLY_BY)}<br>${esc(HOPE)}`) +
@@ -137,6 +138,7 @@ export function buildInvitationEmail(opts: InvitationOpts = {}) {
       "February 19–21, 2027 · Mexico City, Mexico",
       "",
       OPENING,
+      "",
       `${DETAILS_BEFORE} wedding website.`,
       `Wedding website: ${HOME}`,
       `RSVP on our site: ${HOME}`,
