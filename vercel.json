@@ -1,6 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/admin", "destination": "/", "permanent": false },
+    { "source": "/admin/(.*)", "destination": "/", "permanent": false }
+  ],
   "headers": [
     {
       "source": "/img/(.*)",

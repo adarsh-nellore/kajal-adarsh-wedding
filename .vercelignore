@@ -1,1 +1,3 @@
-admin
+# Do not ignore admin/ — kajal-adarsh-guests deploys with Root Directory=admin,
+# and Vercel applies this file to the whole repo before that root is applied.
+# Wedding site blocks /admin via vercel.json so those files stay off the public site.
