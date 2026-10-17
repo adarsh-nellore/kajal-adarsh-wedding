@@ -3,6 +3,8 @@
  *
  * Wedding invites are one-to-one notes, not a newsletter — but Gmail still
  * rewards a working List-Unsubscribe (and one-click) when mail looks bulk.
+ * Tradeoff: unsubscribe headers can nudge tab placement toward Promotions;
+ * we keep them for deliverability/reputation when sending many similar invites.
  * We never set Precedence: bulk or List-Id (those read as marketing).
  *
  * Open/click tracking is a domain setting in Resend — keep both OFF.

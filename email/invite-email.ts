@@ -2,7 +2,7 @@
 // buildInvitationEmail() gives { subject, html, text } for Resend or any sender;
 // pasteable() gives the same email as one self-contained table to paste into Gmail.
 
-import { BACKDROP, BUTTON, BUTTON_INK, ENTER, FONT, INK, PASSWORD, QUESTIONS, QUESTIONS_TEXT, card, dates, esc, link, names, page, photo, rule, signoff, text } from "./rsvp-email.ts";
+import { ENTER, PASSWORD, QUESTIONS, QUESTIONS_TEXT, card, dates, esc, link, page, photo, rule, signoff, text } from "./rsvp-email.ts";
 
 export const HOME = ENTER;
 
@@ -18,25 +18,17 @@ const CANT_WAIT = "We can't wait to celebrate with you!";
 /** Personal Gmails for reply_to — guests reply to real inboxes, not k+a@. */
 export const REPLY_TO = ["adarsh.nellore@gmail.com", "949kjp@gmail.com"] as const;
 
-// The RSVP button with the site's password on a lighter stub just beneath it.
-const rsvpButton = (href: string) => `
-        <tr>
-          <td class="side" align="center" style="padding:4px 32px 20px;">
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
-              <tr>
-                <td class="btn-bg" bgcolor="${BUTTON}" width="130" style="width:130px;background-color:${BUTTON};border:1px solid ${INK};">
-                  <a href="${esc(href)}" class="btn" style="display:block;padding:7px 8px;text-align:center;font-family:${FONT};font-size:20px;line-height:28px;color:${BUTTON_INK};text-decoration:none;">RSVP</a>
-                </td>
-              </tr>
-            </table>
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td height="10" style="height:10px;line-height:10px;font-size:0;">&nbsp;</td></tr></table>
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
-              <tr>
-                <td class="backdrop ink" bgcolor="${BACKDROP}" align="center" style="padding:6px 16px;background-color:${BACKDROP};border:1px dashed ${INK};font-family:${FONT};font-size:18px;line-height:24px;color:${INK};text-align:center;">Password: <span style="font-weight:700;">${esc(PASSWORD)}</span></td>
-              </tr>
-            </table>
-          </td>
-        </tr>`;
+// Quiet CTA: underlined text + password in prose (no filled button / dashed promo box —
+// those read as marketing to Gmail's Promotions classifier).
+const rsvpCta = (href: string) =>
+  text(
+    `${link(href, "RSVP on our site", "#08040a")}. Password: <span style="font-weight:700;">${esc(PASSWORD)}</span>`,
+    { size: "m", bottom: 16 },
+  );
+
+/** Wordmark as type, not a remote PNG — one fewer image fetch for inbox filters. */
+const titles = () =>
+  text("Kajal y Adarsh", { size: "l", weight: 600, top: 4, bottom: 14 });
 
 /** Skip blanks, "Guest", "Guest of …", and other placeholders without a real first name. */
 function isRealFirstName(name: string): boolean {
@@ -81,9 +73,9 @@ function rows(greeting?: string): string {
       text(esc(HEADLINE), { size: "l", weight: 600, bottom: 0 })
     : text(esc(HEADLINE), { size: "l", weight: 600, top: 4, bottom: 0 });
   return lead +
-    rule() + photo() + rule() + names() + dates() + rule() +
+    rule() + photo() + rule() + titles() + dates() + rule() +
     text(`${esc(INVITE)}<br>${esc(DETAILS_BEFORE_LINK)} ${link(HOME, "site", "#08040a")}.`) +
-    rsvpButton(HOME) +
+    rsvpCta(HOME) +
     text(`${esc(REPLY_BY)}<br>${esc(CANT_WAIT)}`) +
     signoff() + rule() + QUESTIONS;
 }

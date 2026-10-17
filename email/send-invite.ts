@@ -4,7 +4,7 @@
  *
  * Future guest sends should use this helper so we keep:
  *   - HTML + strong plain-text multipart
- *   - one message per unique address (deduped within a party)
+ *   - one Resend message per unique address (never multi-To; that looks bulk)
  *   - reply_to → personal Gmails
  *   - List-Unsubscribe + one-click (no Precedence: bulk / List-Id)
  *   - open/click tracking OFF on the domain (set in Resend dashboard; leave it)
@@ -90,50 +90,43 @@ export type SendInviteOpts = {
   headers?: Record<string, string>;
 };
 
-/**
- * POST https://api.resend.com/emails — one transactional message.
- * Does not use Broadcasts, Audiences, or marketing batch APIs.
- */
-export async function sendInvitation(opts: SendInviteOpts): Promise<{
+export type SendInviteResult = {
   ok: boolean;
   status: number;
   id?: string;
   error?: string;
   to: string[];
-}> {
-  loadEnvLocal();
-  const key = process.env.RESEND_API_KEY || "";
-  if (!key) return { ok: false, status: 0, error: "RESEND_API_KEY is not set", to: [] };
+  /** Present when several addresses were split into one-message-each sends. */
+  results?: SendInviteResult[];
+};
 
-  const to = dedupeEmails(Array.isArray(opts.to) ? opts.to : [opts.to]);
-  if (!to.length) return { ok: false, status: 0, error: "no valid recipients", to: [] };
-
-  const mail = buildInvitationEmail({
-    firstNames: opts.firstNames,
-    firstName: opts.firstName,
-  });
-
-  const replyTo = opts.replyTo ?? [...REPLY_TO];
-  const entityRef = `invite-${Date.now().toString(36)}-${to[0].toLowerCase()}`;
+async function postOneInvite(opts: {
+  key: string;
+  to: string;
+  from: string;
+  replyTo: string | string[];
+  mail: ReturnType<typeof buildInvitationEmail>;
+  headers?: Record<string, string>;
+}): Promise<SendInviteResult> {
+  const entityRef = `invite-${Date.now().toString(36)}-${opts.to.toLowerCase()}`;
   const headers = inviteDeliveryHeaders({
     entityRef,
     extra: opts.headers,
   });
-
   const body: Record<string, unknown> = {
-    from: opts.from ?? FROM_DEFAULT,
-    to,
-    subject: mail.subject,
-    html: mail.html,
-    text: mail.text,
-    reply_to: replyTo,
+    from: opts.from,
+    to: [opts.to],
+    subject: opts.mail.subject,
+    html: opts.mail.html,
+    text: opts.mail.text,
+    reply_to: opts.replyTo,
     headers,
   };
 
   const resp = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${key}`,
+      Authorization: `Bearer ${opts.key}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
@@ -150,7 +143,61 @@ export async function sendInvitation(opts: SendInviteOpts): Promise<{
     status: resp.status,
     id: parsed.id,
     error: resp.ok ? undefined : parsed.message || raw.slice(0, 400),
+    to: [opts.to],
+  };
+}
+
+/**
+ * POST https://api.resend.com/emails — one transactional message per address.
+ * Multi-address `to` is split (never one message with many To:). No Broadcasts/Audiences.
+ */
+export async function sendInvitation(opts: SendInviteOpts): Promise<SendInviteResult> {
+  loadEnvLocal();
+  const key = process.env.RESEND_API_KEY || "";
+  if (!key) return { ok: false, status: 0, error: "RESEND_API_KEY is not set", to: [] };
+
+  const to = dedupeEmails(Array.isArray(opts.to) ? opts.to : [opts.to]);
+  if (!to.length) return { ok: false, status: 0, error: "no valid recipients", to: [] };
+
+  const mail = buildInvitationEmail({
+    firstNames: opts.firstNames,
+    firstName: opts.firstName,
+  });
+  const replyTo = opts.replyTo ?? [...REPLY_TO];
+  const from = opts.from ?? FROM_DEFAULT;
+
+  if (to.length === 1) {
+    return postOneInvite({
+      key,
+      to: to[0],
+      from,
+      replyTo,
+      mail,
+      headers: opts.headers,
+    });
+  }
+
+  const results: SendInviteResult[] = [];
+  for (const addr of to) {
+    results.push(
+      await postOneInvite({
+        key,
+        to: addr,
+        from,
+        replyTo,
+        mail,
+        headers: opts.headers,
+      }),
+    );
+  }
+  const failed = results.find((r) => !r.ok);
+  return {
+    ok: !failed,
+    status: failed?.status ?? results[0]?.status ?? 0,
+    id: results.map((r) => r.id).filter(Boolean).join(",") || undefined,
+    error: failed?.error,
     to,
+    results,
   };
 }
 
@@ -169,11 +216,14 @@ async function main() {
   const payload = {
     from: args.from,
     to,
+    oneMessagePerRecipient: true,
     subject: mail.subject,
     reply_to: [...REPLY_TO],
     headers,
     textBytes: mail.text.length,
     htmlBytes: mail.html.length,
+    imgs: (mail.html.match(/<img /g) || []).length,
+    hasBtn: mail.html.includes("btn-bg"),
   };
   if (args.dryRun) {
     console.log(JSON.stringify({ dryRun: true, ...payload, textPreview: mail.text.slice(0, 280) }, null, 2));
